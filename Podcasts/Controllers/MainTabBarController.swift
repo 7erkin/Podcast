@@ -9,7 +9,14 @@
 import Foundation
 import UIKit
 
-class MainTabBarController: UITabBarController {
+protocol PlayerPresenting {
+    func presentPlayer(withEpisode episode: Episode)
+}
+
+class MainTabBarController: UITabBarController, PlayerPresenting, PlayerViewDelegate {
+    private var playerController: PlayerController!
+    private weak var playerView: PlayerView?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -17,6 +24,56 @@ class MainTabBarController: UITabBarController {
         view.backgroundColor = .white
         
         setupViewControllers()
+    }
+    
+    // MARK: - PlayerViewDelegate
+    func dissmis() {
+        self.playerView?.isDissmised = true
+        performShowingTabBarWithAnimation()
+    }
+    
+    func enlarge() {
+        self.playerView?.isDissmised = false
+        performHiddingTabBarWithAnimation()
+    }
+    
+    // MARK: - PlayerPresenting
+    func presentPlayer(withEpisode episode: Episode) {
+        if playerController == Optional.none {
+            playerController = PlayerController()
+            playerController.episode = episode
+            addChild(playerController)
+            let playerView = playerController.view.subviews.first! as! PlayerView
+            playerView.delegate = self
+            playerView.frame = tabBar.frame
+            view.insertSubview(playerView, belowSubview: tabBar)
+            self.playerView = playerView
+        }
+        enlarge()
+    }
+    
+    func performHiddingTabBarWithAnimation() {
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0,
+            options: [.curveEaseIn],
+            animations: {[weak self] in
+                self?.tabBar.isHidden = true
+            },
+            completion: nil
+        )
+    }
+    
+    func performShowingTabBarWithAnimation() {
+        UIView.animate(
+            withDuration: 0.5,
+            delay: 0,
+            options: [.curveEaseIn],
+            animations: {[weak self] in
+                self?.tabBar.isHidden = false
+            },
+            completion: nil
+        )
     }
     
     // MARK: - Setup Functions

@@ -35,9 +35,12 @@ class EpisodesController: UITableViewController {
         }
     }
     
+    var playerLauncher: PlayerPresenting!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        playerLauncher = tabBarController as! MainTabBarController
         setupTableView()
     }
     
@@ -60,14 +63,15 @@ class EpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let window = UIApplication.shared.windows.first!
+        // let window = UIApplication.shared.windows.first!
         let episode = episodes[indexPath.row]
-        let episodePlayerVC = EpisodePlayerController()
-        episodePlayerVC.episode = episode
-        // not sure if it is right
-        window.rootViewController?.addChild(episodePlayerVC)
-        window.addSubview(episodePlayerVC.view)
-        episodePlayerVC.view.frame = window.safeAreaLayoutGuide.layoutFrame
+        playerLauncher.presentPlayer(withEpisode: episode)
+//        let episodePlayerVC = PlayerController()
+//        episodePlayerVC.episode = episode
+//        // not sure if it is right
+//        window.rootViewController?.addChild(episodePlayerVC)
+//        window.addSubview(episodePlayerVC.view)
+//        episodePlayerVC.view.frame = window.safeAreaLayoutGuide.layoutFrame
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

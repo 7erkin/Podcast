@@ -1,23 +1,15 @@
 //
-//  EpisodePlayerView.swift
+//  MaximizePlayerView.swift
 //  Podcasts
 //
-//  Created by Олег Черных on 06/05/2020.
+//  Created by Олег Черных on 10/05/2020.
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
 import UIKit
 import AVKit
 
-protocol EpisodePlayerViewDelegate {
-    func dissmis()
-    func fastForward15()
-    func rewind15()
-    func moveToPlaybackTime(_ playbackTime: CMTime)
-    func playPause()
-}
-
-class EpisodePlayerView: UIView {
+class MaximizePlayerView: UIView {
     //MARK: - outlets
     @IBOutlet var timeSlider: UISlider! {
         didSet {
@@ -43,26 +35,27 @@ class EpisodePlayerView: UIView {
             seconds: Double((sender as! UISlider).value),
             preferredTimescale: 1
         )
-        delegate.moveToPlaybackTime(nextPlaybackTime)
+        playerManager.moveToPlaybackTime(nextPlaybackTime)
     }
     @IBAction func onDismissButtonTapped(_ sender: Any) {
         delegate.dissmis()
     }
     @IBAction func onFastForward15ButtonTapped(_ sender: Any) {
-        delegate.fastForward15()
+        playerManager.fastForward15()
     }
     @IBAction func onRewind15ButtonTapped(_ sender: Any) {
-        delegate.rewind15()
+        playerManager.rewind15()
     }
     @IBAction func onPlayPauseButtonTapped(_ sender: Any) {
-        delegate.playPause()
+        playerManager.playPause()
     }
     
     // MARK: -
     fileprivate let shrinkTransform: CGAffineTransform = CGAffineTransform(scaleX: 0.7, y: 0.7)
     fileprivate let playImage: UIImage = UIImage(named: "play")!
     fileprivate let pauseImage: UIImage = UIImage(named: "pause")!
-    var delegate: EpisodePlayerViewDelegate!
+    weak var delegate: PlayerViewDelegate!
+    weak var playerManager: PlayerManaging!
     
     var episode: Episode! {
         didSet {

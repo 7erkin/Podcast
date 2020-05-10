@@ -10,10 +10,10 @@ import Foundation
 import UIKit
 import AVKit
 
-class EpisodePlayerController: UIViewController {
-    weak var playerView: EpisodePlayerView! {
+class PlayerController: UIViewController {
+    weak var playerView: PlayerView! {
         didSet {
-            self.playerView.delegate = self
+            self.playerView.playerManager = self
         }
     }
     
@@ -30,14 +30,8 @@ class EpisodePlayerController: UIViewController {
     override func loadView() {
         super.loadView()
         
-        guard
-            let playerView = Bundle.main.loadNibNamed(
-                "EpisodePlayerView",
-                owner: self,
-                options: nil
-            )?.first as? EpisodePlayerView else { fatalError("EpisodePlayerView doesn't exist") }
-        
         view = UIView()
+        let playerView = PlayerView()
         self.playerView = playerView
         view.addSubview(playerView)
     }
@@ -94,11 +88,8 @@ class EpisodePlayerController: UIViewController {
     }
 }
 
-extension EpisodePlayerController: EpisodePlayerViewDelegate {
-    func dissmis() {
-        
-    }
-    
+// MARK: - extension with PlayerManaging protocol
+extension PlayerController: PlayerManaging {
     func fastForward15() {
         shiftByTime(15)
     }
@@ -116,6 +107,7 @@ extension EpisodePlayerController: EpisodePlayerViewDelegate {
         updatePlayerViewWithEpisodePlayer()
     }
     
+    // MARK: -- helpers
     func moveToPlaybackTime(_ playbackTime: CMTime) {
         seekToTime(playbackTime)
     }

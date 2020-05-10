@@ -9,7 +9,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="dhH-yE-T4p" customClass="EpisodePlayerView" customModule="Podcasts" customModuleProvider="target">
+        <view contentMode="scaleToFill" id="dhH-yE-T4p" customClass="MaximizePlayerView" customModule="Podcasts" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
@@ -39,7 +39,7 @@
                                 <constraint firstAttribute="height" constant="40" id="gnK-ZE-krg"/>
                             </constraints>
                             <connections>
-                                <action selector="onTimeSliderValueChanged:" destination="dhH-yE-T4p" eventType="valueChanged" id="TYV-gY-l9y"/>
+                                <action selector="onTimeSliderValueChanged:" destination="dhH-yE-T4p" eventType="valueChanged" id="Hov-ga-hAO"/>
                             </connections>
                         </slider>
                         <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aNa-0u-2Bh">
@@ -162,7 +162,6 @@
                     </subviews>
                 </stackView>
             </subviews>
-            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
             <constraints>
                 <constraint firstItem="x3I-gG-65h" firstAttribute="leading" secondItem="MjU-Ns-F4Q" secondAttribute="leading" constant="16" id="Fze-Tc-8x8"/>
                 <constraint firstItem="x3I-gG-65h" firstAttribute="top" secondItem="MjU-Ns-F4Q" secondAttribute="top" id="Yry-m6-TsO"/>
@@ -171,13 +170,13 @@
             </constraints>
             <viewLayoutGuide key="safeArea" id="MjU-Ns-F4Q"/>
             <connections>
-                <outlet property="authorLabel" destination="jKv-P5-VjD" id="JmD-j7-m5w"/>
-                <outlet property="episodeDurationLabel" destination="MgO-ug-fku" id="2JF-Eh-8SC"/>
-                <outlet property="episodeImageView" destination="LiU-t3-ttw" id="yFD-hf-nuO"/>
-                <outlet property="episodeNameLabel" destination="e1W-vj-aAW" id="VLZ-gY-gNH"/>
-                <outlet property="episodeTimePastLabel" destination="tw1-dk-xG0" id="XqL-fY-3Dr"/>
-                <outlet property="playPauseButton" destination="VFC-9H-6IB" id="Uak-0L-xcy"/>
-                <outlet property="timeSlider" destination="GWd-wY-v7w" id="B6b-GN-Nk3"/>
+                <outlet property="authorLabel" destination="jKv-P5-VjD" id="ydC-H9-tQO"/>
+                <outlet property="episodeDurationLabel" destination="MgO-ug-fku" id="MI0-X0-cSu"/>
+                <outlet property="episodeImageView" destination="LiU-t3-ttw" id="pYC-Vw-GyP"/>
+                <outlet property="episodeNameLabel" destination="e1W-vj-aAW" id="Yrf-G0-ajh"/>
+                <outlet property="episodeTimePastLabel" destination="tw1-dk-xG0" id="UQi-qE-mrZ"/>
+                <outlet property="playPauseButton" destination="VFC-9H-6IB" id="zO1-Yx-YRc"/>
+                <outlet property="timeSlider" destination="GWd-wY-v7w" id="bs5-Uc-EIa"/>
             </connections>
             <point key="canvasLocation" x="136" y="-129"/>
         </view>

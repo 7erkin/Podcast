@@ -69,6 +69,18 @@ class MaximizePlayerView: UIView {
         }
     }
     
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(onSwipe))
+        swipeGesture.direction = .down
+        addGestureRecognizer(swipeGesture)
+    }
+    
+    @objc
+    fileprivate func onSwipe() {
+        delegate.dissmis()
+    }
+    
     // MARK: - update view functions
     fileprivate func updateViewWithEpisode() {
         episodeNameLabel.text = episode.name

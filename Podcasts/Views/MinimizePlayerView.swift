@@ -57,7 +57,7 @@ class MinimizePlayerView: UIStackView {
     override func awakeFromNib() {
         super.awakeFromNib()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(onTapped))
-        self.addGestureRecognizer(tapGesture)
+        addGestureRecognizer(tapGesture)
     }
     
     @objc

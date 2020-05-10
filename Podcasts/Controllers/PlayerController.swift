@@ -79,12 +79,14 @@ class PlayerController: UIViewController {
     }
     
     fileprivate func updatePlayerViewWithEpisodePlayer() {
-        playerView.episodePlayer = EpisodePlayer(
-            timePast: player.currentItem!.currentTime(),
-            duration: player.currentItem!.duration,
-            volumeLevel: 10,
-            isPlaying: player.timeControlStatus == .playing
-        )
+        if let playerItem = player.currentItem {
+            playerView.episodePlayer = EpisodePlayer(
+                timePast: playerItem.currentTime(),
+                duration: playerItem.duration,
+                volumeLevel: 10,
+                isPlaying: player.timeControlStatus == .playing
+            )
+        }
     }
 }
 

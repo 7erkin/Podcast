@@ -41,15 +41,15 @@ class MainTabBarController: UITabBarController, PlayerPresenting, PlayerViewDele
     func presentPlayer(withEpisode episode: Episode) {
         if playerController == Optional.none {
             playerController = PlayerController()
-            playerController.episode = episode
             addChild(playerController)
             let playerView = playerController.view.subviews.first! as! PlayerView
             playerView.delegate = self
             playerView.frame = tabBar.frame
             view.insertSubview(playerView, belowSubview: tabBar)
             self.playerView = playerView
+            enlarge()
         }
-        enlarge()
+        playerController.episode = episode
     }
     
     func performHiddingTabBarWithAnimation() {

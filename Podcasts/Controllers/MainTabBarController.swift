@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 
-protocol PlayerPresenting {
+protocol PlayerPresenting: class {
     func presentPlayer(withEpisode episode: Episode)
+    func closePlayer()
 }
 
 class MainTabBarController: UITabBarController, PlayerPresenting, PlayerViewDelegate {
@@ -50,6 +51,12 @@ class MainTabBarController: UITabBarController, PlayerPresenting, PlayerViewDele
             enlarge()
         }
         playerController.episode = episode
+    }
+    
+    func closePlayer() {
+        playerView?.removeFromSuperview()
+        playerController.removeFromParent()
+        playerController = nil
     }
     
     func performHiddingTabBarWithAnimation() {

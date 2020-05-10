@@ -6,9 +6,9 @@
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import AVKit
+import MediaPlayer
 
 class PlayerController: UIViewController {
     weak var playerView: PlayerView! {
@@ -51,11 +51,27 @@ class PlayerController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupRemotePlayerControl()
         if playerView.episode == nil {
             updatePlayerViewWithEpisodePlayer()
             updatePlayerViewWithEpisode()
             player.play()
         }
+    }
+    
+    fileprivate func setupRemotePlayerControl() {
+        UIApplication.shared.beginReceivingRemoteControlEvents()
+        let commandCenter = MPRemoteCommandCenter.shared()
+        let handler: (MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus = { [weak self] _ in self?.playPause(); return .success }
+        // playButton
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.playCommand.addTarget(handler: handler)
+        // pauseButton
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.pauseCommand.addTarget(handler: handler)
+        // toggleButton
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.addTarget(handler: handler)
     }
     
     // NOT FIRED!!!

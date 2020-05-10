@@ -3,4 +3,70 @@
    uuid = "1B7AE745-3AA4-4DDF-BF3B-C7E69488B98E"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "82AF8ED6-CE3E-4DF4-8F47-769E266FDC6D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Podcasts/Controllers/MainTabBarController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "enlarge()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5A88967E-D896-4E79-BB20-2ED419D49ED1"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Podcasts/Controllers/PlayerController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "setupRemotePlayerControl()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "5A88967E-D896-4E79-BB20-2ED419D49ED1 - 7f6f38c51edda860"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Podcasts.PlayerController.(setupRemotePlayerControl in _3A354908CC49224A908BF828A4615AA6)() -&gt; ()"
+                  moduleName = "Podcasts"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/oleg/Desktop/dev/iOS/letsbuildthatapp/Podcasts/Podcasts/Podcasts/Controllers/PlayerController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "65"
+                  endingLineNumber = "65"
+                  offsetFromSymbolStart = "193">
+               </Location>
+               <Location
+                  uuid = "5A88967E-D896-4E79-BB20-2ED419D49ED1 - fdc29c5304f58917"
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (__C.MPRemoteCommandEvent) -&gt; __C.MPRemoteCommandHandlerStatus in Podcasts.PlayerController.(setupRemotePlayerControl in _3A354908CC49224A908BF828A4615AA6)() -&gt; ()"
+                  moduleName = "Podcasts"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/oleg/Desktop/dev/iOS/letsbuildthatapp/Podcasts/Podcasts/Podcasts/Controllers/PlayerController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "65"
+                  endingLineNumber = "65"
+                  offsetFromSymbolStart = "47">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

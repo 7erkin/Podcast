@@ -14,10 +14,10 @@ class MinimizePlayerView: UIStackView {
     @IBOutlet var playPauseButton: UIButton!
     
     @IBAction func onPlayPauseButtonTapped(_ sender: Any) {
-        playerManager.playPause()
+        playerManager?.playPause()
     }
     @IBAction func onFastForward15ButtonTapped(_ sender: Any) {
-        playerManager.fastForward15()
+        playerManager?.fastForward15()
     }
     
     fileprivate let playImage: UIImage = UIImage(named: "play")!
@@ -51,17 +51,30 @@ class MinimizePlayerView: UIStackView {
         }
     }
     
-    var playerManager: PlayerManaging!
-    var delegate: PlayerViewDelegate!
+    weak var playerManager: PlayerManaging?
+    weak var delegate: PlayerViewDelegate?
+    weak var playerPresenter: PlayerPresenting?
     
     override func awakeFromNib() {
         super.awakeFromNib()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(onTapped))
         addGestureRecognizer(tapGesture)
+        
+        let leftSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(onSwipe))
+        leftSwipeGesture.direction = .left
+        let rightSwipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(onSwipe))
+        rightSwipeGesture.direction = .right
+        addGestureRecognizer(leftSwipeGesture)
+        addGestureRecognizer(rightSwipeGesture)
     }
     
     @objc
     fileprivate func onTapped() {
-        delegate.enlarge()
+        delegate?.enlarge()
+    }
+    
+    @objc
+    fileprivate func onSwipe() {
+        playerPresenter?.closePlayer()
     }
 }

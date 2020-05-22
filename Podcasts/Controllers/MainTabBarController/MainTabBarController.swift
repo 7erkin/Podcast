@@ -45,7 +45,7 @@ class MainTabBarController: UITabBarController {
     }
     
     private func setup() {
-        let player = Player.shared
+        let player = PlayerManager.shared
         mediaCenterPlayerController = .init()
         mediaCenterPlayerController.player = player
         

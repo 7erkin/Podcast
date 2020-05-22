@@ -14,13 +14,6 @@ protocol PlayerViewDelegate: class {
     func enlarge()
 }
 
-protocol PlayerManaging: class {
-    func fastForward15()
-    func rewind15()
-    func moveToPlaybackTime(_ playbackTime: CMTime)
-    func playPause()
-}
-
 class AppPlayerView: UIView {
     private let minimizePlayerViewHeight: CGFloat = 75
     private lazy var minimizePlayerView: MinimizePlayerView = {

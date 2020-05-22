@@ -6,4 +6,17 @@
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
-import Foundation
+import UIKit
+import PromiseKit
+
+struct ServiceError: Error {}
+
+struct NetworkError: Error {}
+
+enum ImageServicingError: Error {
+    case ISError
+}
+
+protocol ImageFetching: class {
+    func fetchImage(withImageUrl imageUrl: URL) -> Promise<UIImage>
+}

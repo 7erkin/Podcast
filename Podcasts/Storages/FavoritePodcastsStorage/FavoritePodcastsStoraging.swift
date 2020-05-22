@@ -8,9 +8,16 @@
 
 import PromiseKit
 
+enum FavoritePodcastStoragingEvent {
+    case podcastSaved
+    case podcastDeleted
+    case podcastsLoaded
+}
+
 protocol FavoritePodcastsStoraging  {
     func save(podcast: Podcast)
-    func getFavoritePodcasts() -> Promise<[Podcast]>
+    func getPodcasts() -> Promise<[Podcast]>
     func delete(podcast: Podcast)
+    func load()
 }
 

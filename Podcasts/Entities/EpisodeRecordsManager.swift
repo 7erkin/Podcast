@@ -9,6 +9,7 @@
 import Foundation
 import PromiseKit
 
+// not thread safe
 class EpisodeRecordsManager {
     enum Event {
         case episodeDownloadingProgress(episode: Episode, progress: Float)
@@ -16,45 +17,45 @@ class EpisodeRecordsManager {
         case episodeSaved
     }
     
+    private var subscribers: [UUID:(Event) -> Void] = [:]
     private let storage: EpisodeRecordsStoraging
     private let recordFetcher: EpisodeRecordFetching
-    private let serviceQueue: DispatchQueue
     // how to constraint serviceQueue to serial queue? Smth as constraint or assert
-    init(on serviceQueue: DispatchQueue, storage: EpisodeRecordsStoraging, recordFetcher: EpisodeRecordFetching) {
+    init(storage: EpisodeRecordsStoraging, recordFetcher: EpisodeRecordFetching) {
         self.storage = storage
         self.recordFetcher = recordFetcher
-        self.serviceQueue = serviceQueue
     }
     
-    private var subscribers: [UUID:(Event) -> Void] = [:]
     func save(episode: Episode) {
-        _ = Promise.value.then(on: serviceQueue, flags: nil) {
-            self.recordFetcher.fetch(episode: episode) { [weak self] progress in
-                self?.serviceQueue.async { self?.notifyAll(withEvent: .episodeDownloadingProgress(episode: episode, progress: progress)) }
+        _ = Promise.value.then {
+            self.recordFetcher.fetch(episode: episode) { progress in
+                DispatchQueue.main.async { [weak self] in
+                    self?.notifyAll(withEvent: .episodeDownloadingProgress(episode: episode, progress: progress))
+                }
             }
-        }.then(on: serviceQueue, flags: nil) { data in
+        }.then { data in
             self.storage.save(episode: episode, withRecord: data)
-        }.done(on: serviceQueue, flags: nil) {
+        }.done {
             self.notifyAll(withEvent: .episodeSaved)
         }
     }
     
     func delete(episode: Episode) {
-        _ = Promise.value.done(on: serviceQueue, flags: nil) {
+        _ = Promise.value.done {
             self.storage.delete(episode: episode)
-        }.done(on: serviceQueue, flags: nil) {
+        }.done {
             self.notifyAll(withEvent: .episodeDeleted)
         }
     }
     
     func getEpisodeRecord(_ episode: Episode) -> Promise<Data> {
-        return Promise.value.then(on: serviceQueue, flags: nil) {
+        return Promise.value.then {
             self.storage.getEpisodeRecord(episode)
         }
     }
     
     func getEpisodesInfo() -> Promise<[Episode]> {
-        return Promise.value.then(on: serviceQueue, flags: nil) {
+        return Promise.value.then {
             self.storage.getStoredEpisodesInfo()
         }
     }
@@ -62,7 +63,7 @@ class EpisodeRecordsManager {
     func subscribe(_ subscriber: @escaping (Event) -> Void) -> Subscription {
         let key = UUID.init()
         subscribers[key] = subscriber
-        return Subscription(canceller: { [unowned self] in self.subscribers.removeValue(forKey: key) })
+        return Subscription { [weak self] in self?.subscribers.removeValue(forKey: key) }
     }
     
     // MARK: -  helpers

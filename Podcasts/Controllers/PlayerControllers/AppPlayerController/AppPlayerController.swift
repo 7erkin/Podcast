@@ -19,9 +19,8 @@ class AppPlayerController: UIViewController {
     
     var appPlayerView: AppPlayerView { return view as! AppPlayerView }
     
-    weak var player: Player! {
+    weak var player: PlayerManager! {
         didSet {
-            self.player.subscribe(subscriber: AnyObserver<Player.Event>(self))
         }
     }
     
@@ -73,24 +72,5 @@ extension AppPlayerController: PlayerViewDelegate {
     
     func enlarge() {
         enlargeAnimator.invoke(forAppPlayerView: appPlayerView)
-    }
-}
-
-extension AppPlayerController: Observer {
-    typealias AcceptedEvent = Player.Event
-    func notify(withEvent event: Player.Event) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
-            switch event {
-            case .episodeUpdated:
-                self.appPlayerView.episode = self.player.playingEpisode.episode
-                if self.view.superview == nil {
-                    self.presentAnimator.invoke(forAppPlayerView: self.appPlayerView)
-                }
-            default:
-                self.appPlayerView.playerState = self.player.playerState
-            }
-        }
     }
 }

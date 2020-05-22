@@ -25,7 +25,7 @@ class PodcastCell: UITableViewCell {
         podcastImageView.image = nil
     }
     
-    static var service: ImageServicing = ImageService.shared
+    static var imageFetcher: ImageFetching = ServiceLocator.imageFetcher
     var timer: Timer?
     var podcast: Podcast! {
         didSet {
@@ -42,7 +42,7 @@ class PodcastCell: UITableViewCell {
                     guard let self = self else { return }
                     
                     firstly {
-                        PodcastCell.service.fetchImage(withImageUrl: imageUrl)
+                        PodcastCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
                     }.done(on: .main, flags: nil) { (image) in
                         if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
                             self.podcastImageView.image = image

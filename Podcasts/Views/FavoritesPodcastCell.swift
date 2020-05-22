@@ -16,7 +16,7 @@ class FavoritesPodcastCell: UICollectionViewCell {
         }
     }
     
-    var imageService: ImageServicing = ImageService.shared
+    static var imageFetcher: ImageFetching!
     
     fileprivate let imageView = UIImageView()
     fileprivate let nameLabel = UILabel()
@@ -68,7 +68,7 @@ class FavoritesPodcastCell: UICollectionViewCell {
                 guard let self = self else { return }
                 
                 firstly {
-                    EpisodeCell.service.fetchImage(withImageUrl: imageUrl)
+                    EpisodeCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
                 }.done(on: .main, flags: nil) { (image) in
                     if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
                         self.imageView.image = image

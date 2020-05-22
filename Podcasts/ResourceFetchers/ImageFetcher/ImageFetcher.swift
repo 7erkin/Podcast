@@ -1,8 +1,8 @@
 //
-//  ImageService.swift
+//  ImageFetcher.swift
 //  Podcasts
 //
-//  Created by Олег Черных on 15/05/2020.
+//  Created by user166334 on 5/22/20.
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
@@ -10,9 +10,7 @@ import UIKit
 import PromiseKit
 import Alamofire
 
-class ImageService: ImageServicing {
-    private init() {}
-    static var shared: ImageServicing = ImageService()
+class ImageFetcher: ImageFetching {
     func fetchImage(withImageUrl imageUrl: URL) -> Promise<UIImage> {
         return Promise { (resolver) in
             AF.request(imageUrl).response { (dataResponse) in

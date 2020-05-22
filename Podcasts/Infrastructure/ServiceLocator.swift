@@ -11,10 +11,10 @@ import Foundation
 class ServiceLocator {
     static let podcastService: PodcastServicing = ITunesService.shared
     static let defferedPodcastService: PodcastServicing = DefferedPodcastService(timeout: 1.5, wrappedPodcastService: ServiceLocator.podcastService)
-    static let imageService: ImageServicing = {
-        let service = ImageServiceProxi.shared as! ImageServiceProxi
-        service.imageCache = InMemoryImageCache(withFlushPolicy: LatestImageFlushPolicy(withCacheMemoryLimit: 75))
-        return service
+    static let imageCache = InMemoryImageCache(withFlushPolicy: LatestImageFlushPolicy(withCacheMemoryLimit: 75))
+    static let imageFetcher: ImageFetching = {
+        let imageFetcher = ImageFetcher()
+        return ImageFetcherProxi(cache: ServiceLocator.imageCache, fetcher: imageFetcher)
     }()
     static let favoritePodcastStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastsStorage.shared
     static let episodeRecordStorage: EpisodeRecordsStoraging = SQLEpisodeRecordsStorage.shared

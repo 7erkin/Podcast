@@ -7,32 +7,44 @@
 //
 
 import Foundation
+import PromiseKit
 
 // thread safe
 class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
     // MARK: - constants
     fileprivate let favoritePodcastKey = "favoritePodcastKey"
     fileprivate let serviceQueue = DispatchQueue(
-        label: "user.defaults.favorite.podcast.repository",
+        label: "user.defaults.favorite.podcasts.storage",
         qos: .userInitiated,
         attributes: [],
         autoreleaseFrequency: .workItem,
         target: nil
     )
     fileprivate var storage: UserDefaults { return UserDefaults.standard }
-    // MARK: -
+    fileprivate var podcasts: [Podcast] = []    // MARK: -
     private init() {
         if storage.value(forKey: favoritePodcastKey) == nil {
             let emptyPodcasts = try! JSONEncoder().encode([Podcast]())
             storage.set(emptyPodcasts, forKey: favoritePodcastKey)
         }
     }
-    static var shared = UserDefaultsFavoritePodcastStorage()
-    // MARK: - FavoritePodcastStoraging impl
-    private(set) var podcasts: [Podcast] = []
-    func download() {
-        podcasts = downloadPodcasts()
-        notifyAll(withEvent: .podcastsDownloaded)
+    static var shared = UserDefaultsFavoritePodcastsStorage()
+    // MARK: - FavoritePodcastsStoraging impl
+    func load() {
+        serviceQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            self.podcasts = self.loadPodcastsFromStorage()
+            self.notifyAll(withEvent: .podcastsLoaded)
+        }
+    }
+    
+    func getPodcasts() -> Promise<[Podcast]> {
+        return Promise { resolver in
+            serviceQueue.async { [weak self] in
+                resolver.resolve(.fulfilled(self?.podcasts ?? []))
+            }
+        }
     }
     
     func save(podcast: Podcast) {
@@ -40,7 +52,7 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
             guard let self = self else { return }
             
             if self.podcasts.isEmpty {
-                self.podcasts = self.downloadPodcasts()
+                self.podcasts = self.loadPodcastsFromStorage()
             }
             
             if self.podcasts.contains(podcast) {
@@ -66,12 +78,12 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
             if let index = self.podcasts.firstIndex(of: podcast) {
                 self.podcasts.remove(at: index)
                 self.save(self.podcasts.serialized)
-                self.notifyAll(withEvent: .podcastDeleted(index: index))
+                self.notifyAll(withEvent: .podcastDeleted)
             }
         }
     }
     // MARK: - helpers
-    fileprivate func downloadPodcasts() -> [Podcast] {
+    fileprivate func loadPodcastsFromStorage() -> [Podcast] {
         guard let serializedPodcasts = self.storage.value(forKey: self.favoritePodcastKey) as? Data else { fatalError("UB") }
         
         return [Podcast].deserialize(from: serializedPodcasts)
@@ -81,22 +93,27 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
         self.storage.set(serializedPodcasts, forKey: self.favoritePodcastKey)
     }
     
-    fileprivate func notifyAll(withEvent event: FavoritePodcastRepositoringEvent) {
+    fileprivate func notifyAll(withEvent event: FavoritePodcastStoragingEvent) {
         subscribers.values.forEach { v in v.0.async { v.1(event) } }
     }
-    // MARK: - Observable impl
-    private var subscribers: [UUID : (DispatchQueue, (FavoritePodcastRepositoringEvent) -> Void)] = [:]
+    // MARK: -
+    private var subscribers: [UUID : (DispatchQueue, (FavoritePodcastStoragingEvent) -> Void)] = [:]
     func subscribe(
         on serviceQueue: DispatchQueue,
-        _ subscriber: @escaping (FavoritePodcastRepositoringEvent) -> Void
-    ) -> Subscription {
-        let key = UUID.init()
-        subscribers[key] = (serviceQueue, subscriber)
-        return Subscription(canceller: { [weak self] in
-            self?.serviceQueue.async {
-                 self?.subscribers.removeValue(forKey: key)
+        _ subscriber: @escaping (FavoritePodcastStoragingEvent) -> Void
+    ) -> Promise<Subscription> {
+        return Promise { resolver in
+            serviceQueue.async { [weak self] in
+                let key = UUID.init()
+                self?.subscribers[key] = (serviceQueue, subscriber)
+                let subscription = Subscription { [weak self] in
+                    self?.serviceQueue.async {
+                         self?.subscribers.removeValue(forKey: key)
+                    }
+                }
+                resolver.resolve(.fulfilled(subscription))
             }
-        })
+        }
     }
 }
 

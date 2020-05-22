@@ -11,7 +11,7 @@ import AVKit
 import MediaPlayer
 
 class MediaCenterPlayerController {
-    weak var player: Player! {
+    weak var player: PlayerManager! {
         didSet {
             
         }

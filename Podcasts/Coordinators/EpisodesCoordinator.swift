@@ -27,8 +27,8 @@ class EpisodesCoordintator: Coordinatable, EpisodesControllerCoordinatorDelegate
     }
     
     func choose(episode: Episode) {
-        if let playerEpisodeRepository = Player.shared.episodeRepository, playerEpisodeRepository === episodeRepository { return }
+        if let playerEpisodeRepository = PlayerManager.shared.episodeRepository, playerEpisodeRepository === episodeRepository { return }
         
-        Player.shared.episodeRepository = episodeRepository
+        PlayerManager.shared.episodeRepository = episodeRepository
     }
 }

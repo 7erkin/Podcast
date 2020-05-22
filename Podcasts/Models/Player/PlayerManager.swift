@@ -7,11 +7,7 @@
 //
 
 import AVKit
-
-enum PlayerEvent {
-    case playingEpisodeChanged(playedEpisode: PlayedEpisode)
-    case playerStateUpdated(state: PlayerState)
-}
+import PromiseKit
 
 struct PlayedEpisode {
     var index: Int
@@ -25,8 +21,8 @@ struct PlayerState {
     var isPlaying: Bool
 }
 
-class Player {
-    // MARK: - private properties
+class PlayerManager: PlayerManaging {
+    // MARK: - private properties
     fileprivate lazy var player: AVPlayer = {
         let player = AVPlayer()
         player.automaticallyWaitsToMinimizeStalling = false
@@ -44,22 +40,19 @@ class Player {
         }
         return player
     }()
-    private var subscribers: [UUID:(PlayerEvent) -> Void] = [:]
+    private var subscribers: [UUID:(AppEvent) -> Void] = [:]
     // MARK: - observable properties
     private var episodePlayingList: [Episode]!
     private var playedEpisodeIndex: Int!
     private var podcast: Podcast!
-    
     private(set) var playerState: PlayerState! {
         didSet {
-            notifyAll(withEvent: .playerStateUpdated(state: self.playerState))
+            notifyAll(withEvent: PlayerManagingEvent.playerStateUpdated(state: self.playerState))
         }
     }
-    
     // MARK: - Singleton
     private init() {}
-    static let shared = Player()
-    
+    static let shared = PlayerManager()
     // MARK: - player api
     // public for Player extension to get access. How to fix it???
     func fastForward15() {
@@ -84,7 +77,7 @@ class Player {
         seekToTime(playbackTime)
     }
     
-    func seekToTime(_ seekTime: CMTime) {
+    fileprivate func seekToTime(_ seekTime: CMTime) {
         player.currentItem?.seek(to: seekTime, completionHandler: { [weak self] (res) in
             if res {
             }
@@ -120,7 +113,6 @@ class Player {
     func hasPreviousEpisode() -> Bool {
         return playedEpisodeIndex - 1 >= 0
     }
-    
     // MARK: - helpers
     private func shiftByTime(_ time: Int64) {
         let playbackTime = player.currentTime()
@@ -129,7 +121,7 @@ class Player {
         seekToTime(seekTime)
     }
     
-    private func notifyAll(withEvent event: PlayerEvent) {
+    private func notifyAll(withEvent event: AppEvent) {
         subscribers.values.forEach { $0(event) }
     }
     
@@ -138,11 +130,12 @@ class Player {
         let playerItem = AVPlayerItem(url: nextPlayedEpisode.streamUrl)
         player.replaceCurrentItem(with: playerItem)
         player.play()
-        notifyAll(withEvent: .playingEpisodeChanged(playedEpisode: .init(index: index, episode: nextPlayedEpisode)))
+        let event = EpisodeListPlayableEvent.playingEpisodeChanged(playedEpisode: .init(index: index, episode: nextPlayedEpisode))
+        notifyAll(withEvent: event)
     }
 }
 
-extension Player: EpisodeListPlayable {
+extension PlayerManager: EpisodeListPlayable {
     func play(episodeByIndex episodeIndex: Int, inEpisodeList episodes: [Episode], of podcast: Podcast) {
         if self.podcast == podcast {
             if playedEpisodeIndex == episodeIndex {
@@ -157,10 +150,19 @@ extension Player: EpisodeListPlayable {
         playedEpisodeIndex = episodeIndex
         episodePlayingList = episodes
     }
-    
-    func subscribe(_ subscriber: @escaping (PlayerEvent) -> Void) -> Subscription {
-        let key = UUID.init()
-        subscribers[key] = subscriber
-        return Subscription(canceller: { [unowned self] in self.subscribers.removeValue(forKey: key) })
+}
+
+extension PlayerManager: Observable {
+    func subscribe(_ subscriber: @escaping (AppEvent) -> Void) -> Promise<Subscription> {
+        return Promise { resolver in
+            let key = UUID.init()
+            subscribers[key] = subscriber
+            let subscription = Subscription {
+                DispatchQueue.main.async { [weak self] in
+                    self?.subscribers.removeValue(forKey: key)
+                }
+            }
+            resolver.resolve(.fulfilled(subscription))
+        }
     }
 }

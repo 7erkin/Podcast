@@ -7,11 +7,7 @@
 //
 
 import Foundation
-
-protocol EpisodeListPlayable: class {
-    func play(episodeByIndex episodeIndex: Int, inEpisodeList episodes: [Episode], of podcast: Podcast)
-    func subscribe(_ subscriber: @escaping (PlayerEvent) -> Void) -> Subscription
-}
+import PromiseKit
 
 class EpisodesModel {
     enum Event {
@@ -24,24 +20,26 @@ class EpisodesModel {
     private(set) var episodes: [Episode] = []
     private(set) var pickedEpisodeIndex: Int!
     private let podcastService: PodcastServicing!
-    private let player: EpisodeListPlayable
-    private let playerSubscription: Subscription
-    init(podcast: Podcast, player: EpisodeListPlayable, podcastService: PodcastServicing) {
+    private let player: EpisodeListPlayable & Observable
+    private var playerSubscription: Subscription!
+    init(podcast: Podcast, player: EpisodeListPlayable & Observable, podcastService: PodcastServicing) {
         self.podcast = podcast
         self.podcastService = podcastService
         self.player = player
-        self.playerSubscription = self.player.subscribe { event in
-            switch event {
-            case .playingEpisodeChanged(let playedEpisode):
-                DispatchQueue.main.async { [weak self] in
-                    self?.pickedEpisodeIndex = playedEpisode.index
-                    self?.notifyAll(withEvent: .episodePicked)
+        _ = firstly {
+                self.player.subscribe { appEvent in
+                    switch appEvent as! EpisodeListPlayableEvent {
+                    case .playingEpisodeChanged(let playedEpisode):
+                        DispatchQueue.main.async { [weak self] in
+                            self?.pickedEpisodeIndex = playedEpisode.index
+                            self?.notifyAll(withEvent: .episodePicked)
+                        }
+                        break
+                    default:
+                        break
+                    }
                 }
-                break
-            default:
-                break
-            }
-        }
+            }.done { self.playerSubscription = $0 }
     }
     
     func fetchEpisodes() {

@@ -11,18 +11,40 @@ import PromiseKit
 import MediaPlayer
 
 class LockScreenPlayerController {
-    weak var player: Player! {
+    weak var player: (EpisodeListPlayable & PlayerManaging & Observable)! {
         didSet {
-            self.player?.subscribe(subscriber: AnyObserver<Player.Event>(self))
+            _ = self.player.subscribe { appEvent in
+                DispatchQueue.main.async { [weak self] in
+                    self?.updateViewWithModel(withAppEvent: appEvent)
+                }
+            }.done { self.playerSubscription = $0 }
         }
     }
+    fileprivate var playerSubscription: Subscription!
     fileprivate weak var lockScreenMediaCenter: MPNowPlayingInfoCenter! = MPNowPlayingInfoCenter.default()
-    var imageService: ImageServicing! = ImageService.shared
+    var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
     
-    fileprivate func setupNowPlayingInfo() {
-        if let imageUrl = player.playingEpisode.episode.imageUrl {
-            firstly {
-                imageService.fetchImage(withImageUrl: imageUrl)
+    fileprivate func updateViewWithModel(withAppEvent appEvent: AppEvent) {
+        if let event = appEvent as? EpisodeListPlayableEvent {
+            switch event {
+            case .playingEpisodeChanged(let playedEpisode):
+                updateNowPlayingInfo(withEpisode: playedEpisode.episode)
+            }
+            return
+        }
+        
+        if let event = appEvent as? PlayerManagingEvent {
+            switch event {
+            case .playerStateUpdated(let playerState):
+                updateLockscreenCurrentTime(withPlayerState: playerState)
+            }
+        }
+    }
+    
+    fileprivate func updateNowPlayingInfo(withEpisode episode: Episode) {
+        if let imageUrl = episode.imageUrl {
+            _ = firstly {
+                imageFetcher.fetchImage(withImageUrl: imageUrl)
             }.done(on: .main, flags: nil) { (image) in
                 let artwork = MPMediaItemArtwork(boundsSize: image.size) { (_) -> UIImage in
                     return image
@@ -34,14 +56,14 @@ class LockScreenPlayerController {
         }
         
         var info = [String:Any]()
-        info[MPMediaItemPropertyTitle] = player.playingEpisode.episode.name
-        info[MPMediaItemPropertyArtist] = player.playingEpisode.episode.author
+        info[MPMediaItemPropertyTitle] = episode.name
+        info[MPMediaItemPropertyArtist] = episode.author
         lockScreenMediaCenter.nowPlayingInfo = info
     }
     
-    fileprivate func setupLockscreenCurrentTime() {
+    fileprivate func updateLockscreenCurrentTime(withPlayerState playerState: PlayerState) {
         let center = MPNowPlayingInfoCenter.default()
-        center.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = player.playerState.timePast.roundedSeconds
-        center.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = player.playerState.duration.roundedSeconds
+        center.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playerState.timePast.roundedSeconds
+        center.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = playerState.duration.roundedSeconds
     }
 }

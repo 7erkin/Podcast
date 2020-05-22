@@ -24,7 +24,7 @@ class MinimizePlayerView: UIStackView {
     fileprivate let playImage: UIImage = UIImage(named: "play")!
     fileprivate let pauseImage: UIImage = UIImage(named: "pause")!
     
-    var imageService: ImageServicing! = ImageService.shared
+    var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
     
     var episode: Episode! {
         didSet {
@@ -35,7 +35,7 @@ class MinimizePlayerView: UIStackView {
             
             if let episodeImageUrl = self.episode.imageUrl {
                 firstly {
-                    imageService.fetchImage(withImageUrl: episodeImageUrl)
+                    imageFetcher.fetchImage(withImageUrl: episodeImageUrl)
                 }.done(on: .main, flags: nil) { (image) in
                     if episodeImageUrl == self.episode.imageUrl {
                         self.episodeImageView.image = image
@@ -49,7 +49,7 @@ class MinimizePlayerView: UIStackView {
         }
     }
     
-    var playerState: Player.PlayerState! {
+    var playerState: PlayerState! {
         didSet {
             let image = self.playerState.isPlaying ? pauseImage : playImage
             playPauseButton.setImage(image, for: .normal)

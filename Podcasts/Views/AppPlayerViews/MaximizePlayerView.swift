@@ -77,14 +77,14 @@ class MaximizePlayerView: UIView {
     fileprivate let playImage: UIImage = UIImage(named: "play")!
     fileprivate let pauseImage: UIImage = UIImage(named: "pause")!
     // MARK: - internal dependencies
-    weak var imageService: ImageServicing! = ImageService.shared
+    var imageFetcher: ImageFetching = ServiceLocator.imageFetcher
     // MARK: - for playback slider doesn't debounce after playback time manually update
     fileprivate var playbackTimeBeforeUpdate: CMTime?
     fileprivate var isPlaybackSliderUpdateAvailable: Bool = true
     fileprivate var expectedPlaybackTime: CMTime?
     // MARK: -
     var episode: Episode! { didSet { updateViewWithEpisode() } }
-    var playerState: Player.PlayerState! { didSet { updateViewWithPlayerState() } }
+    var playerState: PlayerState! { didSet { updateViewWithPlayerState() } }
     // MARK: - override methods
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -191,7 +191,7 @@ class MaximizePlayerView: UIView {
     fileprivate func blurEpisodeImage() {
         let image = episodeImageView.image!
         firstly {
-            Utils.blurImage(image, blurAmount: 20)
+            UIImage.blurImage(image, blurAmount: 20)
         }.done(on: .main, flags: nil) { (bluredImage) in
             if self.episodeImageView.image == image {
                 self.episodeImageView.image = bluredImage
@@ -204,7 +204,7 @@ class MaximizePlayerView: UIView {
     fileprivate func updateEpisodeImageWithImageService() {
         let imageUrl = episode.imageUrl!
         firstly {
-            imageService.fetchImage(withImageUrl: imageUrl)
+            imageFetcher.fetchImage(withImageUrl: imageUrl)
         }.done(on: .main, flags: nil) { (image) in
             if imageUrl == self.episode.imageUrl {
                 self.episodeImageView.image = image

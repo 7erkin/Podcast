@@ -11,13 +11,7 @@ import Alamofire
 import PromiseKit
 
 class EpisodeCell: UITableViewCell {
-    static var service: ImageServicing = {
-        let service = ImageServiceProxi.shared
-        let typedService = service as! ImageServiceProxi
-        typedService.instantiateProxingServiceInvoker = { ImageService.shared }
-        typedService.imageCache = InMemoryImageCache(withFlushPolicy: LatestImageFlushPolicy(withCacheMemoryLimit: 50))
-        return service
-    }()
+    static var imageFetcher: ImageFetching!
     
     fileprivate var timer: Timer?
     var episode: Episode! {
@@ -42,7 +36,7 @@ class EpisodeCell: UITableViewCell {
                 guard let self = self else { return }
                 
                 firstly {
-                    EpisodeCell.service.fetchImage(withImageUrl: imageUrl)
+                    EpisodeCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
                 }.done(on: .main, flags: nil) { (image) in
                     if let actualUrl = self.episode.imageUrl, imageUrl == actualUrl {
                         self.episodeImageView.image = image

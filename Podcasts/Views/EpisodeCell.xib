@@ -18,6 +18,7 @@
                 <subviews>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0vJ-7f-Ba8">
                         <rect key="frame" x="16" y="8" width="100" height="100"/>
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="100" id="ERr-bp-nKe"/>
                             <constraint firstAttribute="width" constant="100" id="qva-03-5GF"/>
@@ -46,13 +47,18 @@
                             </label>
                         </subviews>
                     </stackView>
+                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="iiK-nN-iQy">
+                        <rect key="frame" x="56" y="48" width="20" height="20"/>
+                    </activityIndicatorView>
                 </subviews>
                 <constraints>
                     <constraint firstItem="0vJ-7f-Ba8" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="6Kz-L2-CTP"/>
                     <constraint firstItem="GOz-pX-pVE" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="Fa2-Qz-nuO"/>
                     <constraint firstItem="0vJ-7f-Ba8" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="FkL-au-g0a"/>
+                    <constraint firstItem="iiK-nN-iQy" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="56" id="OK9-cO-wCl"/>
                     <constraint firstAttribute="trailing" secondItem="GOz-pX-pVE" secondAttribute="trailing" id="PB7-i0-tsE"/>
                     <constraint firstItem="GOz-pX-pVE" firstAttribute="leading" secondItem="0vJ-7f-Ba8" secondAttribute="trailing" constant="16" id="Vh6-vk-yCF"/>
+                    <constraint firstItem="iiK-nN-iQy" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="vh8-gz-C2T"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
@@ -60,6 +66,7 @@
                 <outlet property="descriptionLabel" destination="quF-JU-aLX" id="kAA-zl-P09"/>
                 <outlet property="episodeImageView" destination="0vJ-7f-Ba8" id="Pjq-7F-fAw"/>
                 <outlet property="episodeNameLabel" destination="ZHm-08-Ek9" id="i7D-eH-e3X"/>
+                <outlet property="loadingImageIndicator" destination="iiK-nN-iQy" id="dkg-cl-EZY"/>
                 <outlet property="publishDateLabel" destination="W31-Ox-3fD" id="zjr-Qu-1y4"/>
             </connections>
             <point key="canvasLocation" x="78.260869565217391" y="38.839285714285715"/>

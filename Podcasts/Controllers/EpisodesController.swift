@@ -9,69 +9,103 @@
 import Foundation
 import UIKit
 import FeedKit
+import PromiseKit
 
-class EpisodesController: UITableViewController {
-    let cellId = "episodeCell"
-    
-    var episodes: [Episode] = []
-    
-    var podcast: Podcast! {
+class FavoriteButtonItem: UIBarButtonItem {
+    var isFavorite: Bool! {
         didSet {
-            navigationItem.title = self.podcast.name
-            if let feedUrl = self.podcast.feedUrl {
-                APIService.shared.fetchEpisodes(url: feedUrl) { (episodes) in
-                    let modifiedEpisodes = episodes.map { episode -> Episode in
-                        if let _ = episode.imageUrl { return episode }
-                        var copy = episode
-                        copy.imageUrl = self.podcast.imageUrl
-                        return copy
-                    }
-                    DispatchQueue.main.async { [weak self] in
-                        self?.episodes = modifiedEpisodes
-                        self?.tableView.reloadData()
-                    }
-                }
+            if self.isFavorite {
+                self.image = UIImage(named: "heart")!
+            } else {
+                self.title = "Favorite"
+                self.image = nil
             }
         }
     }
-    
-    var playerLauncher: PlayerPresenting!
-    
+}
+
+protocol EpisodesControllerCoordinatorDelegate: class {
+    func choose(episode: Episode)
+}
+
+class EpisodesController: UITableViewController {
+    private let cellId = "episodeCell"
+    fileprivate var favoriteButton: FavoriteButtonItem {
+        return navigationItem.rightBarButtonItem as! FavoriteButtonItem
+    }
+    private var podcastStorageSubscription: Subscription!
+    // MARK: - dependencies
+    // ! sign because of strange init requirements
+    weak var coordinator: EpisodesControllerCoordinatorDelegate!
+    var episodesModel: EpisodesModel! {
+        didSet {
+//            podcastStorageSubscription = self.favoritePodcastRepository.subscribe(on: .main) { [weak self] event in
+//                self?.notify(withEvent: event)
+//            }
+        }
+    }
+//    var episodeRepository: EpisodeRepository! {
+//        didSet {
+//            episodeRepository.subscribe(subscriber: AnyObserver<EpisodeRepository.Event>(self))
+//            navigationItem.title = episodeRepository.podcast.name
+//            episodeRepository.downloadEpisodes()
+//        }
+//    }
+    // MARK: - view life cycles
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        playerLauncher = tabBarController as! MainTabBarController
         setupTableView()
+        let favoriteButton = FavoriteButtonItem(
+            title: "",
+            style: .plain,
+            target: self,
+            action: #selector(onFavoriteButtonTapped)
+        )
+        navigationItem.rightBarButtonItem = favoriteButton
+        favoritePodcastRepository.download()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        podcastStorageSubscription = favoritePodcastRepository.subscribe(on: .main) { [weak self] event in
+            self?.notify(withEvent: event)
+        }
+    }
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        podcastStorageSubscription = nil
+    }
+    // MARK: - interaction handlers
+    @objc
+    fileprivate func onFavoriteButtonTapped() {
+        if favoriteButton.isFavorite { return }
+        
+        favoritePodcastRepository.save(podcast: episodeRepository.podcast)
+    }
+    // MARK: - helpers
     fileprivate func setupTableView() {
         let nib = UINib(nibName: "EpisodeCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: cellId)
         tableView.tableFooterView = UIView()
     }
     
+    fileprivate func updateFavoriteButtonWithModel() {
+        favoriteButton.isFavorite = favoritePodcastRepository.podcasts.contains(episodeRepository.podcast)
+    }
     // MARK: - UITableView
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! EpisodeCell
-        let episode = episodes[indexPath.row]
+        let episode = episodeRepository.episodes[indexPath.row]
         cell.episode = episode
         return cell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return episodes.count
+        return episodeRepository.episodesCount
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // let window = UIApplication.shared.windows.first!
-        let episode = episodes[indexPath.row]
-        playerLauncher.presentPlayer(withEpisode: episode)
-//        let episodePlayerVC = PlayerController()
-//        episodePlayerVC.episode = episode
-//        // not sure if it is right
-//        window.rootViewController?.addChild(episodePlayerVC)
-//        window.addSubview(episodePlayerVC.view)
-//        episodePlayerVC.view.frame = window.safeAreaLayoutGuide.layoutFrame
+        episodeRepository.pickEpisode(byIndex: indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -86,6 +120,22 @@ class EpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return episodes.isEmpty ? 200 : 0
+        return episodeRepository.episodesCount == 0 ? 200 : 0
     }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let action = UIContextualAction(style: .normal, title: "Download") { (_, cell, _) in
+            
+        }
+        let configuration = UISwipeActionsConfiguration(actions: [action])
+        return configuration
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .none {
+            
+        }
+    }
+    // MARK: - Notifiers
+
 }

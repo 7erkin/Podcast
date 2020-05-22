@@ -7,18 +7,24 @@
 //
 
 import AVKit
+import PromiseKit
 
 enum PlayerManagingEvent: AppEvent {
-    case playerStateUpdated(state: PlayerState)
+    case playerStateUpdated
 }
 
-protocol PlayerManaging: class {
-    func fastForward15()
-    func rewind15()
-    func moveToPlaybackTime(_ playbackTime: CMTime)
+protocol PlayerStateManaging: class {
     func playPause()
     func nextEpisode()
     func previousEpisode()
-    func hasPreviousEpisode() -> Bool
-    func hasNextEpisode() -> Bool
+}
+
+enum EpisodePlaybackTimeManagingEvent {
+    case playbackTimeUpdated(playbackTime: CMTime)
+}
+
+protocol EpisodePlaybackTimeManaging {
+    func fastForward15()
+    func rewind15()
+    func moveToPlaybackTime(_ playbackTime: CMTime)
 }

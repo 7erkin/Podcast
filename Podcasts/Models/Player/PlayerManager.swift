@@ -9,6 +9,11 @@
 import AVKit
 import PromiseKit
 
+protocol EpisodeListPlayable {
+    func applyPlayList(_ playList: EpisodePlayList)
+    func currentPlayList() -> Promise<EpisodePlayList>
+}
+
 struct PlayedEpisode {
     var index: Int
     var episode: Episode
@@ -19,6 +24,8 @@ struct PlayerState {
     var duration: CMTime
     var volumeLevel: Int
     var isPlaying: Bool
+    var hasPreviousEpisode: Bool
+    var hasNextEpisode: Bool
 }
 
 class PlayerManager: PlayerManaging {

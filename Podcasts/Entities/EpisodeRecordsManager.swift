@@ -9,7 +9,6 @@
 import Foundation
 import PromiseKit
 
-// not thread safe
 class EpisodeRecordsManager {
     enum Event {
         case episodeDownloadingProgress(episode: Episode, progress: Float)

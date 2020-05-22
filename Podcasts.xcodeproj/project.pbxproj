@@ -83,7 +83,7 @@
 		7CF577C12470C99100094097 /* BiggestImageFlushPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */; };
 		B9D4C6052477ADBF00DC00DE /* ImageFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */; };
 		B9D4C6072477CD5300DC00DE /* PlayerManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6062477CD5300DC00DE /* PlayerManaging.swift */; };
-		B9D4C6092477CDAB00DC00DE /* EpisodeListPlayable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6082477CDAB00DC00DE /* EpisodeListPlayable.swift */; };
+		B9FC41EF2477FE95007FFCF3 /* EpisodePlayList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9FC41EE2477FE95007FFCF3 /* EpisodePlayList.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -162,7 +162,7 @@
 		7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiggestImageFlushPolicy.swift; sourceTree = "<group>"; };
 		B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFetcher.swift; sourceTree = "<group>"; };
 		B9D4C6062477CD5300DC00DE /* PlayerManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManaging.swift; sourceTree = "<group>"; };
-		B9D4C6082477CDAB00DC00DE /* EpisodeListPlayable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeListPlayable.swift; sourceTree = "<group>"; };
+		B9FC41EE2477FE95007FFCF3 /* EpisodePlayList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodePlayList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -318,6 +318,7 @@
 			isa = PBXGroup;
 			children = (
 				7C3654D424772C6F00EB68C4 /* EpisodeRecordsManager.swift */,
+				B9FC41EE2477FE95007FFCF3 /* EpisodePlayList.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -486,7 +487,6 @@
 			children = (
 				7CEF302A2468E1BC0045AB91 /* Observable.swift */,
 				B9D4C6062477CD5300DC00DE /* PlayerManaging.swift */,
-				B9D4C6082477CDAB00DC00DE /* EpisodeListPlayable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -556,6 +556,7 @@
 				TargetAttributes = {
 					7C35EE482460CBD30029DA95 = {
 						CreatedOnToolsVersion = 11.3;
+						LastSwiftMigration = 1130;
 					};
 				};
 			};
@@ -613,7 +614,6 @@
 				B9D4C6052477ADBF00DC00DE /* ImageFetcher.swift in Sources */,
 				7C17D0642475A53300BD158E /* PodcastServicing.swift in Sources */,
 				7CF577BF2470C96D00094097 /* LatestImageFlushPolicy.swift in Sources */,
-				B9D4C6092477CDAB00DC00DE /* EpisodeListPlayable.swift in Sources */,
 				7C466D4F246216530014D33A /* RSSFeed.swift in Sources */,
 				7CF237BD246779AE00B7A09F /* AppPlayerView.swift in Sources */,
 				7C466D3A2460FEF70014D33A /* ITunesService.swift in Sources */,
@@ -647,6 +647,7 @@
 				7C3654D02475FE8E00EB68C4 /* Array.swift in Sources */,
 				7CEF302B2468E1BC0045AB91 /* Observable.swift in Sources */,
 				7C3654BF2475CAC900EB68C4 /* EpisodeRecordsStoraging.swift in Sources */,
+				B9FC41EF2477FE95007FFCF3 /* EpisodePlayList.swift in Sources */,
 				7CAA5E0524732E2300ADD087 /* UserDefaultsFavoritePodcastsStorage.swift in Sources */,
 				7C35EE612460CC0E0029DA95 /* MainTabBarController.swift in Sources */,
 				7C3654DF24774A8100EB68C4 /* UIImage.swift in Sources */,
@@ -806,6 +807,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YSK2488U5V;
 				INFOPLIST_FILE = Podcasts/Info.plist;
@@ -815,6 +817,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = petProjects.Podcasts;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -824,6 +827,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = YSK2488U5V;
 				INFOPLIST_FILE = Podcasts/Info.plist;

@@ -25,20 +25,20 @@ class LockScreenPlayerController {
     var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
     
     fileprivate func updateViewWithModel(withAppEvent appEvent: AppEvent) {
-        if let event = appEvent as? EpisodeListPlayableEvent {
-            switch event {
-            case .playingEpisodeChanged(let playedEpisode):
-                updateNowPlayingInfo(withEpisode: playedEpisode.episode)
-            }
-            return
-        }
-        
-        if let event = appEvent as? PlayerManagingEvent {
-            switch event {
-            case .playerStateUpdated(let playerState):
-                updateLockscreenCurrentTime(withPlayerState: playerState)
-            }
-        }
+//        if let event = appEvent as? EpisodeListPlayableEvent {
+//            switch event {
+//            case .playingEpisodeChanged(let playedEpisode):
+//                updateNowPlayingInfo(withEpisode: playedEpisode.episode)
+//            }
+//            return
+//        }
+//        
+//        if let event = appEvent as? PlayerManagingEvent {
+//            switch event {
+//            case .playerStateUpdated(let playerState):
+//                updateLockscreenCurrentTime(withPlayerState: playerState)
+//            }
+//        }
     }
     
     fileprivate func updateNowPlayingInfo(withEpisode episode: Episode) {

@@ -10,17 +10,40 @@ import UIKit
 import Alamofire
 import PromiseKit
 
+enum EpisodeRecordStatus {
+    case downloaded
+    case downloading
+    case none
+}
+
 class EpisodeCell: UITableViewCell {
-    static var imageFetcher: ImageFetching!
+    static var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
     
     fileprivate var timer: Timer?
     var episode: Episode! {
         didSet {
-            updateViewWithModel()
+            updateViewWithEpisode()
+        }
+    }
+    var episodeRecordStatus: EpisodeRecordStatus! {
+        didSet {
+            updateViewWithEpisodeRecordStatus()
+        }
+    }
+    fileprivate func updateViewWithEpisodeRecordStatus() {
+        switch episodeRecordStatus! {
+        case .none:
+            episodeRecordDownloadIndicator.isHidden = true
+        case .downloaded:
+            episodeRecordDownloadIndicator.isHidden = false
+            episodeRecordDownloadIndicator.tintColor = .green
+        case .downloading:
+            episodeRecordDownloadIndicator.isHidden = false
+            episodeRecordDownloadIndicator.tintColor = .red
         }
     }
     
-    fileprivate func updateViewWithModel() {
+    fileprivate func updateViewWithEpisode() {
         episodeNameLabel.text = episode.name
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM dd, yyyy"
@@ -63,6 +86,11 @@ class EpisodeCell: UITableViewCell {
     @IBOutlet var loadingImageIndicator: UIActivityIndicatorView! {
         didSet {
             self.loadingImageIndicator.hidesWhenStopped = true
+        }
+    }
+    @IBOutlet var episodeRecordDownloadIndicator: UIButton! {
+        didSet {
+            self.episodeRecordDownloadIndicator.isEnabled = false
         }
     }
     

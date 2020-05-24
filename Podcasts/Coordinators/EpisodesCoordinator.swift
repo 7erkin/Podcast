@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EpisodesCoordintator: Coordinatable, EpisodesControllerCoordinatorDelegate {
+class EpisodesCoordintator: Coordinatable {
     var child: Coordinatable!
     var navigationController: UINavigationController!
     
@@ -18,17 +18,17 @@ class EpisodesCoordintator: Coordinatable, EpisodesControllerCoordinatorDelegate
     
     func start(withPodcast podcast: Podcast) {
         let episodesController = EpisodesController()
-        let repository = EpisodeRepository(withPodcast: podcast)
-        episodeRepository = repository
-        episodesController.coordinator = self
-        episodesController.episodeRepository = repository
-        episodesController.favoritePodcastRepository = ServiceLocator.favoritePodcastRepository
+        let recordsManager = EpisodeRecordsManager.shared
+        recordsManager.recordsStorage = ServiceLocator.episodeRecordStorage
+        recordsManager.recordFetcher = ServiceLocator.episodeRecordFetcher
+        let model = EpisodesModel(
+            podcast: podcast,
+            player: Player.shared,
+            podcastService: ServiceLocator.podcastService,
+            recordsManager: EpisodeRecordsManager.shared,
+            favoritePodcastsStorage: ServiceLocator.favoritePodcastStorage
+        )
+        episodesController.episodesModel = model
         navigationController.pushViewController(episodesController, animated: true)
-    }
-    
-    func choose(episode: Episode) {
-        if let playerEpisodeRepository = PlayerManager.shared.episodeRepository, playerEpisodeRepository === episodeRepository { return }
-        
-        PlayerManager.shared.episodeRepository = episodeRepository
     }
 }

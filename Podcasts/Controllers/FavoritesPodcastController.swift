@@ -20,27 +20,12 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     weak var coordinator: FavoritesPodcastControllerCoordinatorDelegate!
     var favoritePodcastsModel: FavoritePodcastsModel! {
         didSet {
-//            podcastRepositorySubscription = self.favoritePodcastRepository.subscribe(on: .main) { [weak self] event in
-//                self?.notify(withEvent: event)
-//            }
-//            if self.favoritePodcastRepository.podcasts.isEmpty {
-//                self.favoritePodcastRepository.download()
-//            }
+            self.favoritePodcastsModel.initialize()
+            self.favoritePodcastsModel.subscriber = { [weak self] in
+                self?.updateViewWithModel(withEvent: $0)
+            }
         }
     }
-    // MARK: -
-//    fileprivate func notify(withEvent event: FavoritePodcastRepositoringEvent) {
-//        switch event {
-//        case .podcastsDownloaded:
-//            collectionView.reloadData()
-//        case .podcastSaved:
-//            navigationController?.tabBarItem.badgeValue = "NEW"
-//        case .podcastDeleted(let index):
-//            collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
-//        default:
-//            break
-//        }
-//    }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -56,14 +41,17 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
         collectionView.register(FavoritesPodcastCell.self, forCellWithReuseIdentifier: cellId)
     }
     
+    fileprivate func updateViewWithModel(withEvent event: FavoritePodcastsModel.Event) {}
+    
     @objc
     fileprivate func onLongPressGestureHappened(_ gesture: UILongPressGestureRecognizer) {
         let gestureLocation = gesture.location(in: collectionView)
         if let indexPath = collectionView.indexPathForItem(at: gestureLocation) {
-            let podcast = favoritePodcastRepository.podcasts[indexPath.row]
+            let podcastIndex = indexPath.row
+            let podcast = favoritePodcastsModel.podcasts[podcastIndex]
             let alertController = UIAlertController(title: "Delete \(podcast.name ?? "") podcast from favorites?", message: nil, preferredStyle: .actionSheet)
             let deleteAction = UIAlertAction(title: "Yes", style: .destructive) { [weak self] _ in
-                self?.favoritePodcastRepository.delete(podcast: podcast)
+                self?.favoritePodcastsModel.deletePodcast(podcastIndex: podcastIndex)
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
                 alertController.dismiss(animated: true, completion: nil)
@@ -75,13 +63,13 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return favoritePodcastRepository.podcasts.count
+        return favoritePodcastsModel.podcasts.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! FavoritesPodcastCell
         // if this safe code??? what if podcasts changed in model?
-        cell.podcast = favoritePodcastRepository.podcasts[indexPath.row]
+        cell.podcast = favoritePodcastsModel.podcasts[indexPath.row]
         return cell
     }
 
@@ -103,7 +91,7 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let podcast = favoritePodcastRepository.podcasts[indexPath.row]
+        let podcast = favoritePodcastsModel.podcasts[indexPath.row]
         coordinator.choose(podcast: podcast)
     }
 }

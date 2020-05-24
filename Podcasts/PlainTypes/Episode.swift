@@ -9,7 +9,7 @@
 import Foundation
 import FeedKit
 
-struct Episode: Equatable {
+struct Episode: Codable, Equatable {
     var name: String
     var author: String
     var publishDate: Date
@@ -30,4 +30,7 @@ struct Episode: Equatable {
             imageUrl = Bundle.main.url(forResource: "podcast", withExtension: "jpeg")
         }
     }
+}
+
+extension Episode: Hashable {
 }

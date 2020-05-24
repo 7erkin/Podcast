@@ -17,5 +17,6 @@ class ServiceLocator {
         return ImageFetcherProxi(cache: ServiceLocator.imageCache, fetcher: imageFetcher)
     }()
     static let favoritePodcastStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastsStorage.shared
-    static let episodeRecordStorage: EpisodeRecordsStoraging = SQLEpisodeRecordsStorage.shared
+    static let episodeRecordStorage: EpisodeRecordsStoraging = FileSystemRecordsStorage.shared!
+    static let episodeRecordFetcher: EpisodeRecordFetching = EpisodeRecordFetcher()
 }

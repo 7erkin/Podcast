@@ -21,7 +21,8 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
         target: nil
     )
     fileprivate var storage: UserDefaults { return UserDefaults.standard }
-    fileprivate var podcasts: [Podcast] = []    // MARK: -
+    fileprivate var podcasts: [Podcast] = []
+    // MARK: -
     private init() {
         if storage.value(forKey: favoritePodcastKey) == nil {
             let emptyPodcasts = try! JSONEncoder().encode([Podcast]())
@@ -30,12 +31,16 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
     }
     static var shared = UserDefaultsFavoritePodcastsStorage()
     // MARK: - FavoritePodcastsStoraging impl
-    func load() {
-        serviceQueue.async { [weak self] in
-            guard let self = self else { return }
-            
-            self.podcasts = self.loadPodcastsFromStorage()
-            self.notifyAll(withEvent: .podcastsLoaded)
+    func hasPodcast(_ podcast: Podcast) -> Promise<Bool> {
+        return Promise { resolver in
+            serviceQueue.async { [weak self] in
+                guard let self = self else { return }
+                
+                if self.podcasts.isEmpty {
+                    self.podcasts = self.loadPodcastsFromStorage()
+                }
+                resolver.fulfill(self.podcasts.contains(podcast))
+            }
         }
     }
     
@@ -94,18 +99,15 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
     }
     
     fileprivate func notifyAll(withEvent event: FavoritePodcastStoragingEvent) {
-        subscribers.values.forEach { v in v.0.async { v.1(event) } }
+        subscribers.values.forEach { $0(event) }
     }
     // MARK: -
-    private var subscribers: [UUID : (DispatchQueue, (FavoritePodcastStoragingEvent) -> Void)] = [:]
-    func subscribe(
-        on serviceQueue: DispatchQueue,
-        _ subscriber: @escaping (FavoritePodcastStoragingEvent) -> Void
-    ) -> Promise<Subscription> {
+    private var subscribers: [UUID : (FavoritePodcastStoragingEvent) -> Void] = [:]
+    func subscribe(_ subscriber: @escaping (FavoritePodcastStoragingEvent) -> Void) -> Promise<Subscription> {
         return Promise { resolver in
             serviceQueue.async { [weak self] in
                 let key = UUID.init()
-                self?.subscribers[key] = (serviceQueue, subscriber)
+                self?.subscribers[key] = subscriber
                 let subscription = Subscription { [weak self] in
                     self?.serviceQueue.async {
                          self?.subscribers.removeValue(forKey: key)

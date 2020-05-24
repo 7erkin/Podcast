@@ -11,13 +11,15 @@ import PromiseKit
 enum FavoritePodcastStoragingEvent {
     case podcastSaved
     case podcastDeleted
-    case podcastsLoaded
 }
 
 protocol FavoritePodcastsStoraging  {
     func save(podcast: Podcast)
     func getPodcasts() -> Promise<[Podcast]>
     func delete(podcast: Podcast)
-    func load()
+    func hasPodcast(_ podcast: Podcast) -> Promise<Bool>
+    func subscribe(
+        _ subscriber: @escaping (FavoritePodcastStoragingEvent) -> Void
+    ) -> Promise<Subscription>
 }
 

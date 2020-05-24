@@ -24,33 +24,20 @@ class FavoriteButtonItem: UIBarButtonItem {
     }
 }
 
-protocol EpisodesControllerCoordinatorDelegate: class {
-    func choose(episode: Episode)
-}
-
 class EpisodesController: UITableViewController {
     private let cellId = "episodeCell"
     fileprivate var favoriteButton: FavoriteButtonItem {
         return navigationItem.rightBarButtonItem as! FavoriteButtonItem
     }
-    private var podcastStorageSubscription: Subscription!
     // MARK: - dependencies
-    // ! sign because of strange init requirements
-    weak var coordinator: EpisodesControllerCoordinatorDelegate!
     var episodesModel: EpisodesModel! {
         didSet {
-//            podcastStorageSubscription = self.favoritePodcastRepository.subscribe(on: .main) { [weak self] event in
-//                self?.notify(withEvent: event)
-//            }
+            self.episodesModel.initialize()
+            self.episodesModel.subscriber = { [weak self] event in
+                self?.updateViewWithModel(withEvent: event)
+            }
         }
     }
-//    var episodeRepository: EpisodeRepository! {
-//        didSet {
-//            episodeRepository.subscribe(subscriber: AnyObserver<EpisodeRepository.Event>(self))
-//            navigationItem.title = episodeRepository.podcast.name
-//            episodeRepository.downloadEpisodes()
-//        }
-//    }
     // MARK: - view life cycles
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,25 +49,20 @@ class EpisodesController: UITableViewController {
             action: #selector(onFavoriteButtonTapped)
         )
         navigationItem.rightBarButtonItem = favoriteButton
-        favoritePodcastRepository.download()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        podcastStorageSubscription = favoritePodcastRepository.subscribe(on: .main) { [weak self] event in
-            self?.notify(withEvent: event)
-        }
     }
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        podcastStorageSubscription = nil
     }
     // MARK: - interaction handlers
     @objc
     fileprivate func onFavoriteButtonTapped() {
-        if favoriteButton.isFavorite { return }
-        
-        favoritePodcastRepository.save(podcast: episodeRepository.podcast)
+        if !favoriteButton.isFavorite {
+            episodesModel.addPodcastToFavorites()
+        }
     }
     // MARK: - helpers
     fileprivate func setupTableView() {
@@ -89,23 +71,41 @@ class EpisodesController: UITableViewController {
         tableView.tableFooterView = UIView()
     }
     
-    fileprivate func updateFavoriteButtonWithModel() {
-        favoriteButton.isFavorite = favoritePodcastRepository.podcasts.contains(episodeRepository.podcast)
+    fileprivate func updateViewWithModel(withEvent event: EpisodesModel.Event) {
+        switch event {
+        case .initialized:
+            tableView.reloadData()
+            favoriteButton.isFavorite = episodesModel.isPodcastFavorite
+        case .podcastStatusUpdated:
+            favoriteButton.isFavorite = episodesModel.isPodcastFavorite
+        case .episodeSavingProgressUpdated:
+            let indexPathsToReload = tableView.visibleCells
+                .map { $0 as! EpisodeCell }
+                .filter { episodesModel.savingEpisodes[$0.episode] != nil }
+                .map { tableView.indexPath(for: $0)! }
+            tableView.reloadRows(at: indexPathsToReload, with: .none)
+            break
+        case .episodeSaved:
+            break
+        default:
+            break
+        }
     }
     // MARK: - UITableView
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! EpisodeCell
-        let episode = episodeRepository.episodes[indexPath.row]
+        let episode = episodesModel.episodes[indexPath.row]
         cell.episode = episode
+        cell.episodeRecordStatus = episodesModel.savedEpisodes.contains(episode) ? EpisodeRecordStatus.downloaded : .none
         return cell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return episodeRepository.episodesCount
+        return episodesModel.episodes.count
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        episodeRepository.pickEpisode(byIndex: indexPath.row)
+        episodesModel.pickEpisode(episodeIndex: indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -120,22 +120,14 @@ class EpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return episodeRepository.episodesCount == 0 ? 200 : 0
+        return episodesModel.episodes.count == 0 ? 200 : 0
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let action = UIContextualAction(style: .normal, title: "Download") { (_, cell, _) in
-            
+        let action = UIContextualAction(style: .normal, title: "Download") { [weak self] (_, _, _) in
+            self?.episodesModel.saveEpisodeRecord(episodeIndex: indexPath.row)
         }
         let configuration = UISwipeActionsConfiguration(actions: [action])
         return configuration
     }
-    
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .none {
-            
-        }
-    }
-    // MARK: - Notifiers
-
 }

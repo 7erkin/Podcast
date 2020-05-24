@@ -19,7 +19,8 @@ class AppPlayerController: UIViewController {
     
     var appPlayerView: AppPlayerView { return view as! AppPlayerView }
     
-    weak var player: PlayerManager! {
+    // player manager
+    weak var player: Player! {
         didSet {
         }
     }

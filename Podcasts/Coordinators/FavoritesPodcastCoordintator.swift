@@ -20,7 +20,8 @@ class FavoritesPodcastCoordinator: Coordinatable, FavoritesPodcastControllerCoor
         let layout = UICollectionViewFlowLayout()
         let viewController = FavoritesPodcastController(collectionViewLayout: layout)
         viewController.coordinator = self
-        viewController.favoritePodcastsModel = FavoritePodcastsModel()
+        let model = FavoritePodcastsModel(favoritePodcastsStorage: ServiceLocator.favoritePodcastStorage)
+        viewController.favoritePodcastsModel = model
         viewController.navigationItem.title = "Favorites"
         navigationController.pushViewController(viewController, animated: true)
     }

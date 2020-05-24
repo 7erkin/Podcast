@@ -9,11 +9,18 @@
 import UIKit
 import PromiseKit
 
+struct StoredEpisodeRecordItem: Codable {
+    var episode: Episode
+    var podcast: Podcast
+    var recordUrl: URL
+}
+
 protocol EpisodeRecordsStoraging {
     @discardableResult
-    func save(episode: Episode, withRecord record: Data) -> Promise<Void>
+    func save(episode: Episode, ofPodcast podcast: Podcast, withRecord record: Data) -> Promise<Void>
     @discardableResult
     func delete(episode: Episode) -> Promise<Void>
-    func getEpisodeRecord(_ episode: Episode) -> Promise<Data>
-    func getStoredEpisodesInfo() -> Promise<[Episode]>
+    func getStoredEpisodeRecordItem(_ episode: Episode) -> Promise<StoredEpisodeRecordItem>
+    func getStoredEpisodeRecordList() -> Promise<[StoredEpisodeRecordItem]>
+    func hasEpisode(_ episode: Episode) -> Promise<Bool>
 }

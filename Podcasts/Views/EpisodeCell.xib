@@ -25,22 +25,22 @@
                         </constraints>
                     </imageView>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="1" translatesAutoresizingMaskIntoConstraints="NO" id="GOz-pX-pVE">
-                        <rect key="frame" x="132" y="31.5" width="322" height="53"/>
+                        <rect key="frame" x="132" y="31.5" width="272" height="53"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="pubDate" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="W31-Ox-3fD">
-                                <rect key="frame" x="0.0" y="0.0" width="322" height="17"/>
+                                <rect key="frame" x="0.0" y="0.0" width="272" height="17"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" systemColor="systemIndigoColor" red="0.34509803919999998" green="0.33725490200000002" blue="0.83921568629999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="episodeName" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZHm-08-Ek9">
-                                <rect key="frame" x="0.0" y="18" width="322" height="19.5"/>
+                                <rect key="frame" x="0.0" y="18" width="272" height="19.5"/>
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="description" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quF-JU-aLX">
-                                <rect key="frame" x="0.0" y="38.5" width="322" height="14.5"/>
+                                <rect key="frame" x="0.0" y="38.5" width="272" height="14.5"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -50,13 +50,26 @@
                     <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="iiK-nN-iQy">
                         <rect key="frame" x="56" y="48" width="20" height="20"/>
                     </activityIndicatorView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XLu-WS-ofo">
+                        <rect key="frame" x="420" y="8" width="26" height="26"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="26" id="F6A-ub-PQg"/>
+                            <constraint firstAttribute="height" constant="26" id="OnH-X8-uaq"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="21"/>
+                        <state key="normal" backgroundImage="square.and.arrow.down" catalog="system">
+                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="medium" weight="bold"/>
+                        </state>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="trailing" secondItem="GOz-pX-pVE" secondAttribute="trailing" constant="50" id="1Lj-4W-iVO"/>
                     <constraint firstItem="0vJ-7f-Ba8" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="16" id="6Kz-L2-CTP"/>
                     <constraint firstItem="GOz-pX-pVE" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="Fa2-Qz-nuO"/>
                     <constraint firstItem="0vJ-7f-Ba8" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="FkL-au-g0a"/>
+                    <constraint firstAttribute="trailing" secondItem="XLu-WS-ofo" secondAttribute="trailing" constant="8" id="Hhu-qC-Dsg"/>
+                    <constraint firstItem="XLu-WS-ofo" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="LjP-8p-Acg"/>
                     <constraint firstItem="iiK-nN-iQy" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="56" id="OK9-cO-wCl"/>
-                    <constraint firstAttribute="trailing" secondItem="GOz-pX-pVE" secondAttribute="trailing" id="PB7-i0-tsE"/>
                     <constraint firstItem="GOz-pX-pVE" firstAttribute="leading" secondItem="0vJ-7f-Ba8" secondAttribute="trailing" constant="16" id="Vh6-vk-yCF"/>
                     <constraint firstItem="iiK-nN-iQy" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="vh8-gz-C2T"/>
                 </constraints>
@@ -66,10 +79,14 @@
                 <outlet property="descriptionLabel" destination="quF-JU-aLX" id="kAA-zl-P09"/>
                 <outlet property="episodeImageView" destination="0vJ-7f-Ba8" id="Pjq-7F-fAw"/>
                 <outlet property="episodeNameLabel" destination="ZHm-08-Ek9" id="i7D-eH-e3X"/>
+                <outlet property="episodeRecordDownloadIndicator" destination="XLu-WS-ofo" id="RMV-G7-3fh"/>
                 <outlet property="loadingImageIndicator" destination="iiK-nN-iQy" id="dkg-cl-EZY"/>
                 <outlet property="publishDateLabel" destination="W31-Ox-3fD" id="zjr-Qu-1y4"/>
             </connections>
             <point key="canvasLocation" x="78.260869565217391" y="38.839285714285715"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <image name="square.and.arrow.down" catalog="system" width="60" height="64"/>
+    </resources>
 </document>

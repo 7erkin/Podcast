@@ -10,5 +10,5 @@ import PromiseKit
 import Foundation
 
 protocol EpisodeRecordFetching {
-    func fetch(episode: Episode, _ progressHandler: (Float) -> Void) -> Promise<Data>
+    func fetch(episode: Episode, _ progressHandler: ((Double) -> Void)?) -> Promise<Data>
 }

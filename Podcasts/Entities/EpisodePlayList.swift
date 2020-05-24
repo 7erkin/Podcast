@@ -14,79 +14,55 @@ enum EpisodePlayListEvent: AppEvent {
     case episodeListChanged
 }
 
+protocol EpisodePlayListCreatorToken {}
+
+struct EpisodePlayListItem {
+    var episode: Episode
+    var podcast: Podcast
+}
+
+// client of this class are models and must work with it in main thread
 class EpisodePlayList {
-    private let serviceQueue = DispatchQueue.main
     private var subscribers: [UUID:(EpisodePlayListEvent) -> Void] = [:]
-    private let episodes: [Episode]
-    private var playingEpisodeIndex: Int
-    private let creatorId: UUID
-    private let id: Any?
-    init(episodes: [Episode], playingEpisodeIndex index: Int, playListCreatorId: UUID, playListId: Any?) {
-        self.episodes = episodes
-        self.playingEpisodeIndex = index
-        self.creatorId = playListCreatorId
-        self.id = playListId
+    private let playList: [EpisodePlayListItem]
+    private var playingItemIndex: Int
+    let creatorToken: EpisodePlayListCreatorToken
+    init(playList: [EpisodePlayListItem], playingItemIndex index: Int, creatorToken: EpisodePlayListCreatorToken) {
+        self.playList = playList
+        self.playingItemIndex = index
+        self.creatorToken = creatorToken
     }
     
     deinit {
-        serviceQueue.async { [weak self] in
-            self?.notifyAll(withEvent: .playingEpisodeChanged)
-        }
+        notifyAll(withEvent: .playingEpisodeChanged)
     }
     
     func nextEpisode() {
-        serviceQueue.async { [weak self] in
-            self?.playingEpisodeIndex += 1
-            self?.notifyAll(withEvent: .playingEpisodeChanged)
-        }
+        playingItemIndex += 1
+        notifyAll(withEvent: .playingEpisodeChanged)
     }
     
     func previousEpisode() {
-        serviceQueue.async { [weak self] in
-            self?.playingEpisodeIndex -= 1
-            self?.notifyAll(withEvent: .playingEpisodeChanged)
-        }
+        playingItemIndex -= 1
+        notifyAll(withEvent: .playingEpisodeChanged)
     }
     
-    func getPlayingEpisode() -> Promise<Episode> {
-        return Promise { resolver in
-            serviceQueue.async { [weak self] in
-                guard let self = self else { return }
-                
-                resolver.resolve(.fulfilled(self.episodes[self.playingEpisodeIndex]))
-            }
-        }
+    func getPlayingEpisode() -> EpisodePlayListItem {
+        return playList[playingItemIndex]
     }
     
-    func hasNextEpisode() -> Promise<Bool> {
-        return Promise { resolver in
-            serviceQueue.async { [weak self] in
-                guard let self = self else { return }
-                
-                resolver.resolve(.fulfilled(self.playingEpisodeIndex + 1 != self.episodes.count))
-            }
-        }
+    func hasNextEpisode() -> Bool {
+        return self.playingItemIndex + 1 != self.playList.count
     }
     
-    func hasPreviousEpisode() -> Promise<Bool> {
-        return Promise { resolver in
-            serviceQueue.async { [weak self] in
-                guard let self = self else { return }
-                
-                resolver.resolve(.fulfilled(self.playingEpisodeIndex != 0))
-            }
-        }
+    func hasPreviousEpisode() -> Bool {
+        return playingItemIndex != 0
     }
     
-    func subscribe(_ subscriber: @escaping (EpisodePlayListEvent) -> Void) -> Promise<Subscription> {
-        return Promise { resolver in
-            let key = UUID.init()
-            serviceQueue.async { [weak self] in
-                self?.subscribers[key] = subscriber
-                let subscription = Subscription { [weak self] in self?.subscribers.removeValue(forKey: key) }
-                resolver.resolve(.fulfilled(subscription))
-            }
-        }
+    func subscribe(_ subscriber: @escaping (EpisodePlayListEvent) -> Void) -> Subscription {
+        let key = UUID.init()
+        subscribers[key] = subscriber
+        return Subscription { [weak self] in self?.subscribers.removeValue(forKey: key) }
     }
     
     fileprivate func notifyAll(withEvent event: EpisodePlayListEvent) {

@@ -7,5 +7,71 @@
 //
 
 import Foundation
+import PromiseKit
 
-class FavoritePodcastsModel {}
+class FavoritePodcastsModel {
+    enum Event {
+        case initialized
+        case podcastDeleted
+        case podcastSaved
+    }
+    
+    private(set) var podcasts: [Podcast] = []
+    private var storageSubscription: Subscription!
+    private let storage: FavoritePodcastsStoraging
+    var subscriber: ((Event) -> Void)!
+    init(favoritePodcastsStorage: FavoritePodcastsStoraging) {
+        self.storage = favoritePodcastsStorage
+        subscribeToFavoritePodcastsStorage()
+    }
+    
+    func initialize() {
+        firstly {
+            updatePodcastsWithStorage()
+        }.done {
+            self.subscriber(.initialized)
+        }.catch { _ in }
+    }
+    
+    func deletePodcast(podcastIndex index: Int) {
+        storage.delete(podcast: podcasts[index])
+    }
+    
+    private func subscribeToFavoritePodcastsStorage() {
+        storage.subscribe { event in
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                switch event {
+                case .podcastSaved:
+                    firstly {
+                        self.updatePodcastsWithStorage()
+                    }.done {
+                        self.subscriber(.podcastSaved)
+                    }.catch { _ in }
+                    break
+                case .podcastDeleted:
+                    firstly {
+                        self.updatePodcastsWithStorage()
+                    }.done {
+                        self.subscriber(.podcastDeleted)
+                    }.catch { _ in }
+                    break
+                }
+            }
+        }.done { subscription in
+            self.storageSubscription = subscription
+        }.catch { _ in
+            
+        }
+    }
+    
+    private func updatePodcastsWithStorage() -> Promise<Void> {
+        firstly {
+            storage.getPodcasts()
+        }.then { podcasts -> Promise<Void> in
+            self.podcasts = podcasts
+            return Promise.value
+        }
+    }
+}

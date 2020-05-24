@@ -20,8 +20,8 @@ class PodcastSearchCoordinator: Coordinatable, PodcastsSearchControllerCoordinat
         let viewController = PodcastsSearchController()
         viewController.coordinator = self
         viewController.navigationItem.title = "Podcasts"
-        viewController.podcastService = ServiceLocator.defferedPodcastService
-        viewController.podcastRepository = PodcastRepository(podcastService: ServiceLocator.podcastService)
+        let model = PodcastsSearchModel(podcastService: ServiceLocator.podcastService)
+        viewController.podcastsSearchModel = model
         navigationController.pushViewController(viewController, animated: true)
     }
     

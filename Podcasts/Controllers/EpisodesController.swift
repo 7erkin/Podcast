@@ -86,6 +86,11 @@ class EpisodesController: UITableViewController {
             tableView.reloadRows(at: indexPathsToReload, with: .none)
             break
         case .episodeSaved:
+            let indexPathsToReload = tableView.visibleCells
+                .map { $0 as! EpisodeCell }
+                .filter { $0.episodeRecordStatus! == .downloading }
+                .map { tableView.indexPath(for: $0)! }
+            tableView.reloadRows(at: indexPathsToReload, with: .none)
             break
         default:
             break
@@ -96,7 +101,15 @@ class EpisodesController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! EpisodeCell
         let episode = episodesModel.episodes[indexPath.row]
         cell.episode = episode
-        cell.episodeRecordStatus = episodesModel.savedEpisodes.contains(episode) ? EpisodeRecordStatus.downloaded : .none
+        if episodesModel.savedEpisodes.contains(episode)  {
+            cell.episodeRecordStatus = .downloaded
+        } else {
+            if episodesModel.savingEpisodes[episode] != nil {
+                cell.episodeRecordStatus = .downloading
+            } else {
+                cell.episodeRecordStatus = EpisodeRecordStatus.none
+            }
+        }
         return cell
     }
     
@@ -124,8 +137,9 @@ class EpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let action = UIContextualAction(style: .normal, title: "Download") { [weak self] (_, _, _) in
+        let action = UIContextualAction(style: .normal, title: "Download") { [weak self] (_, _, completionHandler) in
             self?.episodesModel.saveEpisodeRecord(episodeIndex: indexPath.row)
+            completionHandler(true)
         }
         let configuration = UISwipeActionsConfiguration(actions: [action])
         return configuration

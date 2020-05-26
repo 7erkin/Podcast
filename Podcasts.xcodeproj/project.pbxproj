@@ -21,8 +21,8 @@
 		7C3654B72475B6BB00EB68C4 /* DefferedPodcastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654B62475B6BB00EB68C4 /* DefferedPodcastService.swift */; };
 		7C3654BA2475BD9000EB68C4 /* RootCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654B92475BD9000EB68C4 /* RootCoordinator.swift */; };
 		7C3654BF2475CAC900EB68C4 /* EpisodeRecordsStoraging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654BE2475CAC900EB68C4 /* EpisodeRecordsStoraging.swift */; };
-		7C3654C32475D0F200EB68C4 /* EpisodeRecordsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654C22475D0F200EB68C4 /* EpisodeRecordsController.swift */; };
-		7C3654C52475D2D700EB68C4 /* EpisodeRecordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654C42475D2D700EB68C4 /* EpisodeRecordsModel.swift */; };
+		7C3654C32475D0F200EB68C4 /* DownloadedEpisodesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654C22475D0F200EB68C4 /* DownloadedEpisodesController.swift */; };
+		7C3654C52475D2D700EB68C4 /* DownloadedEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654C42475D2D700EB68C4 /* DownloadedEpisodesModel.swift */; };
 		7C3654C82475FB7900EB68C4 /* FileSystemRecordsStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654C72475FB7900EB68C4 /* FileSystemRecordsStorage.swift */; };
 		7C3654CC2475FE2E00EB68C4 /* PodcastsSearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654CB2475FE2E00EB68C4 /* PodcastsSearchModel.swift */; };
 		7C3654CE2475FE4700EB68C4 /* FavoritePodcastsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3654CD2475FE4700EB68C4 /* FavoritePodcastsModel.swift */; };
@@ -87,7 +87,12 @@
 		7CF577C12470C99100094097 /* BiggestImageFlushPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */; };
 		B9D4C6052477ADBF00DC00DE /* ImageFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */; };
 		B9D4C6072477CD5300DC00DE /* PlayerManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6062477CD5300DC00DE /* PlayerManaging.swift */; };
-		B9E57DEF247D07D30009A8E4 /* DownloadBarRootCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DEE247D07D30009A8E4 /* DownloadBarRootCoordinator.swift */; };
+		B9E57DEF247D07D30009A8E4 /* DownloadsBarRootCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DEE247D07D30009A8E4 /* DownloadsBarRootCoordinator.swift */; };
+		B9E57DF1247D08F00009A8E4 /* DownloadedEpisodesCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DF0247D08F00009A8E4 /* DownloadedEpisodesCoordinator.swift */; };
+		B9E57DF5247D46EB0009A8E4 /* not.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DF4247D46EB0009A8E4 /* not.swift */; };
+		B9E57DF7247D4B560009A8E4 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DF6247D4B560009A8E4 /* OrderedDictionary.swift */; };
+		B9E57DF9247D51820009A8E4 /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DF8247D51820009A8E4 /* Int.swift */; };
+		B9E57DFB247D630E0009A8E4 /* composition.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DFA247D630E0009A8E4 /* composition.swift */; };
 		B9FC41EF2477FE95007FFCF3 /* EpisodePlayList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9FC41EE2477FE95007FFCF3 /* EpisodePlayList.swift */; };
 /* End PBXBuildFile section */
 
@@ -125,8 +130,8 @@
 		7C3654B62475B6BB00EB68C4 /* DefferedPodcastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefferedPodcastService.swift; sourceTree = "<group>"; };
 		7C3654B92475BD9000EB68C4 /* RootCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootCoordinator.swift; sourceTree = "<group>"; };
 		7C3654BE2475CAC900EB68C4 /* EpisodeRecordsStoraging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRecordsStoraging.swift; sourceTree = "<group>"; };
-		7C3654C22475D0F200EB68C4 /* EpisodeRecordsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRecordsController.swift; sourceTree = "<group>"; };
-		7C3654C42475D2D700EB68C4 /* EpisodeRecordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRecordsModel.swift; sourceTree = "<group>"; };
+		7C3654C22475D0F200EB68C4 /* DownloadedEpisodesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedEpisodesController.swift; sourceTree = "<group>"; };
+		7C3654C42475D2D700EB68C4 /* DownloadedEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedEpisodesModel.swift; sourceTree = "<group>"; };
 		7C3654C72475FB7900EB68C4 /* FileSystemRecordsStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemRecordsStorage.swift; sourceTree = "<group>"; };
 		7C3654CB2475FE2E00EB68C4 /* PodcastsSearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastsSearchModel.swift; sourceTree = "<group>"; };
 		7C3654CD2475FE4700EB68C4 /* FavoritePodcastsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritePodcastsModel.swift; sourceTree = "<group>"; };
@@ -192,7 +197,12 @@
 		7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiggestImageFlushPolicy.swift; sourceTree = "<group>"; };
 		B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFetcher.swift; sourceTree = "<group>"; };
 		B9D4C6062477CD5300DC00DE /* PlayerManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManaging.swift; sourceTree = "<group>"; };
-		B9E57DEE247D07D30009A8E4 /* DownloadBarRootCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadBarRootCoordinator.swift; sourceTree = "<group>"; };
+		B9E57DEE247D07D30009A8E4 /* DownloadsBarRootCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsBarRootCoordinator.swift; sourceTree = "<group>"; };
+		B9E57DF0247D08F00009A8E4 /* DownloadedEpisodesCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedEpisodesCoordinator.swift; sourceTree = "<group>"; };
+		B9E57DF4247D46EB0009A8E4 /* not.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = not.swift; sourceTree = "<group>"; };
+		B9E57DF6247D4B560009A8E4 /* OrderedDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderedDictionary.swift; sourceTree = "<group>"; };
+		B9E57DF8247D51820009A8E4 /* Int.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Int.swift; sourceTree = "<group>"; };
+		B9E57DFA247D630E0009A8E4 /* composition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = composition.swift; sourceTree = "<group>"; };
 		B9FC41EE2477FE95007FFCF3 /* EpisodePlayList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodePlayList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -301,7 +311,7 @@
 				7C35EE632460D63D0029DA95 /* PodcastsSearchController.swift */,
 				7C466D402461E6860014D33A /* EpisodesController.swift */,
 				7CAA5DFB2472FD2100ADD087 /* FavoritesPodcastController.swift */,
-				7C3654C22475D0F200EB68C4 /* EpisodeRecordsController.swift */,
+				7C3654C22475D0F200EB68C4 /* DownloadedEpisodesController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -311,7 +321,7 @@
 			children = (
 				7C994B58246C95E200B8C628 /* Player */,
 				7CEF3044246934B80045AB91 /* EpisodesModel.swift */,
-				7C3654C42475D2D700EB68C4 /* EpisodeRecordsModel.swift */,
+				7C3654C42475D2D700EB68C4 /* DownloadedEpisodesModel.swift */,
 				7C3654CB2475FE2E00EB68C4 /* PodcastsSearchModel.swift */,
 				7C3654CD2475FE4700EB68C4 /* FavoritePodcastsModel.swift */,
 			);
@@ -430,6 +440,7 @@
 				7CF237BA2466529300B7A09F /* CMTime.swift */,
 				7C3654CF2475FE8E00EB68C4 /* Array.swift */,
 				7C3654DE24774A8100EB68C4 /* UIImage.swift */,
+				B9E57DF8247D51820009A8E4 /* Int.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -452,7 +463,8 @@
 				7C994B56246C8A8F00B8C628 /* SearchBarRootCoordinator.swift */,
 				7C994B50246C788D00B8C628 /* PodcastSearchCoordinator.swift */,
 				7C994B54246C7BD600B8C628 /* EpisodesCoordinator.swift */,
-				B9E57DEE247D07D30009A8E4 /* DownloadBarRootCoordinator.swift */,
+				B9E57DEE247D07D30009A8E4 /* DownloadsBarRootCoordinator.swift */,
+				B9E57DF0247D08F00009A8E4 /* DownloadedEpisodesCoordinator.swift */,
 			);
 			path = Coordinators;
 			sourceTree = "<group>";
@@ -565,6 +577,9 @@
 			isa = PBXGroup;
 			children = (
 				7CF577B82470A37500094097 /* ForwardList.swift */,
+				B9E57DF4247D46EB0009A8E4 /* not.swift */,
+				B9E57DF6247D4B560009A8E4 /* OrderedDictionary.swift */,
+				B9E57DFA247D630E0009A8E4 /* composition.swift */,
 			);
 			path = Library;
 			sourceTree = "<group>";
@@ -750,6 +765,7 @@
 				7CAA5DFC2472FD2100ADD087 /* FavoritesPodcastController.swift in Sources */,
 				7C3654B52475A82300EB68C4 /* FavoritesBarRootCoordinator.swift in Sources */,
 				7C466D3F246188E10014D33A /* PodcastCell.swift in Sources */,
+				B9E57DF5247D46EB0009A8E4 /* not.swift in Sources */,
 				7CA423AB246788B0009C4A18 /* MinimizePlayerView.swift in Sources */,
 				7C35EE4D2460CBD30029DA95 /* AppDelegate.swift in Sources */,
 				7C940CA9246E0C35000B2DF3 /* ImageFetcherProxi.swift in Sources */,
@@ -763,6 +779,7 @@
 				7C466D47246204F90014D33A /* EpisodeCell.swift in Sources */,
 				7C3654C82475FB7900EB68C4 /* FileSystemRecordsStorage.swift in Sources */,
 				7CDB722C2479927700EF487D /* EpisodeRecordFetcher.swift in Sources */,
+				B9E57DF1247D08F00009A8E4 /* DownloadedEpisodesCoordinator.swift in Sources */,
 				7CF577B92470A37500094097 /* ForwardList.swift in Sources */,
 				7CF577BD2470C93E00094097 /* InMemoryImageCacheFlushPolicy.swift in Sources */,
 				7CEDAD622470223A00DACFE5 /* PresentAnimatorEnchancer.swift in Sources */,
@@ -779,6 +796,7 @@
 				7CEF302B2468E1BC0045AB91 /* Observable.swift in Sources */,
 				7C3654BF2475CAC900EB68C4 /* EpisodeRecordsStoraging.swift in Sources */,
 				B9FC41EF2477FE95007FFCF3 /* EpisodePlayList.swift in Sources */,
+				B9E57DF7247D4B560009A8E4 /* OrderedDictionary.swift in Sources */,
 				7CAA5E0524732E2300ADD087 /* UserDefaultsFavoritePodcastsStorage.swift in Sources */,
 				7C35EE612460CC0E0029DA95 /* MainTabBarController.swift in Sources */,
 				7C3654DF24774A8100EB68C4 /* UIImage.swift in Sources */,
@@ -788,9 +806,10 @@
 				7C35EE642460D63D0029DA95 /* PodcastsSearchController.swift in Sources */,
 				7CEF3045246934B80045AB91 /* EpisodesModel.swift in Sources */,
 				7C940CAC246E0D07000B2DF3 /* ImageCaching.swift in Sources */,
-				7C3654C32475D0F200EB68C4 /* EpisodeRecordsController.swift in Sources */,
+				7C3654C32475D0F200EB68C4 /* DownloadedEpisodesController.swift in Sources */,
+				B9E57DFB247D630E0009A8E4 /* composition.swift in Sources */,
 				7CF577C12470C99100094097 /* BiggestImageFlushPolicy.swift in Sources */,
-				7C3654C52475D2D700EB68C4 /* EpisodeRecordsModel.swift in Sources */,
+				7C3654C52475D2D700EB68C4 /* DownloadedEpisodesModel.swift in Sources */,
 				7C35EE4F2460CBD30029DA95 /* SceneDelegate.swift in Sources */,
 				7CF33CF124794D8C0013E9FA /* EpisodeRecordsManager.swift in Sources */,
 				7CEF30242468D3DC0045AB91 /* MediaCenterPlayerController.swift in Sources */,
@@ -799,8 +818,9 @@
 				7CEDAD6C2470247D00DACFE5 /* PresentAnimator.swift in Sources */,
 				7C3654AF2475A7B500EB68C4 /* FavoritesPodcastCoordintator.swift in Sources */,
 				7C940CAE246E0DB4000B2DF3 /* InMemoryImageCache.swift in Sources */,
-				B9E57DEF247D07D30009A8E4 /* DownloadBarRootCoordinator.swift in Sources */,
+				B9E57DEF247D07D30009A8E4 /* DownloadsBarRootCoordinator.swift in Sources */,
 				7C994B55246C7BD600B8C628 /* EpisodesCoordinator.swift in Sources */,
+				B9E57DF9247D51820009A8E4 /* Int.swift in Sources */,
 				7C3654CC2475FE2E00EB68C4 /* PodcastsSearchModel.swift in Sources */,
 				7CEF30222468D3CC0045AB91 /* LockScreenPlayerController.swift in Sources */,
 				7C466D4D246214E90014D33A /* URL.swift in Sources */,

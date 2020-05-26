@@ -11,15 +11,20 @@ import PromiseKit
 
 struct BreakPromiseChainError: Error {}
 
+// must be called from the main thread
 class EpisodeRecordsManager {
     enum Event {
-        case episodeSaved(episode: Episode)
-        case episodeDeleted(episode: Episode)
-        case episodeSavingProgress(episode: Episode, progress: Double)
+        case episodeDownloaded
+        case episodeDeleted
+        case episodeDownloadingProgress
+        case episodeStartDownloading
     }
     
+    private(set) var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
+    // MARK: - dependencies
     var recordsStorage: EpisodeRecordsStoraging!
     var recordFetcher: EpisodeRecordFetching!
+    // MARK: -
     private var subscribers: [UUID:(Event) -> Void] = [:]
     static let shared = EpisodeRecordsManager()
     private init() {}
@@ -28,36 +33,39 @@ class EpisodeRecordsManager {
         return recordsStorage.hasEpisode(episode)
     }
     
-    func saveEpisode(_ episode: Episode, ofPodcast podcast: Podcast) {
-        firstly {
+    func downloadEpisode(_ episode: Episode, ofPodcast podcast: Podcast) {
+        firstly { () -> Promise<Bool> in
             recordsStorage.hasEpisode(episode)
         }.then { hasEpisode -> Promise<Data> in
             if hasEpisode { return Promise(error: BreakPromiseChainError()) }
+            var isStartDownloadingNotified = false
             return self.recordFetcher.fetch(episode: episode) { progress in
                 DispatchQueue.main.async { [weak self] in
-                    self?.notifyAll(withEvent: .episodeSavingProgress(episode: episode, progress: progress))
+                    if !isStartDownloadingNotified {
+                        isStartDownloadingNotified = true
+                        self?.notifyAll(withEvent: .episodeStartDownloading)
+                    }
+                    self?.downloadingEpisodes[episode] = progress
+                    self?.notifyAll(withEvent: .episodeDownloadingProgress)
                 }
             }
-        }.then { data in
+        }.then { data -> Promise<Void> in
             self.recordsStorage.save(episode: episode, ofPodcast: podcast, withRecord: data)
         }.done {
-            self.notifyAll(withEvent: .episodeSaved(episode: episode))
-        }.catch { _ in
-            
-        }
+            self.downloadingEpisodes.removeValue(forKey: episode)
+            self.notifyAll(withEvent: .episodeDownloaded)
+        }.catch { _ in }
     }
     
     func deleteEpisode(_ episode: Episode) {
         firstly {
             recordsStorage.delete(episode: episode)
         }.done {
-            // notify
-        }.catch { _ in
-            
-        }
+            self.notifyAll(withEvent: .episodeDeleted)
+        }.catch { _ in }
     }
     
-    var storedEpisodes: Promise<[StoredEpisodeRecordItem]> {
+    var storedEpisodeList: Promise<[StoredEpisodeItem]> {
         return recordsStorage.getStoredEpisodeRecordList()
     }
     
@@ -68,7 +76,7 @@ class EpisodeRecordsManager {
             self?.subscribers.removeValue(forKey: key)
         }
     }
-    
+    // MARK: - helpers
     fileprivate func notifyAll(withEvent event: Event) {
         subscribers.values.forEach { $0(event) }
     }

@@ -51,7 +51,7 @@ class FileSystemRecordsStorage: EpisodeRecordsStoraging {
             // create description file in record directory
             var itemDesriptionUrl = directoryUrl
             itemDesriptionUrl.appendPathComponent("description")
-            let itemDescription = StoredEpisodeRecordItem(episode: episode, podcast: podcast, recordUrl: recordUrl)
+            let itemDescription = StoredEpisodeItem(episode: episode, podcast: podcast, recordUrl: recordUrl)
             let serializedItemDescription = try! JSONEncoder().encode(itemDescription)
             try! serializedItemDescription.write(to: itemDesriptionUrl)
             //precondition(FileManager.default.createFile(atPath: itemDesriptionUrl.absoluteString, contents: serializedItemDescription, attributes: nil))
@@ -69,20 +69,20 @@ class FileSystemRecordsStorage: EpisodeRecordsStoraging {
         }
     }
     
-    func getStoredEpisodeRecordItem(_ episode: Episode) -> Promise<StoredEpisodeRecordItem> {
-        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<StoredEpisodeRecordItem> in
+    func getStoredEpisodeRecordItem(_ episode: Episode) -> Promise<StoredEpisodeItem> {
+        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<StoredEpisodeItem> in
             let directoryName = self.getRecordDirectoryName(forSavedEpisode: episode)
             var descriptionUrl = self.recordsDirectoryRootUrl
             descriptionUrl.appendPathComponent(directoryName)
             descriptionUrl.appendPathComponent("description")
             let serializedItemDescription = FileManager.default.contents(atPath: descriptionUrl.absoluteString)!
-            let item = try! JSONDecoder().decode(StoredEpisodeRecordItem.self, from: serializedItemDescription)
+            let item = try! JSONDecoder().decode(StoredEpisodeItem.self, from: serializedItemDescription)
             return Promise { resolver in resolver.fulfill(item) }
         }
     }
     
-    func getStoredEpisodeRecordList() -> Promise<[StoredEpisodeRecordItem]> {
-        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[StoredEpisodeRecordItem]> in
+    func getStoredEpisodeRecordList() -> Promise<[StoredEpisodeItem]> {
+        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[StoredEpisodeItem]> in
             let items = try! FileManager.default.contentsOfDirectory(
                 at: self.recordsDirectoryRootUrl,
                 includingPropertiesForKeys: nil,
@@ -94,7 +94,7 @@ class FileSystemRecordsStorage: EpisodeRecordsStoraging {
                 //let serializedItemDescription = FileManager.default.contents(atPath: itemDescriptionUrl.absoluteString)
                 return try? FileHandle(forReadingFrom: itemDescriptionUrl).readDataToEndOfFile()
             }.map { data in
-                return try! JSONDecoder().decode(StoredEpisodeRecordItem.self, from: data)
+                return try! JSONDecoder().decode(StoredEpisodeItem.self, from: data)
             }
             return Promise { resolver in resolver.fulfill(items) }
         }

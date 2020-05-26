@@ -78,22 +78,17 @@ class EpisodesController: UITableViewController {
             favoriteButton.isFavorite = episodesModel.isPodcastFavorite
         case .podcastStatusUpdated:
             favoriteButton.isFavorite = episodesModel.isPodcastFavorite
-        case .episodeSavingProgressUpdated:
+        case .episodeDownloadingProgressUpdated:
             let indexPathsToReload = tableView.visibleCells
                 .map { $0 as! EpisodeCell }
-                .filter { episodesModel.savingEpisodes[$0.episode] != nil }
+                .filter { episodesModel.downloadingEpisodes[$0.episode] != nil }
                 .map { tableView.indexPath(for: $0)! }
             indexPathsToReload
                 .map { tableView.cellForRow(at: $0) as! EpisodeCell }
                 .forEach { $0.episodeRecordStatus = .downloading }
             break
-        case .episodeSaved:
-            let cellsWithSavingEpisodes = tableView.visibleCells
-                .map { $0 as! EpisodeCell }
-                .filter { $0.episodeRecordStatus! == .downloading }
-            let index = cellsWithSavingEpisodes.firstIndex { episodesModel.savedEpisodes.contains($0.episode) }!
-            let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as! EpisodeCell
-            cell.episodeRecordStatus = .downloaded
+        case .episodeDownloaded:
+            // todo
             break
         default:
             break
@@ -104,15 +99,7 @@ class EpisodesController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! EpisodeCell
         let episode = episodesModel.episodes[indexPath.row]
         cell.episode = episode
-        if episodesModel.savedEpisodes.contains(episode)  {
-            cell.episodeRecordStatus = .downloaded
-        } else {
-            if episodesModel.savingEpisodes[episode] != nil {
-                cell.episodeRecordStatus = .downloading
-            } else {
-                cell.episodeRecordStatus = EpisodeRecordStatus.none
-            }
-        }
+        // todo
         return cell
     }
     
@@ -141,7 +128,7 @@ class EpisodesController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let action = UIContextualAction(style: .normal, title: "Download") { [weak self] (_, _, completionHandler) in
-            self?.episodesModel.saveEpisodeRecord(episodeIndex: indexPath.row)
+            self?.episodesModel.downloadEpisode(episodeIndex: indexPath.row)
             completionHandler(true)
         }
         let configuration = UISwipeActionsConfiguration(actions: [action])

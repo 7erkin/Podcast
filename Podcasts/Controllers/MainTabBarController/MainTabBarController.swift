@@ -26,6 +26,12 @@ class MainTabBarController: UITabBarController {
         return coordinator
     }()
     
+    private lazy var downloadsBarCoordinator: DownloadsBarRootCoordinator = {
+        let coordinator = DownloadsBarRootCoordinator()
+        coordinator.start()
+        return coordinator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -85,7 +91,7 @@ class MainTabBarController: UITabBarController {
         viewControllers = [
             favoritesBarCoordinator.navigationController,
             searchBarCoordinator.navigationController,
-            generateNavigationController(with: ViewController(), title: "Downloads", image: UIImage(named: "downloads")!)
+            downloadsBarCoordinator.navigationController
         ]
     }
     

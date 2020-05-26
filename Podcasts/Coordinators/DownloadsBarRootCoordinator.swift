@@ -9,17 +9,18 @@
 import Foundation
 import UIKit
 
-class DownloadBarRootCoordinator: RootCoordinator {
+class DownloadsBarRootCoordinator: RootCoordinator {
     override init() {
         super.init()
         navigationController = UINavigationController()
         navigationController.tabBarItem.image = UIImage(named: "downloads")!
         navigationController.navigationBar.prefersLargeTitles = true
-        navigationController.tabBarItem.title = "Dowloads"
+        navigationController.tabBarItem.title = "Downloads"
     }
     
     func start() {
-        let coordinator = PodcastSearchCoordinator(withNavigationController: navigationController)
+        let coordinator = DownloadedEpisodesCoordintator(withNavigationController: navigationController)
         coordinator.start()
         child = coordinator
-    }}
+    }
+}

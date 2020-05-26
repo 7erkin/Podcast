@@ -7,16 +7,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "986955BD-848D-447E-B01B-D6E291800A95"
+            uuid = "BEDA47F9-7010-43E1-A99F-DB6AFD1BD862"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Podcasts/Views/EpisodeCell.swift"
+            filePath = "Podcasts/Entities/EpisodeRecordsManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "38"
-            endingLineNumber = "38"
-            landmarkName = "updateViewWithEpisodeRecordStatus()"
+            startingLineNumber = "46"
+            endingLineNumber = "46"
+            landmarkName = "downloadEpisode(_:ofPodcast:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "A6D1C5CA-8530-4FA1-9D55-65B3CAC68057"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Podcasts/Entities/EpisodeRecordsManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
+            landmarkName = "downloadEpisode(_:ofPodcast:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

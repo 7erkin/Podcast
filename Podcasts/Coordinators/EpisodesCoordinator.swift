@@ -25,7 +25,7 @@ class EpisodesCoordintator: Coordinatable {
             podcast: podcast,
             player: Player.shared,
             podcastService: ServiceLocator.podcastService,
-            recordsManager: EpisodeRecordsManager.shared,
+            recordsManager: ServiceLocator.recordsManager,
             favoritePodcastsStorage: ServiceLocator.favoritePodcastStorage
         )
         episodesController.episodesModel = model

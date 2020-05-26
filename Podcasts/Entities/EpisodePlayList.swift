@@ -17,6 +17,7 @@ enum EpisodePlayListEvent: AppEvent {
 protocol EpisodePlayListCreatorToken {}
 
 struct EpisodePlayListItem {
+    var indexInList: Int
     var episode: Episode
     var podcast: Podcast
 }
@@ -47,7 +48,7 @@ class EpisodePlayList {
         notifyAll(withEvent: .playingEpisodeChanged)
     }
     
-    func getPlayingEpisode() -> EpisodePlayListItem {
+    func getPlayingEpisodeItem() -> EpisodePlayListItem {
         return playList[playingItemIndex]
     }
     

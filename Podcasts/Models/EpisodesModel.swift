@@ -20,21 +20,25 @@ class EpisodesModel {
     enum Event {
         case initialized
         case episodePicked
-        case episodeSaved
-        case episodeSavingProgressUpdated
+        case episodeDownloaded
+        case episodeDownloadingProgressUpdated
         case podcastStatusUpdated
     }
     
     var subscriber: ((Event) -> Void)!
+    // MARK: - data for client
     private(set) var podcast: Podcast
     private(set) var episodes: [Episode] = []
-    private(set) var savedEpisodes: Set<Episode> = []
+    private(set) var storedEpisodes: [Episode] = []
     private(set) var pickedEpisodeIndex: Int?
     private(set) var isPodcastFavorite: Bool!
-    private(set) var savingEpisodes: [Episode:Double] = [:]
+    private(set) var downloadingEpisodes: OrderedDictionary<Episode, Double> {
+        get { recordsManager.downloadingEpisodes }
+        set {}
+    }
     // MARK: - dependencies
     private let recordsManager: EpisodeRecordsManager
-    private let podcastService: PodcastServicing!
+    private let podcastService: PodcastServicing
     private let player: EpisodeListPlayable
     private let favoritePodcastsStorage: FavoritePodcastsStoraging
     // MARK: - subscriptions
@@ -44,7 +48,13 @@ class EpisodesModel {
     // MARK: -
     private let token: EpisodeModelToken
     private weak var episodePlayList: EpisodePlayList!
-    init(podcast: Podcast, player: EpisodeListPlayable, podcastService: PodcastServicing, recordsManager: EpisodeRecordsManager, favoritePodcastsStorage: FavoritePodcastsStoraging) {
+    init(
+        podcast: Podcast,
+        player: EpisodeListPlayable,
+        podcastService: PodcastServicing,
+        recordsManager: EpisodeRecordsManager,
+        favoritePodcastsStorage: FavoritePodcastsStoraging
+    ) {
         self.podcast = podcast
         self.podcastService = podcastService
         self.player = player
@@ -63,27 +73,25 @@ class EpisodesModel {
     func initialize() {
         let fetchEpisodesPromise = fetchEpisodes()
         let isPodcastFavoritePromise = favoritePodcastsStorage.hasPodcast(podcast)
-        let getSavedEpisodesPromise = firstly {
-            recordsManager.storedEpisodes
-        }.then(on: DispatchQueue.global(qos: .userInitiated), flags: nil) { items -> Promise<Set<Episode>> in
+        let getStoredEpisodeListPromise = firstly {
+            recordsManager.storedEpisodeList
+        }.then(on: DispatchQueue.global(qos: .userInitiated), flags: nil) { items -> Promise<[Episode]> in
             let episodes = items
                 .filter { $0.podcast == self.podcast }
-                .reduce(into: Set<Episode>()) { $0.insert($1.episode) }
+                .map { $0.episode }
             return Promise { resolver in resolver.fulfill(episodes) }
         }
-        when(fulfilled: fetchEpisodesPromise, isPodcastFavoritePromise, getSavedEpisodesPromise).done { episodes, isFavorite, savedEpisodes in
+        when(fulfilled: fetchEpisodesPromise, isPodcastFavoritePromise, getStoredEpisodeListPromise).done { episodes, isFavorite, storedEpisodeList in
             self.episodes = episodes
             self.isPodcastFavorite = isFavorite
-            self.savedEpisodes = savedEpisodes
+            self.storedEpisodes = storedEpisodeList
             self.notifyAll(withEvent: .initialized)
-        }.catch { _ in
-        
-        }
+        }.catch { _ in }
     }
     
     func pickEpisode(episodeIndex index: Int) {
         let episodePlayList = EpisodePlayList(
-            playList: episodes.map { EpisodePlayListItem(episode: $0, podcast: podcast) },
+            playList: episodes.enumerated().map { EpisodePlayListItem(indexInList: $0, episode: $1, podcast: podcast) },
             playingItemIndex: index,
             creatorToken: token
         )
@@ -95,8 +103,8 @@ class EpisodesModel {
         favoritePodcastsStorage.save(podcast: podcast)
     }
     
-    func saveEpisodeRecord(episodeIndex index: Int) {
-        recordsManager.saveEpisode(episodes[index], ofPodcast: podcast)
+    func downloadEpisode(episodeIndex index: Int) {
+        recordsManager.downloadEpisode(episodes[index], ofPodcast: podcast)
     }
     // MARK: - helpers
     private func fetchEpisodes() -> Promise<[Episode]> {
@@ -130,15 +138,19 @@ class EpisodesModel {
     
     private func subscribeToRecordsManager() {
         recordsManagerSubscription = recordsManager.subscribe { [weak self] event in
+            guard let self = self else { return }
+            
             switch event {
-            case .episodeSaved(let episode):
-                self?.savingEpisodes.removeValue(forKey: episode)
-                self?.savedEpisodes.insert(episode)
-                self?.notifyAll(withEvent: .episodeSaved)
+            case .episodeDownloaded:
+                firstly {
+                    self.recordsManager.storedEpisodeList
+                }.done { storedEpisodeList in
+                    self.storedEpisodes = storedEpisodeList.map { $0.episode }
+                    self.notifyAll(withEvent: .episodeDownloaded)
+                }.catch { _ in }
                 break
-            case .episodeSavingProgress(let episode, let progress):
-                self?.savingEpisodes[episode] = progress
-                self?.notifyAll(withEvent: .episodeSavingProgressUpdated)
+            case .episodeDownloadingProgress:
+                self.notifyAll(withEvent: .episodeDownloadingProgressUpdated)
                 break
             default:
                 break
@@ -159,7 +171,7 @@ class EpisodesModel {
     private func updateModelWithPlayList(withEvent event: EpisodePlayListEvent) {
         switch event {
         case .playingEpisodeChanged:
-            let episode = episodePlayList.getPlayingEpisode().episode
+            let episode = episodePlayList.getPlayingEpisodeItem().episode
             pickedEpisodeIndex = episodes.firstIndex(of: episode)!
             notifyAll(withEvent: .episodePicked)
         case .episodeListChanged:

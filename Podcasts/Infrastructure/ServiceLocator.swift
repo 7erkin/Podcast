@@ -19,4 +19,10 @@ class ServiceLocator {
     static let favoritePodcastStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastsStorage.shared
     static let episodeRecordStorage: EpisodeRecordsStoraging = FileSystemRecordsStorage.shared!
     static let episodeRecordFetcher: EpisodeRecordFetching = EpisodeRecordFetcher()
+    static let recordsManager: EpisodeRecordsManager = {
+        var recordsManager = EpisodeRecordsManager.shared
+        recordsManager.recordFetcher = ServiceLocator.episodeRecordFetcher
+        recordsManager.recordsStorage = ServiceLocator.episodeRecordStorage
+        return recordsManager
+    }()
 }

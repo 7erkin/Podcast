@@ -9,7 +9,7 @@
 import UIKit
 import PromiseKit
 
-struct StoredEpisodeRecordItem: Codable {
+struct StoredEpisodeItem: Codable {
     var episode: Episode
     var podcast: Podcast
     var recordUrl: URL
@@ -20,7 +20,7 @@ protocol EpisodeRecordsStoraging {
     func save(episode: Episode, ofPodcast podcast: Podcast, withRecord record: Data) -> Promise<Void>
     @discardableResult
     func delete(episode: Episode) -> Promise<Void>
-    func getStoredEpisodeRecordItem(_ episode: Episode) -> Promise<StoredEpisodeRecordItem>
-    func getStoredEpisodeRecordList() -> Promise<[StoredEpisodeRecordItem]>
+    func getStoredEpisodeRecordItem(_ episode: Episode) -> Promise<StoredEpisodeItem>
+    func getStoredEpisodeRecordList() -> Promise<[StoredEpisodeItem]>
     func hasEpisode(_ episode: Episode) -> Promise<Bool>
 }

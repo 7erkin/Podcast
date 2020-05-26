@@ -37,6 +37,7 @@ class EpisodeCell: UITableViewCell {
         case .downloaded:
             episodeRecordDownloadIndicator.isHidden = false
             episodeRecordDownloadIndicator.tintColor = .green
+            break
         case .downloading:
             episodeRecordDownloadIndicator.isHidden = false
             episodeRecordDownloadIndicator.tintColor = .red

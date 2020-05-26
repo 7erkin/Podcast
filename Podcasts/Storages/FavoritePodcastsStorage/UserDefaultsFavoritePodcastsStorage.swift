@@ -36,9 +36,7 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
             serviceQueue.async { [weak self] in
                 guard let self = self else { return }
                 
-                if self.podcasts.isEmpty {
-                    self.podcasts = self.loadPodcastsFromStorage()
-                }
+                self.loadPodcastsIfNeeded()
                 resolver.fulfill(self.podcasts.contains(podcast))
             }
         }
@@ -47,7 +45,10 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
     func getPodcasts() -> Promise<[Podcast]> {
         return Promise { resolver in
             serviceQueue.async { [weak self] in
-                resolver.resolve(.fulfilled(self?.podcasts ?? []))
+                guard let self = self else { return }
+                
+                self.loadPodcastsIfNeeded()
+                resolver.resolve(.fulfilled(self.podcasts))
             }
         }
     }
@@ -56,10 +57,7 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
         serviceQueue.async { [weak self] in
             guard let self = self else { return }
             
-            if self.podcasts.isEmpty {
-                self.podcasts = self.loadPodcastsFromStorage()
-            }
-            
+            self.loadPodcastsIfNeeded()
             if self.podcasts.contains(podcast) {
                 self.notifyAll(withEvent: .podcastSaved)
                 return
@@ -88,6 +86,12 @@ class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
         }
     }
     // MARK: - helpers
+    fileprivate func loadPodcastsIfNeeded() {
+        if podcasts.isEmpty {
+            podcasts = loadPodcastsFromStorage()
+        }
+    }
+    
     fileprivate func loadPodcastsFromStorage() -> [Podcast] {
         guard let serializedPodcasts = self.storage.value(forKey: self.favoritePodcastKey) as? Data else { fatalError("UB") }
         

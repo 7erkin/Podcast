@@ -83,14 +83,17 @@ class EpisodesController: UITableViewController {
                 .map { $0 as! EpisodeCell }
                 .filter { episodesModel.savingEpisodes[$0.episode] != nil }
                 .map { tableView.indexPath(for: $0)! }
-            tableView.reloadRows(at: indexPathsToReload, with: .none)
+            indexPathsToReload
+                .map { tableView.cellForRow(at: $0) as! EpisodeCell }
+                .forEach { $0.episodeRecordStatus = .downloading }
             break
         case .episodeSaved:
-            let indexPathsToReload = tableView.visibleCells
+            let cellsWithSavingEpisodes = tableView.visibleCells
                 .map { $0 as! EpisodeCell }
                 .filter { $0.episodeRecordStatus! == .downloading }
-                .map { tableView.indexPath(for: $0)! }
-            tableView.reloadRows(at: indexPathsToReload, with: .none)
+            let index = cellsWithSavingEpisodes.firstIndex { episodesModel.savedEpisodes.contains($0.episode) }!
+            let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0)) as! EpisodeCell
+            cell.episodeRecordStatus = .downloaded
             break
         default:
             break

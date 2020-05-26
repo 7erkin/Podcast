@@ -87,6 +87,7 @@
 		7CF577C12470C99100094097 /* BiggestImageFlushPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */; };
 		B9D4C6052477ADBF00DC00DE /* ImageFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */; };
 		B9D4C6072477CD5300DC00DE /* PlayerManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6062477CD5300DC00DE /* PlayerManaging.swift */; };
+		B9E57DEF247D07D30009A8E4 /* DownloadBarRootCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DEE247D07D30009A8E4 /* DownloadBarRootCoordinator.swift */; };
 		B9FC41EF2477FE95007FFCF3 /* EpisodePlayList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9FC41EE2477FE95007FFCF3 /* EpisodePlayList.swift */; };
 /* End PBXBuildFile section */
 
@@ -191,6 +192,7 @@
 		7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiggestImageFlushPolicy.swift; sourceTree = "<group>"; };
 		B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFetcher.swift; sourceTree = "<group>"; };
 		B9D4C6062477CD5300DC00DE /* PlayerManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerManaging.swift; sourceTree = "<group>"; };
+		B9E57DEE247D07D30009A8E4 /* DownloadBarRootCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadBarRootCoordinator.swift; sourceTree = "<group>"; };
 		B9FC41EE2477FE95007FFCF3 /* EpisodePlayList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodePlayList.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -450,6 +452,7 @@
 				7C994B56246C8A8F00B8C628 /* SearchBarRootCoordinator.swift */,
 				7C994B50246C788D00B8C628 /* PodcastSearchCoordinator.swift */,
 				7C994B54246C7BD600B8C628 /* EpisodesCoordinator.swift */,
+				B9E57DEE247D07D30009A8E4 /* DownloadBarRootCoordinator.swift */,
 			);
 			path = Coordinators;
 			sourceTree = "<group>";
@@ -796,6 +799,7 @@
 				7CEDAD6C2470247D00DACFE5 /* PresentAnimator.swift in Sources */,
 				7C3654AF2475A7B500EB68C4 /* FavoritesPodcastCoordintator.swift in Sources */,
 				7C940CAE246E0DB4000B2DF3 /* InMemoryImageCache.swift in Sources */,
+				B9E57DEF247D07D30009A8E4 /* DownloadBarRootCoordinator.swift in Sources */,
 				7C994B55246C7BD600B8C628 /* EpisodesCoordinator.swift in Sources */,
 				7C3654CC2475FE2E00EB68C4 /* PodcastsSearchModel.swift in Sources */,
 				7CEF30222468D3CC0045AB91 /* LockScreenPlayerController.swift in Sources */,

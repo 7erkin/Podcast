@@ -133,6 +133,7 @@ class EpisodesModel {
             switch event {
             case .episodeSaved(let episode):
                 self?.savingEpisodes.removeValue(forKey: episode)
+                self?.savedEpisodes.insert(episode)
                 self?.notifyAll(withEvent: .episodeSaved)
                 break
             case .episodeSavingProgress(let episode, let progress):

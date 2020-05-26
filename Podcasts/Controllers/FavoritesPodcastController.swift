@@ -41,7 +41,17 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
         collectionView.register(FavoritesPodcastCell.self, forCellWithReuseIdentifier: cellId)
     }
     
-    fileprivate func updateViewWithModel(withEvent event: FavoritePodcastsModel.Event) {}
+    fileprivate func updateViewWithModel(withEvent event: FavoritePodcastsModel.Event) {
+        switch event {
+        case .initialized:
+            collectionView.reloadData()
+        case .podcastSaved:
+            collectionView.reloadData()
+            navigationController?.tabBarItem.badgeValue = "NEW"
+        case .podcastDeleted:
+            collectionView.reloadData()
+        }
+    }
     
     @objc
     fileprivate func onLongPressGestureHappened(_ gesture: UILongPressGestureRecognizer) {

@@ -12,22 +12,23 @@ import MediaPlayer
 
 class AppPlayerController: UIViewController {
     typealias AnimationInvoker = (UIView) -> Void
-    
     var dissmisAnimator: AppPlayerViewAnimator!
     var enlargeAnimator: AppPlayerViewAnimator!
     var presentAnimator: AppPlayerViewAnimator!
-    
     var appPlayerView: AppPlayerView { return view as! AppPlayerView }
-    
-    // player manager
+    private var playerSubscription: Subscription!
+    private var hasViewBeenPresented = false
+    // MARK: - dependencies
     weak var player: Player! {
         didSet {
+            playerSubscription = self.player.subscribe { [weak self] event in
+                self?.updateWithPlayer(withEvent: event)
+            }
         }
     }
-    
+    // MARK: - lifecycle methods
     override func loadView() {
         super.loadView()
-        
         let playerView = AppPlayerView()
         playerView.delegate = self
         playerView.playerManager = self
@@ -37,14 +38,22 @@ class AppPlayerController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-    
-    // NOT FIRED!!!
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    // MARK: - helpers
+    private func updateWithPlayer(withEvent event: PlayerEvent) {
+        if !hasViewBeenPresented {
+            presentAnimator.invoke(forAppPlayerView: appPlayerView)
+            hasViewBeenPresented = true
+        }
+        switch event {
+        case .playerStateUpdated:
+            appPlayerView.playerState = player.playerState
+            break
+        case .playingEpisodeUpdated:
+            appPlayerView.episode = player.playingEpisode
+            break
+        case .playingPodcastUpdated:
+            break
+        }
     }
 }
 

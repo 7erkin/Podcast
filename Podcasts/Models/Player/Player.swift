@@ -17,6 +17,7 @@ protocol EpisodeListPlayable {
 enum PlayerEvent: AppEvent {
     case playingEpisodeUpdated
     case playerStateUpdated
+    case playingPodcastUpdated
 }
 
 struct PlayerState {
@@ -45,22 +46,42 @@ class Player {
         }
         return player
     }()
-    private var subscribers: [UUID:(AppEvent) -> Void] = [:]
+    private var playerListSubscription: Subscription!
+    private var subscribers: [UUID:(PlayerEvent) -> Void] = [:]
     // MARK: - Singleton
     private init() {}
     static let shared = Player()
-    // MARK: - observable properties
-    private var podcast: Podcast!
+    // MARK: - data for client
+    private var playingPodcast: Podcast! {
+        didSet {
+            notifyAll(withEvent: PlayerEvent.playingPodcastUpdated)
+        }
+    }
     private(set) var playerState: PlayerState! {
         didSet {
             notifyAll(withEvent: PlayerEvent.playerStateUpdated)
         }
     }
-    private var playList: EpisodePlayList!
+    private(set) var playingEpisode: Episode! {
+        didSet {
+            let playerItem = AVPlayerItem(url: self.playingEpisode.streamUrl)
+            player.replaceCurrentItem(with: playerItem)
+            player.play()
+            notifyAll(withEvent: PlayerEvent.playingEpisodeUpdated)
+        }
+    }
+    private var playList: EpisodePlayList! {
+        didSet {
+            playerListSubscription = self.playList.subscribe { [weak self] event in
+                self?.updateWithPlayList(withEvent: event)
+            }
+            let item = self.playList.getPlayingEpisodeItem()
+            self.playingEpisode = item.episode
+            self.playingPodcast = item.podcast
+        }
+    }
     // MARK: - player api
-    // public for Player extension to get access. How to fix it???
     func fastForward15() {
-        
         shiftByTime(15)
     }
     
@@ -87,11 +108,11 @@ class Player {
     }
     
     func nextEpisode() {
-        playList.nextEpisode()
+        playList.pickNextEpisode()
     }
     
     func previousEpisode() {
-        playList.previousEpisode()
+        playList.pickPreviousEpisode()
     }
     
     func hasNextEpisode() -> Bool {
@@ -100,6 +121,12 @@ class Player {
     
     func hasPreviousEpisode() -> Bool {
         return playList.hasPreviousEpisode()
+    }
+    
+    func subscribe(_ subscriber: @escaping (PlayerEvent) -> Void) -> Subscription {
+        let key = UUID.init()
+        subscribers[key] = subscriber
+        return Subscription { [weak self] in self?.subscribers.removeValue(forKey: key) }
     }
     // MARK: - helpers
     private func shiftByTime(_ time: Int64) {
@@ -116,7 +143,20 @@ class Player {
         })
     }
     
-    private func notifyAll(withEvent event: AppEvent) {
+    private func updateWithPlayList(withEvent event: EpisodePlayListEvent) {
+        switch event {
+        case .playingEpisodeChanged:
+            let item = playList.getPlayingEpisodeItem()
+            playingEpisode = item.episode
+            if playingPodcast != item.podcast {
+                playingPodcast = item.podcast
+            }
+        default:
+            break
+        }
+    }
+    
+    private func notifyAll(withEvent event: PlayerEvent) {
         subscribers.values.forEach { $0(event) }
     }
 }

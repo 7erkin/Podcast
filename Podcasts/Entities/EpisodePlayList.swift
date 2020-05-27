@@ -35,15 +35,20 @@ class EpisodePlayList {
     }
     
     deinit {
+        notifyAll(withEvent: .episodeListChanged)
+    }
+    
+    func pickEpisodeWithIndex(_ index: Int) {
+        playingItemIndex = index
         notifyAll(withEvent: .playingEpisodeChanged)
     }
     
-    func nextEpisode() {
+    func pickNextEpisode() {
         playingItemIndex += 1
         notifyAll(withEvent: .playingEpisodeChanged)
     }
     
-    func previousEpisode() {
+    func pickPreviousEpisode() {
         playingItemIndex -= 1
         notifyAll(withEvent: .playingEpisodeChanged)
     }

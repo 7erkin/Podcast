@@ -56,7 +56,7 @@ class MainTabBarController: UITabBarController {
         mediaCenterPlayerController.player = player
         
         lockScreenPlayerController = .init()
-        //lockScreenPlayerController.player = player
+        lockScreenPlayerController.player = player
         
         appPlayerController = .init()
         appPlayerController.player = player

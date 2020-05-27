@@ -29,10 +29,11 @@ class EpisodesController: UITableViewController {
     private var storedEpisodes: [Episode] = []
     fileprivate var favoriteButton: FavoriteButtonItem {
         return navigationItem.rightBarButtonItem as! FavoriteButtonItem
-    }    // MARK: - dependencies
+    }
+    fileprivate var isModelInitialized = false
+    // MARK: - dependencies
     var model: EpisodesModel! {
         didSet {
-            self.model.initialize()
             self.model.subscriber = { [weak self] event in
                 self?.updateViewWithModel(withEvent: event)
             }
@@ -53,9 +54,10 @@ class EpisodesController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-    }
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+        if !isModelInitialized {
+            model.initialize()
+            isModelInitialized = true
+        }
     }
     // MARK: - interaction handlers
     @objc
@@ -69,6 +71,11 @@ class EpisodesController: UITableViewController {
         let nib = UINib(nibName: "EpisodeCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: cellId)
         tableView.tableFooterView = UIView()
+    }
+    
+    fileprivate func selectRow(at indexPath: IndexPath) {
+        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+        tableView.cellForRow(at: indexPath)!.isSelected = true
     }
     
     fileprivate func updateViewWithModel(withEvent event: EpisodesModel.Event) {
@@ -106,6 +113,11 @@ class EpisodesController: UITableViewController {
                 
                 let cell = tableView.cellForRow(at: IndexPath(row: indexCellToUpdate!, section: 0)) as! EpisodeCell
                 cell.episodeRecordStatus = .downloaded
+            }
+        case .episodePicked:
+            if let index = model.pickedEpisodeIndex {
+                if tableView.visibleCells.isEmpty { return }
+                selectRow(at: IndexPath(row: index, section: 0))
             }
         default:
             break

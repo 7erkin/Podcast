@@ -41,7 +41,7 @@ class EpisodesModel {
     // MARK: - dependencies
     private let recordsManager: EpisodeRecordsManager
     private let podcastService: PodcastServicing
-    private let player: EpisodeListPlayable
+    private let player: Player
     private let favoritePodcastsStorage: FavoritePodcastsStoraging
     // MARK: - subscriptions
     private var recordsManagerSubscription: Subscription!
@@ -49,10 +49,9 @@ class EpisodesModel {
     private var favoritePodcastsStorageSubscription: Subscription!
     // MARK: -
     private let token: EpisodeModelToken
-    private weak var episodePlayList: EpisodePlayList!
     init(
         podcast: Podcast,
-        player: EpisodeListPlayable,
+        player: Player,
         podcastService: PodcastServicing,
         recordsManager: EpisodeRecordsManager,
         favoritePodcastsStorage: FavoritePodcastsStoraging
@@ -63,16 +62,19 @@ class EpisodesModel {
         self.recordsManager = recordsManager
         self.favoritePodcastsStorage = favoritePodcastsStorage
         self.token = EpisodeModelToken(podcast: podcast)
-        if let playList = player.currentPlayList() {
-            if let playListToken = playList.creatorToken as? EpisodeModelToken, token == playListToken {
-                subscribeToPlayList(playList)
-            }
-        }
+
         subscribeToRecordsManager()
         subscribeToFavoritePodcastsStorage()
     }
     // MARK: - public api
     func initialize() {
+        if let playList = player.currentPlayList() {
+            if let playListToken = playList.creatorToken as? EpisodeModelToken, token == playListToken {
+                pickedEpisodeIndex = playList.getPlayingEpisodeItem().indexInList
+                subscribeToPlayList(playList)
+            }
+        }
+        
         let fetchEpisodesPromise = fetchEpisodes()
         let isPodcastFavoritePromise = favoritePodcastsStorage.hasPodcast(podcast)
         let getStoredEpisodeListPromise = firstly {
@@ -92,6 +94,13 @@ class EpisodesModel {
     }
     
     func pickEpisode(episodeIndex index: Int) {
+        if let currentPlayList = player.currentPlayList(), let creatorToken = currentPlayList.creatorToken as? EpisodeModelToken {
+            if creatorToken == token {
+                currentPlayList.pickEpisodeWithIndex(index)
+                return
+            }
+        }
+        
         let episodePlayList = EpisodePlayList(
             playList: episodes.enumerated().map { EpisodePlayListItem(indexInList: $0, episode: $1, podcast: podcast) },
             playingItemIndex: index,
@@ -99,6 +108,8 @@ class EpisodesModel {
         )
         subscribeToPlayList(episodePlayList)
         player.applyPlayList(episodePlayList)
+        pickedEpisodeIndex = index
+        notifyAll(withEvent: .episodePicked)
     }
     
     func addPodcastToFavorites() {
@@ -133,7 +144,7 @@ class EpisodesModel {
     private func subscribeToPlayList(_ playList: EpisodePlayList) {
         playListSubscription = playList.subscribe { event in
             DispatchQueue.main.async { [weak self] in
-                self?.updateModelWithPlayList(withEvent: event)
+                self?.updateWithPlayList(withEvent: event)
             }
         }
     }
@@ -159,17 +170,17 @@ class EpisodesModel {
     private func subscribeToFavoritePodcastsStorage() {
         favoritePodcastsStorage.subscribe { [weak self] event in
             DispatchQueue.main.async {
-                self?.updateModelWithFavoritePodcastsStorage(withEvent: event)
+                self?.updateWithFavoritePodcastsStorage(withEvent: event)
             }
         }.done { subscription in
             self.favoritePodcastsStorageSubscription = subscription
         }.catch { _ in }
     }
     // MARK: - Update model functions
-    private func updateModelWithPlayList(withEvent event: EpisodePlayListEvent) {
+    private func updateWithPlayList(withEvent event: EpisodePlayListEvent) {
         switch event {
         case .playingEpisodeChanged:
-            let episode = episodePlayList.getPlayingEpisodeItem().episode
+            let episode = player.currentPlayList()!.getPlayingEpisodeItem().episode
             pickedEpisodeIndex = episodes.firstIndex(of: episode)!
             notifyAll(withEvent: .episodePicked)
         case .episodeListChanged:
@@ -178,7 +189,7 @@ class EpisodesModel {
         }
     }
     
-    private func updateModelWithFavoritePodcastsStorage(withEvent event: FavoritePodcastStoragingEvent) {
+    private func updateWithFavoritePodcastsStorage(withEvent event: FavoritePodcastStoragingEvent) {
         switch event {
         case .podcastSaved:
             isPodcastFavorite = true

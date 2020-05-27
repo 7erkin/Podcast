@@ -78,7 +78,6 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! FavoritesPodcastCell
-        // if this safe code??? what if podcasts changed in model?
         cell.podcast = favoritePodcastsModel.podcasts[indexPath.row]
         return cell
     }

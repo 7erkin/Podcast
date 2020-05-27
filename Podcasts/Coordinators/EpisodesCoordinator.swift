@@ -28,7 +28,7 @@ class EpisodesCoordintator: Coordinatable {
             recordsManager: ServiceLocator.recordsManager,
             favoritePodcastsStorage: ServiceLocator.favoritePodcastStorage
         )
-        episodesController.episodesModel = model
+        episodesController.model = model
         navigationController.pushViewController(episodesController, animated: true)
     }
 }

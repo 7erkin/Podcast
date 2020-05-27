@@ -20,9 +20,11 @@ class EpisodesModel {
     enum Event {
         case initialized
         case episodePicked
+        case episodeDeleted
         case episodeDownloaded
         case episodeDownloadingProgressUpdated
         case podcastStatusUpdated
+        case episodeStartDownloading
     }
     
     var subscriber: ((Event) -> Void)!
@@ -142,16 +144,12 @@ class EpisodesModel {
             
             switch event {
             case .episodeDownloaded:
-                firstly {
-                    self.recordsManager.storedEpisodeList
-                }.done { storedEpisodeList in
-                    self.storedEpisodes = storedEpisodeList.map { $0.episode }
-                    self.notifyAll(withEvent: .episodeDownloaded)
-                }.catch { _ in }
-                break
+                self.updateStoredEpisodeList(withEvent: .episodeDownloaded)
             case .episodeDownloadingProgress:
                 self.notifyAll(withEvent: .episodeDownloadingProgressUpdated)
                 break
+            case .episodeDeleted:
+                self.updateStoredEpisodeList(withEvent: .episodeDeleted)
             default:
                 break
             }
@@ -189,5 +187,14 @@ class EpisodesModel {
             isPodcastFavorite = false
             notifyAll(withEvent: .podcastStatusUpdated)
         }
+    }
+    
+    fileprivate func updateStoredEpisodeList(withEvent event: EpisodesModel.Event) {
+        firstly {
+            recordsManager.storedEpisodeList
+        }.done {
+            self.storedEpisodes = $0.map { $0.episode }
+            self.subscriber(event)
+        }.catch { _ in }
     }
 }

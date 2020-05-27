@@ -13,6 +13,7 @@ struct StoredEpisodeItem: Codable {
     var episode: Episode
     var podcast: Podcast
     var recordUrl: URL
+    var dateOfCreate = Date()
 }
 
 protocol EpisodeRecordsStoraging {
@@ -21,6 +22,8 @@ protocol EpisodeRecordsStoraging {
     @discardableResult
     func delete(episode: Episode) -> Promise<Void>
     func getStoredEpisodeRecordItem(_ episode: Episode) -> Promise<StoredEpisodeItem>
-    func getStoredEpisodeRecordList() -> Promise<[StoredEpisodeItem]>
+    func getStoredEpisodeRecordList(
+        withSortPolicy sortPolicy: @escaping (StoredEpisodeItem, StoredEpisodeItem) -> Bool
+    ) -> Promise<[StoredEpisodeItem]>
     func hasEpisode(_ episode: Episode) -> Promise<Bool>
 }

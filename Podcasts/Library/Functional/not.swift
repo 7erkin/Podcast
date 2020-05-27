@@ -8,4 +8,4 @@
 
 import Foundation
 
-func not(_ block: @autoclosure () -> Bool) -> Bool { return !block() }
+let not: (Bool) -> Bool = { !$0 }

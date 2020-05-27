@@ -35,7 +35,7 @@ class MaximizePlayerView: UIView {
     @IBOutlet var playPauseButton: UIButton!
     //MARK: - action handlers
     @IBAction func onStartMovingTimeSlider(_ sender: Any) {
-        print("Start moving")
+
     }
     @IBAction func onTimeSliderValueChanged(_ sender: Any) {
         let nextPlaybackTime: CMTime = .init(

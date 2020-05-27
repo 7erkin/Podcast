@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import PromiseKit
 
-struct LatestImageFlushPolicy: InMemoryImageCacheFlushPolicy {
+struct LatestImageFlushPolicy: RAMImageCacheFlushPolicy {
     fileprivate var cachedUrls: ForwardList<URL> = []
     fileprivate var cacheSize: Float = 0
     fileprivate let cacheMemoryLimit: Float
@@ -18,8 +19,8 @@ struct LatestImageFlushPolicy: InMemoryImageCacheFlushPolicy {
     }
     
     mutating func cached(_ image: UIImage, withUrl url: URL) {
-        cachedUrls.pushBack(value: url)
-        cacheSize += image.sizeInMB ?? 0
+        self.cachedUrls.pushBack(value: url)
+        self.cacheSize += image.sizeInMB ?? 0
     }
     
     mutating func prepareCache(_ cache: inout [URL : UIImage], forCachingImage cachingImage: UIImage) {

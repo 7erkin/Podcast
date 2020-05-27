@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-struct BiggestImageFlushPolicy: InMemoryImageCacheFlushPolicy {
+struct BiggestImageFlushPolicy: RAMImageCacheFlushPolicy {
     init(withCacheMemoryLimit availableMegaBytes: Float) {
         fatalError("Not implemented")
     }

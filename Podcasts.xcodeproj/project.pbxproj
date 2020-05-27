@@ -43,8 +43,7 @@
 		7C466D4F246216530014D33A /* RSSFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C466D4E246216530014D33A /* RSSFeed.swift */; };
 		7C940CA9246E0C35000B2DF3 /* ImageFetcherProxi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C940CA8246E0C35000B2DF3 /* ImageFetcherProxi.swift */; };
 		7C940CAC246E0D07000B2DF3 /* ImageCaching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C940CAB246E0D07000B2DF3 /* ImageCaching.swift */; };
-		7C940CAE246E0DB4000B2DF3 /* InMemoryImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C940CAD246E0DB4000B2DF3 /* InMemoryImageCache.swift */; };
-		7C940CB0246E0DFD000B2DF3 /* CoreDataImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C940CAF246E0DFD000B2DF3 /* CoreDataImageCache.swift */; };
+		7C940CAE246E0DB4000B2DF3 /* RAMImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C940CAD246E0DB4000B2DF3 /* RAMImageCache.swift */; };
 		7C994B51246C788D00B8C628 /* PodcastSearchCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C994B50246C788D00B8C628 /* PodcastSearchCoordinator.swift */; };
 		7C994B53246C792800B8C628 /* Coordinatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C994B52246C792800B8C628 /* Coordinatable.swift */; };
 		7C994B55246C7BD600B8C628 /* EpisodesCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C994B54246C7BD600B8C628 /* EpisodesCoordinator.swift */; };
@@ -58,6 +57,9 @@
 		7CAA5E1224746DE900ADD087 /* FavoritePodcastsStoraging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAA5E1124746DE900ADD087 /* FavoritePodcastsStoraging.swift */; };
 		7CD902FC247A128E00838192 /* FavoritePodcastsStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD902FB247A128E00838192 /* FavoritePodcastsStorageTests.swift */; };
 		7CD9030A247A12F100838192 /* FileSystemRecordsStorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD90309247A12F100838192 /* FileSystemRecordsStorageTests.swift */; };
+		7CD90314247D989900838192 /* apply.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD90313247D989900838192 /* apply.swift */; };
+		7CD90316247DA0BF00838192 /* parsePair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD90315247DA0BF00838192 /* parsePair.swift */; };
+		7CD90318247DA66B00838192 /* forceUnwrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CD90317247DA66B00838192 /* forceUnwrap.swift */; };
 		7CDB722924797EB600EF487D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7CDB722824797EB600EF487D /* Main.storyboard */; };
 		7CDB722C2479927700EF487D /* EpisodeRecordFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDB722B2479927700EF487D /* EpisodeRecordFetcher.swift */; };
 		7CEDAD5A2470212C00DACFE5 /* Swinject in Frameworks */ = {isa = PBXBuildFile; productRef = 7CEDAD592470212C00DACFE5 /* Swinject */; };
@@ -82,7 +84,7 @@
 		7CF237BD246779AE00B7A09F /* AppPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF237BC246779AE00B7A09F /* AppPlayerView.swift */; };
 		7CF33CF124794D8C0013E9FA /* EpisodeRecordsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF33CF024794D8C0013E9FA /* EpisodeRecordsManager.swift */; };
 		7CF577B92470A37500094097 /* ForwardList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577B82470A37500094097 /* ForwardList.swift */; };
-		7CF577BD2470C93E00094097 /* InMemoryImageCacheFlushPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577BC2470C93E00094097 /* InMemoryImageCacheFlushPolicy.swift */; };
+		7CF577BD2470C93E00094097 /* RAMImageCacheFlushPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577BC2470C93E00094097 /* RAMImageCacheFlushPolicy.swift */; };
 		7CF577BF2470C96D00094097 /* LatestImageFlushPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577BE2470C96D00094097 /* LatestImageFlushPolicy.swift */; };
 		7CF577C12470C99100094097 /* BiggestImageFlushPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */; };
 		B9D4C6052477ADBF00DC00DE /* ImageFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */; };
@@ -150,8 +152,7 @@
 		7C466D4E246216530014D33A /* RSSFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSSFeed.swift; sourceTree = "<group>"; };
 		7C940CA8246E0C35000B2DF3 /* ImageFetcherProxi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFetcherProxi.swift; sourceTree = "<group>"; };
 		7C940CAB246E0D07000B2DF3 /* ImageCaching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCaching.swift; sourceTree = "<group>"; };
-		7C940CAD246E0DB4000B2DF3 /* InMemoryImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryImageCache.swift; sourceTree = "<group>"; };
-		7C940CAF246E0DFD000B2DF3 /* CoreDataImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataImageCache.swift; sourceTree = "<group>"; };
+		7C940CAD246E0DB4000B2DF3 /* RAMImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAMImageCache.swift; sourceTree = "<group>"; };
 		7C994B50246C788D00B8C628 /* PodcastSearchCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastSearchCoordinator.swift; sourceTree = "<group>"; };
 		7C994B52246C792800B8C628 /* Coordinatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinatable.swift; sourceTree = "<group>"; };
 		7C994B54246C7BD600B8C628 /* EpisodesCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodesCoordinator.swift; sourceTree = "<group>"; };
@@ -170,6 +171,9 @@
 		7CD90307247A12F100838192 /* EpisodeRecordsStorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EpisodeRecordsStorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CD90309247A12F100838192 /* FileSystemRecordsStorageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemRecordsStorageTests.swift; sourceTree = "<group>"; };
 		7CD9030B247A12F100838192 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7CD90313247D989900838192 /* apply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = apply.swift; sourceTree = "<group>"; };
+		7CD90315247DA0BF00838192 /* parsePair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = parsePair.swift; sourceTree = "<group>"; };
+		7CD90317247DA66B00838192 /* forceUnwrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = forceUnwrap.swift; sourceTree = "<group>"; };
 		7CDB722824797EB600EF487D /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		7CDB722B2479927700EF487D /* EpisodeRecordFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRecordFetcher.swift; sourceTree = "<group>"; };
 		7CEDAD5D2470222100DACFE5 /* DissmisAnimatorEnchancer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DissmisAnimatorEnchancer.swift; sourceTree = "<group>"; };
@@ -192,7 +196,7 @@
 		7CF237BC246779AE00B7A09F /* AppPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppPlayerView.swift; sourceTree = "<group>"; };
 		7CF33CF024794D8C0013E9FA /* EpisodeRecordsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRecordsManager.swift; sourceTree = "<group>"; };
 		7CF577B82470A37500094097 /* ForwardList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardList.swift; sourceTree = "<group>"; };
-		7CF577BC2470C93E00094097 /* InMemoryImageCacheFlushPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryImageCacheFlushPolicy.swift; sourceTree = "<group>"; };
+		7CF577BC2470C93E00094097 /* RAMImageCacheFlushPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RAMImageCacheFlushPolicy.swift; sourceTree = "<group>"; };
 		7CF577BE2470C96D00094097 /* LatestImageFlushPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatestImageFlushPolicy.swift; sourceTree = "<group>"; };
 		7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiggestImageFlushPolicy.swift; sourceTree = "<group>"; };
 		B9D4C6042477ADBF00DC00DE /* ImageFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFetcher.swift; sourceTree = "<group>"; };
@@ -349,8 +353,7 @@
 			isa = PBXGroup;
 			children = (
 				7C940CAB246E0D07000B2DF3 /* ImageCaching.swift */,
-				7CF577BA2470C91100094097 /* InMemoryImageCache */,
-				7C940CAF246E0DFD000B2DF3 /* CoreDataImageCache.swift */,
+				7CF577BA2470C91100094097 /* RAMImageCache */,
 			);
 			path = ImageCache;
 			sourceTree = "<group>";
@@ -523,6 +526,27 @@
 			path = EpisodeRecordsStorageTests;
 			sourceTree = "<group>";
 		};
+		7CD90311247D976500838192 /* DataStructures */ = {
+			isa = PBXGroup;
+			children = (
+				7CF577B82470A37500094097 /* ForwardList.swift */,
+				B9E57DF6247D4B560009A8E4 /* OrderedDictionary.swift */,
+			);
+			path = DataStructures;
+			sourceTree = "<group>";
+		};
+		7CD90312247D977A00838192 /* Functional */ = {
+			isa = PBXGroup;
+			children = (
+				B9E57DF4247D46EB0009A8E4 /* not.swift */,
+				B9E57DFA247D630E0009A8E4 /* composition.swift */,
+				7CD90313247D989900838192 /* apply.swift */,
+				7CD90315247DA0BF00838192 /* parsePair.swift */,
+				7CD90317247DA66B00838192 /* forceUnwrap.swift */,
+			);
+			path = Functional;
+			sourceTree = "<group>";
+		};
 		7CEDAD5B247021F300DACFE5 /* MainTabBarController */ = {
 			isa = PBXGroup;
 			children = (
@@ -576,31 +600,29 @@
 		7CEF30322468EDE80045AB91 /* Library */ = {
 			isa = PBXGroup;
 			children = (
-				7CF577B82470A37500094097 /* ForwardList.swift */,
-				B9E57DF4247D46EB0009A8E4 /* not.swift */,
-				B9E57DF6247D4B560009A8E4 /* OrderedDictionary.swift */,
-				B9E57DFA247D630E0009A8E4 /* composition.swift */,
+				7CD90312247D977A00838192 /* Functional */,
+				7CD90311247D976500838192 /* DataStructures */,
 			);
 			path = Library;
 			sourceTree = "<group>";
 		};
-		7CF577BA2470C91100094097 /* InMemoryImageCache */ = {
+		7CF577BA2470C91100094097 /* RAMImageCache */ = {
 			isa = PBXGroup;
 			children = (
-				7CF577BB2470C92700094097 /* InMemoryImageCacheFlushPolicy */,
-				7C940CAD246E0DB4000B2DF3 /* InMemoryImageCache.swift */,
+				7CF577BB2470C92700094097 /* RAMImageCacheFlushPolicy */,
+				7C940CAD246E0DB4000B2DF3 /* RAMImageCache.swift */,
 			);
-			path = InMemoryImageCache;
+			path = RAMImageCache;
 			sourceTree = "<group>";
 		};
-		7CF577BB2470C92700094097 /* InMemoryImageCacheFlushPolicy */ = {
+		7CF577BB2470C92700094097 /* RAMImageCacheFlushPolicy */ = {
 			isa = PBXGroup;
 			children = (
-				7CF577BC2470C93E00094097 /* InMemoryImageCacheFlushPolicy.swift */,
+				7CF577BC2470C93E00094097 /* RAMImageCacheFlushPolicy.swift */,
 				7CF577BE2470C96D00094097 /* LatestImageFlushPolicy.swift */,
 				7CF577C02470C99100094097 /* BiggestImageFlushPolicy.swift */,
 			);
-			path = InMemoryImageCacheFlushPolicy;
+			path = RAMImageCacheFlushPolicy;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -757,9 +779,11 @@
 				7CEDAD642470227600DACFE5 /* AppPlayerViewAnimatorEnchancer.swift in Sources */,
 				7CF237B7246364CE00B7A09F /* AppPlayerController.swift in Sources */,
 				B9D4C6052477ADBF00DC00DE /* ImageFetcher.swift in Sources */,
+				7CD90316247DA0BF00838192 /* parsePair.swift in Sources */,
 				7C17D0642475A53300BD158E /* PodcastServicing.swift in Sources */,
 				7CF577BF2470C96D00094097 /* LatestImageFlushPolicy.swift in Sources */,
 				7C466D4F246216530014D33A /* RSSFeed.swift in Sources */,
+				7CD90318247DA66B00838192 /* forceUnwrap.swift in Sources */,
 				7CF237BD246779AE00B7A09F /* AppPlayerView.swift in Sources */,
 				7C466D3A2460FEF70014D33A /* ITunesService.swift in Sources */,
 				7CAA5DFC2472FD2100ADD087 /* FavoritesPodcastController.swift in Sources */,
@@ -781,11 +805,10 @@
 				7CDB722C2479927700EF487D /* EpisodeRecordFetcher.swift in Sources */,
 				B9E57DF1247D08F00009A8E4 /* DownloadedEpisodesCoordinator.swift in Sources */,
 				7CF577B92470A37500094097 /* ForwardList.swift in Sources */,
-				7CF577BD2470C93E00094097 /* InMemoryImageCacheFlushPolicy.swift in Sources */,
+				7CF577BD2470C93E00094097 /* RAMImageCacheFlushPolicy.swift in Sources */,
 				7CEDAD622470223A00DACFE5 /* PresentAnimatorEnchancer.swift in Sources */,
 				7C17D0612475A4F300BD158E /* ServiceLocator.swift in Sources */,
 				7CEDAD6E2470248E00DACFE5 /* EnlargeAnimator.swift in Sources */,
-				7C940CB0246E0DFD000B2DF3 /* CoreDataImageCache.swift in Sources */,
 				7C994B57246C8A8F00B8C628 /* SearchBarRootCoordinator.swift in Sources */,
 				B9D4C6072477CD5300DC00DE /* PlayerManaging.swift in Sources */,
 				7CEDAD5E2470222100DACFE5 /* DissmisAnimatorEnchancer.swift in Sources */,
@@ -799,6 +822,7 @@
 				B9E57DF7247D4B560009A8E4 /* OrderedDictionary.swift in Sources */,
 				7CAA5E0524732E2300ADD087 /* UserDefaultsFavoritePodcastsStorage.swift in Sources */,
 				7C35EE612460CC0E0029DA95 /* MainTabBarController.swift in Sources */,
+				7CD90314247D989900838192 /* apply.swift in Sources */,
 				7C3654DF24774A8100EB68C4 /* UIImage.swift in Sources */,
 				7C3654DA24772FF100EB68C4 /* EpisodeRecordFetching.swift in Sources */,
 				7CA423AD246788BB009C4A18 /* MaximizePlayerView.swift in Sources */,
@@ -817,7 +841,7 @@
 				7C3654BA2475BD9000EB68C4 /* RootCoordinator.swift in Sources */,
 				7CEDAD6C2470247D00DACFE5 /* PresentAnimator.swift in Sources */,
 				7C3654AF2475A7B500EB68C4 /* FavoritesPodcastCoordintator.swift in Sources */,
-				7C940CAE246E0DB4000B2DF3 /* InMemoryImageCache.swift in Sources */,
+				7C940CAE246E0DB4000B2DF3 /* RAMImageCache.swift in Sources */,
 				B9E57DEF247D07D30009A8E4 /* DownloadsBarRootCoordinator.swift in Sources */,
 				7C994B55246C7BD600B8C628 /* EpisodesCoordinator.swift in Sources */,
 				B9E57DF9247D51820009A8E4 /* Int.swift in Sources */,

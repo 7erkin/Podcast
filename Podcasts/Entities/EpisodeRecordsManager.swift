@@ -66,7 +66,8 @@ class EpisodeRecordsManager {
     }
     
     var storedEpisodeList: Promise<[StoredEpisodeItem]> {
-        return recordsStorage.getStoredEpisodeRecordList()
+        let sortPolicy: (StoredEpisodeItem, StoredEpisodeItem) -> Bool = { $0.dateOfCreate > $1.dateOfCreate }
+        return recordsStorage.getStoredEpisodeRecordList(withSortPolicy: sortPolicy)
     }
     
     func subscribe(_ subscriber: @escaping (Event) -> Void) -> Subscription {

@@ -61,6 +61,12 @@ public struct OrderedDictionary<Key: Hashable, Value> {
     }
 }
 
+extension OrderedDictionary {
+    var keys: [Key] {
+        return array
+    }
+}
+
 extension OrderedDictionary: ExpressibleByDictionaryLiteral {
     public init(dictionaryLiteral elements: (Key, Value)...) {
         self.init()

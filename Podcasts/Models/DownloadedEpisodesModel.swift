@@ -38,18 +38,18 @@ class DownloadedEpisodesModel {
     init(recordsManager: EpisodeRecordsManager, player: EpisodeListPlayable) {
         self.player = player
         self.recordsManager = recordsManager
-        if let playList = player.currentPlayList() {
-            if let _ = playList.creatorToken as? DownloadedEpisodesModelToken {
-                subscribeToPlayList(playList)
-            }
-        }
-        subscribeToRecordsManager()
     }
     // MARK: - public api
     func initialize() {
         firstly {
             recordsManager.storedEpisodeList
         }.done {
+            if let playList = self.player.currentPlayList() {
+                if let _ = playList.creatorToken as? DownloadedEpisodesModelToken {
+                    self.subscribeToPlayList(playList)
+                }
+            }
+            self.subscribeToRecordsManager()
             self.storedEpisodes = $0.map { $0.episode }
             self.subscriber(.initialized)
         }.catch { _ in }
@@ -57,6 +57,9 @@ class DownloadedEpisodesModel {
     
     func delete(episode: Episode) {
         recordsManager.deleteEpisode(episode)
+    }
+    
+    func cancelDownloading(episode: Episode) {
     }
     
     func pickEpisode(episodeIndex index: Int) {
@@ -118,7 +121,7 @@ class DownloadedEpisodesModel {
         case .episodeDownloaded:
             updateStoredEpisodeList(withEvent: .episodeDownloaded)
         case .episodeStartDownloading:
-            subscriber(.episodeStartDownloading)
+            subscriber?(.episodeStartDownloading)
         }
     }
     

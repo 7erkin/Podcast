@@ -18,6 +18,10 @@ struct Episode: Codable, Equatable {
     
     var imageUrl: URL?
     
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.streamUrl == rhs.streamUrl
+    }
+    
     init(rssFeedItem: RSSFeedItem) {
         name = rssFeedItem.title ?? ""
         author = rssFeedItem.iTunes?.iTunesAuthor ?? ""
@@ -32,5 +36,4 @@ struct Episode: Codable, Equatable {
     }
 }
 
-extension Episode: Hashable {
-}
+extension Episode: Hashable {}

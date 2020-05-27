@@ -26,14 +26,14 @@ class FavoriteButtonItem: UIBarButtonItem {
 
 class EpisodesController: UITableViewController {
     private let cellId = "episodeCell"
+    private var storedEpisodes: [Episode] = []
     fileprivate var favoriteButton: FavoriteButtonItem {
         return navigationItem.rightBarButtonItem as! FavoriteButtonItem
-    }
-    // MARK: - dependencies
-    var episodesModel: EpisodesModel! {
+    }    // MARK: - dependencies
+    var model: EpisodesModel! {
         didSet {
-            self.episodesModel.initialize()
-            self.episodesModel.subscriber = { [weak self] event in
+            self.model.initialize()
+            self.model.subscriber = { [weak self] event in
                 self?.updateViewWithModel(withEvent: event)
             }
         }
@@ -61,7 +61,7 @@ class EpisodesController: UITableViewController {
     @objc
     fileprivate func onFavoriteButtonTapped() {
         if !favoriteButton.isFavorite {
-            episodesModel.addPodcastToFavorites()
+            model.addPodcastToFavorites()
         }
     }
     // MARK: - helpers
@@ -75,21 +75,38 @@ class EpisodesController: UITableViewController {
         switch event {
         case .initialized:
             tableView.reloadData()
-            favoriteButton.isFavorite = episodesModel.isPodcastFavorite
+            storedEpisodes = model.storedEpisodes
+            favoriteButton.isFavorite = model.isPodcastFavorite
         case .podcastStatusUpdated:
-            favoriteButton.isFavorite = episodesModel.isPodcastFavorite
+            favoriteButton.isFavorite = model.isPodcastFavorite
+        case .episodeDeleted:
+            if let deletedEpisodeIndex = storedEpisodes.firstIndex(where: { !model.storedEpisodes.contains($0) }) {
+                let episode = storedEpisodes[deletedEpisodeIndex]
+                if let indexCellToUpdate = model.episodes.firstIndex(of: episode) {
+                    storedEpisodes = model.storedEpisodes
+                    let cell = tableView.cellForRow(at: IndexPath(row: indexCellToUpdate, section: 0)) as! EpisodeCell
+                    cell.episodeRecordStatus = EpisodeRecordStatus.none
+                }
+            }
         case .episodeDownloadingProgressUpdated:
-            let indexPathsToReload = tableView.visibleCells
+            tableView.visibleCells
                 .map { $0 as! EpisodeCell }
-                .filter { episodesModel.downloadingEpisodes[$0.episode] != nil }
-                .map { tableView.indexPath(for: $0)! }
-            indexPathsToReload
-                .map { tableView.cellForRow(at: $0) as! EpisodeCell }
-                .forEach { $0.episodeRecordStatus = .downloading }
+                .forEach {
+                    if let progress = model.downloadingEpisodes[$0.episode] {
+                        $0.episodeRecordStatus = .downloading(progress: progress)
+                    }
+                }
             break
         case .episodeDownloaded:
-            // todo
-            break
+            if let downloadedEpisodeIndex = model.storedEpisodes.firstIndex(where: { !storedEpisodes.contains($0) }) {
+                let episode = model.storedEpisodes[downloadedEpisodeIndex]
+                let indexCellToUpdate = model.episodes.firstIndex(of: episode)
+                storedEpisodes = model.storedEpisodes
+                guard indexCellToUpdate != nil else { return }
+                
+                let cell = tableView.cellForRow(at: IndexPath(row: indexCellToUpdate!, section: 0)) as! EpisodeCell
+                cell.episodeRecordStatus = .downloaded
+            }
         default:
             break
         }
@@ -97,18 +114,26 @@ class EpisodesController: UITableViewController {
     // MARK: - UITableView
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! EpisodeCell
-        let episode = episodesModel.episodes[indexPath.row]
+        let episode = model.episodes[indexPath.row]
         cell.episode = episode
-        // todo
+        if model.storedEpisodes.contains(episode) {
+            cell.episodeRecordStatus = .downloaded
+        } else {
+            if let progress = model.downloadingEpisodes[episode] {
+                cell.episodeRecordStatus = .downloading(progress: progress)
+            } else {
+                cell.episodeRecordStatus = EpisodeRecordStatus.none
+            }
+        }
         return cell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return episodesModel.episodes.count
+        return model.episodes.count
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        episodesModel.pickEpisode(episodeIndex: indexPath.row)
+        model.pickEpisode(episodeIndex: indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -123,15 +148,20 @@ class EpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return episodesModel.episodes.count == 0 ? 200 : 0
+        return model.episodes.count == 0 ? 200 : 0
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let action = UIContextualAction(style: .normal, title: "Download") { [weak self] (_, _, completionHandler) in
-            self?.episodesModel.downloadEpisode(episodeIndex: indexPath.row)
-            completionHandler(true)
+        switch (tableView.cellForRow(at: indexPath) as! EpisodeCell).episodeRecordStatus {
+        case .downloaded:
+            return nil
+        default:
+            let action = UIContextualAction(style: .normal, title: "Download") { [weak self] (_, _, completionHandler) in
+                self?.model.downloadEpisode(episodeIndex: indexPath.row)
+                completionHandler(true)
+            }
+            let configuration = UISwipeActionsConfiguration(actions: [action])
+            return configuration
         }
-        let configuration = UISwipeActionsConfiguration(actions: [action])
-        return configuration
     }
 }

@@ -81,7 +81,7 @@ class FileSystemRecordsStorage: EpisodeRecordsStoraging {
         }
     }
     
-    func getStoredEpisodeRecordList() -> Promise<[StoredEpisodeItem]> {
+    func getStoredEpisodeRecordList(withSortPolicy sortPolicy: @escaping (StoredEpisodeItem, StoredEpisodeItem) -> Bool) -> Promise<[StoredEpisodeItem]> {
         return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[StoredEpisodeItem]> in
             let items = try! FileManager.default.contentsOfDirectory(
                 at: self.recordsDirectoryRootUrl,
@@ -93,9 +93,9 @@ class FileSystemRecordsStorage: EpisodeRecordsStoraging {
                 //let fd = try? FileHandle(forReadingFrom: itemDescriptionUrl)
                 //let serializedItemDescription = FileManager.default.contents(atPath: itemDescriptionUrl.absoluteString)
                 return try? FileHandle(forReadingFrom: itemDescriptionUrl).readDataToEndOfFile()
-            }.map { data in
-                return try! JSONDecoder().decode(StoredEpisodeItem.self, from: data)
-            }
+            }.compactMap { data in
+                return try? JSONDecoder().decode(StoredEpisodeItem.self, from: data)
+            }.sorted(by: sortPolicy)
             return Promise { resolver in resolver.fulfill(items) }
         }
     }

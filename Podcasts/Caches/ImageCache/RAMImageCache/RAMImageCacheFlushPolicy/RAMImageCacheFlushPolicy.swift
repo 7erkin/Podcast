@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-protocol InMemoryImageCacheFlushPolicy {
+protocol RAMImageCacheFlushPolicy {
     init(withCacheMemoryLimit availableMegaBytes: Float)
     mutating func prepareCache(_ cache: inout [URL:UIImage], forCachingImage cachingImage: UIImage)
     mutating func cached(_ image: UIImage, withUrl url: URL)

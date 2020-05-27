@@ -11,9 +11,9 @@ import Alamofire
 import PromiseKit
 
 enum EpisodeRecordStatus {
-    case downloaded
-    case downloading
     case none
+    case downloading(progress: Double)
+    case downloaded
 }
 
 class EpisodeCell: UITableViewCell {
@@ -30,17 +30,19 @@ class EpisodeCell: UITableViewCell {
             updateViewWithEpisodeRecordStatus()
         }
     }
+    
     fileprivate func updateViewWithEpisodeRecordStatus() {
         switch episodeRecordStatus! {
         case .none:
             episodeRecordDownloadIndicator.isHidden = true
+            progressLabel.isHidden = true
+        case .downloading(let progress):
+            episodeRecordDownloadIndicator.isHidden = true
+            progressLabel.isHidden = false
+            progressLabel.text = "\(Int(100 * progress))%"
         case .downloaded:
             episodeRecordDownloadIndicator.isHidden = false
-            episodeRecordDownloadIndicator.tintColor = .green
-            break
-        case .downloading:
-            episodeRecordDownloadIndicator.isHidden = false
-            episodeRecordDownloadIndicator.tintColor = .red
+            progressLabel.isHidden = true
         }
     }
     
@@ -84,6 +86,7 @@ class EpisodeCell: UITableViewCell {
     @IBOutlet var publishDateLabel: UILabel!
     @IBOutlet var episodeNameLabel: UILabel!
     @IBOutlet var descriptionLabel: UILabel!
+    @IBOutlet var progressLabel: UILabel!
     @IBOutlet var loadingImageIndicator: UIActivityIndicatorView! {
         didSet {
             self.loadingImageIndicator.hidesWhenStopped = true
@@ -92,6 +95,7 @@ class EpisodeCell: UITableViewCell {
     @IBOutlet var episodeRecordDownloadIndicator: UIButton! {
         didSet {
             self.episodeRecordDownloadIndicator.isEnabled = false
+            self.tintColor = .systemBlue
         }
     }
     

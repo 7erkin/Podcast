@@ -32,6 +32,8 @@ class EpisodePlayList {
         self.playList = playList
         self.playingItemIndex = index
         self.creatorToken = creatorToken
+        print("Playing urls: \(playList.map { $0.episode.streamUrl })")
+        print("Real path: \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
     }
     
     deinit {

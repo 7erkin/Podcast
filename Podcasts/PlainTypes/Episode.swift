@@ -16,6 +16,7 @@ struct Episode: Codable, Equatable {
     var description: String
     var streamUrl: URL
     
+    var fileUrl: URL?
     var imageUrl: URL?
     
     static func == (lhs: Self, rhs: Self) -> Bool {

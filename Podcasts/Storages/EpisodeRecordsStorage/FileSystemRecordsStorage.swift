@@ -45,7 +45,7 @@ class FileSystemRecordsStorage: EpisodeRecordsStoraging {
             try! FileManager.default.createDirectory(at: directoryUrl.absoluteURL, withIntermediateDirectories: true, attributes: nil)
             // create record file in directory
             var recordUrl = directoryUrl
-            recordUrl.appendPathComponent("record")
+            recordUrl.appendPathComponent("record.mp3")
             try! record.write(to: recordUrl)
             //precondition(FileManager.default.createFile(atPath: recordUrl.absoluteString, contents: record, attributes: nil))
             // create description file in record directory

@@ -68,7 +68,7 @@ class DownloadedEpisodesModel {
         }.done {
             let playList = $0.enumerated().map { (index, item) -> EpisodePlayListItem in
                 var episodeCopy = item.episode
-                episodeCopy.streamUrl = item.recordUrl
+                episodeCopy.fileUrl = item.recordUrl.currentRealUrl
                 return EpisodePlayListItem(indexInList: index, episode: episodeCopy, podcast: item.podcast)
             }
             let episodePlayList = EpisodePlayList(
@@ -132,5 +132,14 @@ class DownloadedEpisodesModel {
             self.storedEpisodes = $0.map { $0.episode }
             self.subscriber(event)
         }.catch { _ in }
+    }
+}
+
+extension URL {
+    var currentRealUrl: URL {
+        let index = self.pathComponents.firstIndex(of: "Documents")!
+        let baseUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let url = self.pathComponents[(index + 1)...].reduce(into: baseUrl) { $0.appendPathComponent($1) }
+        return url
     }
 }

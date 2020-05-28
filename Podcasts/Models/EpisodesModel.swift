@@ -101,15 +101,29 @@ class EpisodesModel {
             }
         }
         
-        let episodePlayList = EpisodePlayList(
-            playList: episodes.enumerated().map { EpisodePlayListItem(indexInList: $0, episode: $1, podcast: podcast) },
-            playingItemIndex: index,
-            creatorToken: token
-        )
-        subscribeToPlayList(episodePlayList)
-        player.applyPlayList(episodePlayList)
-        pickedEpisodeIndex = index
-        notifyAll(withEvent: .episodePicked)
+        firstly { () -> Promise<[StoredEpisodeItem]> in
+            return recordsManager.storedEpisodeList
+        }.then(on: DispatchQueue.global(qos: .userInitiated), flags: nil) { storedEpisodeList -> Promise<[Episode]> in
+            let episodes = self.episodes.map { episode -> Episode in
+                if let index = storedEpisodeList.firstIndex(where: { $0.episode == episode }) {
+                    var episodeCopy = episode
+                    episodeCopy.fileUrl = storedEpisodeList[index].recordUrl.currentRealUrl
+                    return episodeCopy
+                }
+                return episode
+            }
+            return Promise { $0.fulfill(episodes) }
+        }.done { episodes in
+            let episodePlayList = EpisodePlayList(
+                playList: episodes.enumerated().map { EpisodePlayListItem(indexInList: $0, episode: $1, podcast: self.podcast) },
+                playingItemIndex: index,
+                creatorToken: self.token
+            )
+            self.subscribeToPlayList(episodePlayList)
+            self.player.applyPlayList(episodePlayList)
+            self.pickedEpisodeIndex = index
+            self.notifyAll(withEvent: .episodePicked)
+        }.catch { _ in }
     }
     
     func addPodcastToFavorites() {

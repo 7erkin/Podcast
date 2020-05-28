@@ -64,7 +64,7 @@ class Player {
     }
     private(set) var playingEpisode: Episode! {
         didSet {
-            let playerItem = AVPlayerItem(url: self.playingEpisode.streamUrl)
+            let playerItem = AVPlayerItem(url: self.playingEpisode.fileUrl ?? self.playingEpisode.streamUrl)
             player.replaceCurrentItem(with: playerItem)
             player.play()
             notifyAll(withEvent: PlayerEvent.playingEpisodeUpdated)

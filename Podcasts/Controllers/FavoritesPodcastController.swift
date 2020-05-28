@@ -16,6 +16,7 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     fileprivate let cellId = "cellId"
     fileprivate let sideInset: CGFloat = 16
     fileprivate let spacingBetweenItems: CGFloat = 16
+    fileprivate var podcasts: [Podcast] = []
     // MARK: - dependencies
     weak var coordinator: FavoritesPodcastControllerCoordinatorDelegate!
     var favoritePodcastsModel: FavoritePodcastsModel! {
@@ -26,7 +27,7 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
             }
         }
     }
-    
+    // MARK: -
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.tabBarItem.badgeValue = nil
@@ -35,7 +36,7 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGestureHappened(_:)))
-        longPressGesture.minimumPressDuration = 1.5
+        longPressGesture.minimumPressDuration = 1
         collectionView.addGestureRecognizer(longPressGesture)
         collectionView.backgroundColor = .white
         collectionView.register(FavoritesPodcastCell.self, forCellWithReuseIdentifier: cellId)
@@ -44,12 +45,17 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     fileprivate func updateViewWithModel(withEvent event: FavoritePodcastsModel.Event) {
         switch event {
         case .initialized:
+            podcasts = favoritePodcastsModel.podcasts
             collectionView.reloadData()
         case .podcastSaved:
-            collectionView.reloadData()
+            let index = favoritePodcastsModel.podcasts.firstIndex(where: { !podcasts.contains($0) })!
+            podcasts = favoritePodcastsModel.podcasts
+            collectionView.insertItems(at: [IndexPath(item: index, section: 0)])
             navigationController?.tabBarItem.badgeValue = "NEW"
         case .podcastDeleted:
-            collectionView.reloadData()
+            let index = podcasts.firstIndex(where: { !favoritePodcastsModel.podcasts.contains($0) })!
+            podcasts = favoritePodcastsModel.podcasts
+            collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
         }
     }
     
@@ -71,14 +77,14 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
             present(alertController, animated: true, completion: nil)
         }
     }
-    
+    // MARK: - UICollectionView
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return favoritePodcastsModel.podcasts.count
+        return podcasts.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! FavoritesPodcastCell
-        cell.podcast = favoritePodcastsModel.podcasts[indexPath.row]
+        cell.podcast = podcasts[indexPath.row]
         return cell
     }
 
@@ -100,7 +106,7 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let podcast = favoritePodcastsModel.podcasts[indexPath.row]
+        let podcast = podcasts[indexPath.row]
         coordinator.choose(podcast: podcast)
     }
 }

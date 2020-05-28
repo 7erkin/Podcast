@@ -323,7 +323,7 @@
 		7C35EE652460D6B20029DA95 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				7C994B58246C95E200B8C628 /* Player */,
+				7CEF30252468D4CA0045AB91 /* Player.swift */,
 				7CEF3044246934B80045AB91 /* EpisodesModel.swift */,
 				7C3654C42475D2D700EB68C4 /* DownloadedEpisodesModel.swift */,
 				7C3654CB2475FE2E00EB68C4 /* PodcastsSearchModel.swift */,
@@ -470,14 +470,6 @@
 				B9E57DF0247D08F00009A8E4 /* DownloadedEpisodesCoordinator.swift */,
 			);
 			path = Coordinators;
-			sourceTree = "<group>";
-		};
-		7C994B58246C95E200B8C628 /* Player */ = {
-			isa = PBXGroup;
-			children = (
-				7CEF30252468D4CA0045AB91 /* Player.swift */,
-			);
-			path = Player;
 			sourceTree = "<group>";
 		};
 		7C994B5B246C96D600B8C628 /* PlayerControllers */ = {

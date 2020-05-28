@@ -37,6 +37,7 @@ class EpisodesController: UITableViewController {
             self.model.subscriber = { [weak self] event in
                 self?.updateViewWithModel(withEvent: event)
             }
+            navigationItem.title = self.model.podcast.name
         }
     }
     // MARK: - view life cycles

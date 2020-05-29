@@ -12,7 +12,7 @@ import Alamofire
 
 struct EpisodeRecordFetcherError: Error {}
 
-class EpisodeRecordFetcher: EpisodeRecordFetching {
+final class EpisodeRecordFetcher: EpisodeRecordFetching {
     func fetch(episode: Episode, _ progressHandler: ((Double) -> Void)?) -> Promise<Data> {
         return  Promise { resolver in
             let downloadRequest = AF.download(episode.streamUrl)

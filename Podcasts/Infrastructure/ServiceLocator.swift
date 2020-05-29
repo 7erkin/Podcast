@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ServiceLocator {
+final class ServiceLocator {
     static let podcastService: PodcastServicing = ITunesService.shared
     static let defferedPodcastService: PodcastServicing = DefferedPodcastService(timeout: 1.5, wrappedPodcastService: ServiceLocator.podcastService)
     static let imageCache = RAMImageCache(withFlushPolicy: LatestImageFlushPolicy(withCacheMemoryLimit: 300))

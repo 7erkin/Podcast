@@ -10,7 +10,7 @@ import Foundation
 import AVKit
 import MediaPlayer
 
-class MediaCenterPlayerController {
+final class MediaCenterPlayerController {
     private var playerSubscription: Subscription!
     // MARK: - dependency
     weak var player: Player! {
@@ -25,7 +25,7 @@ class MediaCenterPlayerController {
         setup()
     }
     // MARK: - helpers
-    fileprivate func setup() {
+    private func setup() {
         let mediaCenter = MPRemoteCommandCenter.shared()
         UIApplication.shared.beginReceivingRemoteControlEvents()
         let playPauseHandler: (MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus = { [weak self] _ in
@@ -56,7 +56,7 @@ class MediaCenterPlayerController {
         mediaCenter.nextTrackCommand.addTarget(handler: playNextEpisodeHandler)
     }
     
-    fileprivate func updateViewWithModel() {
+    private func updateViewWithModel() {
         let mediaCenter = MPRemoteCommandCenter.shared()
         mediaCenter.nextTrackCommand.isEnabled = player.hasNextEpisode()
         mediaCenter.previousTrackCommand.isEnabled = player.hasPreviousEpisode()

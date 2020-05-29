@@ -9,11 +9,10 @@
 import Foundation
 import UIKit
 
-class MainTabBarController: UITabBarController {
+final class MainTabBarController: UITabBarController {
     private var appPlayerController: AppPlayerController!
     private var mediaCenterPlayerController: MediaCenterPlayerController!
     private var lockScreenPlayerController: LockScreenPlayerController!
-    
     private lazy var searchBarCoordinator: SearchBarRootCoordinator = {
         let coordinator = SearchBarRootCoordinator()
         coordinator.start()
@@ -38,70 +37,38 @@ class MainTabBarController: UITabBarController {
         view.tintColor = .purple
         view.backgroundColor = .white
         
-        setupViewControllers()
-        setup()
-        setupAppPlayerControllerAnimations()
+        setupRootViewControllers()
+        setupPlayerControllers()
     }
-    
-    private func setupAppPlayerControllerAnimations() {
-        let animatorFactory = AppPlayerViewAnimatorFactory()
-        appPlayerController.enlargeAnimator = EnlargeAnimatorEnhancer(self, animatorFactory.createAnimation(.enlarge))
-        appPlayerController.dissmisAnimator = DissmisAnimatorEnhancer(self, animatorFactory.createAnimation(.dissmis))
-        appPlayerController.presentAnimator = PresentAnimatorEnhancer(self, animatorFactory.createAnimation(.present))
-    }
-    
-    private func setup() {
-        let player = Player.shared
-        mediaCenterPlayerController = .init()
-        mediaCenterPlayerController.player = player
-        
-        lockScreenPlayerController = .init()
-        lockScreenPlayerController.player = player
-        
+    // MARK :- setup functions
+    private func setupAppPlayerViewController() {
         appPlayerController = .init()
-        appPlayerController.player = player
+        appPlayerController.player = Player.shared
+        appPlayerController.view.frame = tabBar.frame
+        view.insertSubview(appPlayerController.view, belowSubview: tabBar)
+        appPlayerController.dissmisAnimationInvoker = { [ unowned tabBar = tabBar ] playerView in
+            invokeAppearingAnimation(withTabBar: tabBar)
+            invokeDissmisAnimation(withAppPlayerView: playerView)
+        }
+        appPlayerController.enlargeAnimationInvoker = { [ unowned tabBar = tabBar ] playerView in
+            invokeHiddingAnimation(withTabBar: tabBar)
+            invokeEnlargeAnimation(withAppPlayerView: playerView)
+        }
     }
     
-    func performHiddingTabBarWithAnimation() {
-        UIView.animate(
-            withDuration: 0.5,
-            delay: 0,
-            options: [.curveEaseIn],
-            animations: {[weak self] in
-                self?.tabBar.isHidden = true
-            },
-            completion: nil
-        )
+    private func setupPlayerControllers() {
+        mediaCenterPlayerController = .init()
+        mediaCenterPlayerController.player = Player.shared
+        lockScreenPlayerController = .init()
+        lockScreenPlayerController.player = Player.shared
+        setupAppPlayerViewController()
     }
     
-    func performShowingTabBarWithAnimation() {
-        UIView.animate(
-            withDuration: 0.5,
-            delay: 0,
-            options: [.curveEaseIn],
-            animations: {[weak self] in
-                self?.tabBar.isHidden = false
-            },
-            completion: nil
-        )
-    }
-    
-    // MARK: - Setup Functions
-    fileprivate func setupViewControllers() {
+    private func setupRootViewControllers() {
         viewControllers = [
             favoritesBarCoordinator.navigationController,
             searchBarCoordinator.navigationController,
             downloadsBarCoordinator.navigationController
         ]
-    }
-    
-    // MARK: - Helper Functions
-    fileprivate func generateNavigationController(with rootViewController: UIViewController, title: String, image: UIImage) -> UINavigationController {
-        let navController = UINavigationController(rootViewController: rootViewController)
-        navController.navigationBar.prefersLargeTitles = true
-        rootViewController.navigationItem.title = title
-        navController.tabBarItem.title = title
-        navController.tabBarItem.image = image
-        return navController
     }
 }

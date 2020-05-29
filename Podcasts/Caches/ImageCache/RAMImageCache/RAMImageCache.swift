@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 import UIKit
 
-class RAMImageCache: ImageCaching {
+final class RAMImageCache: ImageCaching {
     private var cache: [URL:UIImage] = [:]
     private var cacheFlushPolicy: RAMImageCacheFlushPolicy
     private let serviceQueue = DispatchQueue(

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FavoritesBarRootCoordinator: RootCoordinator {
+final class FavoritesBarRootCoordinator: RootCoordinator {
     override init() {
         super.init()
         navigationController.tabBarItem.image = UIImage(named: "favorites")!

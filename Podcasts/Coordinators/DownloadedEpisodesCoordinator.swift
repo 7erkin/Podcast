@@ -9,7 +9,7 @@
 import UIKit
 import Foundation
 
-class DownloadedEpisodesCoordintator: Coordinatable {
+final class DownloadedEpisodesCoordintator: Coordinatable {
     var child: Coordinatable!
     var navigationController: UINavigationController!
     

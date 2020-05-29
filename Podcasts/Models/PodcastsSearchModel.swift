@@ -8,7 +8,7 @@
 
 import Foundation
 
-class PodcastsSearchModel {
+final class PodcastsSearchModel {
     enum Event {
         case podcastsFetched
     }

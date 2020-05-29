@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EpisodesCoordintator: Coordinatable {
+final class EpisodesCoordintator: Coordinatable {
     var child: Coordinatable!
     var navigationController: UINavigationController!
     

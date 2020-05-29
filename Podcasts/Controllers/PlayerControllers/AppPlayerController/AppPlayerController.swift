@@ -10,15 +10,15 @@ import UIKit
 import AVKit
 import MediaPlayer
 
-class AppPlayerController: UIViewController {
-    typealias AnimationInvoker = (UIView) -> Void
-    var dissmisAnimator: AppPlayerViewAnimator!
-    var enlargeAnimator: AppPlayerViewAnimator!
-    var presentAnimator: AppPlayerViewAnimator!
-    var appPlayerView: AppPlayerView { return view as! AppPlayerView }
+final class AppPlayerController: UIViewController {
+    typealias AppPlayerViewAnimator = (AppPlayerView) -> Void
+    
+    private var appPlayerView: AppPlayerView { return view as! AppPlayerView }
     private var playerSubscription: Subscription!
-    private var hasViewBeenPresented = false
+    private var hasAppPlayerViewBeenPresented = false
     // MARK: - dependencies
+    var dissmisAnimationInvoker: AppPlayerViewAnimator!
+    var enlargeAnimationInvoker: AppPlayerViewAnimator!
     weak var player: Player! {
         didSet {
             playerSubscription = self.player.subscribe { [weak self] event in
@@ -40,10 +40,11 @@ class AppPlayerController: UIViewController {
     }
     // MARK: - helpers
     private func updateWithPlayer(withEvent event: PlayerEvent) {
-        if !hasViewBeenPresented {
-            presentAnimator.invoke(forAppPlayerView: appPlayerView)
-            hasViewBeenPresented = true
+        if !hasAppPlayerViewBeenPresented {
+            invokeEnlargeAnimation(withAppPlayerView: appPlayerView)
+            hasAppPlayerViewBeenPresented = true
         }
+        
         switch event {
         case .playerStateUpdated:
             appPlayerView.playerState = player.playerState
@@ -77,10 +78,10 @@ extension AppPlayerController: PlayerManaging {
 
 extension AppPlayerController: PlayerViewDelegate {
     func dissmis() {
-        dissmisAnimator.invoke(forAppPlayerView: appPlayerView)
+        invokeDissmisAnimation(withAppPlayerView: appPlayerView)
     }
     
     func enlarge() {
-        enlargeAnimator.invoke(forAppPlayerView: appPlayerView)
+        invokeEnlargeAnimation(withAppPlayerView: appPlayerView)
     }
 }

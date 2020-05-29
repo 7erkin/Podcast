@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SearchBarRootCoordinator: RootCoordinator {
+final class SearchBarRootCoordinator: RootCoordinator {
     override init() {
         super.init()
         navigationController = UINavigationController()

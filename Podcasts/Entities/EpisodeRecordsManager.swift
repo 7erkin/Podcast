@@ -12,7 +12,7 @@ import PromiseKit
 struct BreakPromiseChainError: Error {}
 
 // must be called from the main thread
-class EpisodeRecordsManager {
+final class EpisodeRecordsManager {
     enum Event {
         case episodeDownloaded
         case episodeDeleted

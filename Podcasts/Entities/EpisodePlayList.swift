@@ -22,8 +22,7 @@ struct EpisodePlayListItem {
     var podcast: Podcast
 }
 
-// client of this class are models and must work with it in main thread
-class EpisodePlayList {
+final class EpisodePlayList {
     private var subscribers: [UUID:(EpisodePlayListEvent) -> Void] = [:]
     private let playList: [EpisodePlayListItem]
     private var playingItemIndex: Int
@@ -32,8 +31,6 @@ class EpisodePlayList {
         self.playList = playList
         self.playingItemIndex = index
         self.creatorToken = creatorToken
-        print("Playing urls: \(playList.map { $0.episode.streamUrl })")
-        print("Real path: \(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))")
     }
     
     deinit {

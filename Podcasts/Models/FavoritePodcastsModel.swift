@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-class FavoritePodcastsModel {
+final class FavoritePodcastsModel {
     enum Event {
         case initialized
         case podcastDeleted

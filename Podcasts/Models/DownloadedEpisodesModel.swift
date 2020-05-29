@@ -11,7 +11,7 @@ import PromiseKit
 
 struct DownloadedEpisodesModelToken: EpisodePlayListCreatorToken {}
 
-class DownloadedEpisodesModel {
+final class DownloadedEpisodesModel {
     enum Event {
         case initialized
         case episodeDeleted

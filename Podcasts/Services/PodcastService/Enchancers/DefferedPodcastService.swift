@@ -8,7 +8,7 @@
 
 import Foundation
 
-class DefferedPodcastService: PodcastServicing {
+final class DefferedPodcastService: PodcastServicing {
     private let wrappedPodcastService: PodcastServicing
     private var timer: Timer?
     private let timeout: TimeInterval

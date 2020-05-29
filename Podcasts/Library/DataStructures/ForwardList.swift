@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ForwardListNode<Element> {
+final class ForwardListNode<Element> {
     let value: Element
     var nextNode: ForwardListNode<Element>?
     init(value: Element) {

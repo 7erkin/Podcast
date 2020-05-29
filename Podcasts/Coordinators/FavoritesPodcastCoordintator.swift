@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FavoritesPodcastCoordinator: Coordinatable, FavoritesPodcastControllerCoordinatorDelegate {
+final class FavoritesPodcastCoordinator: Coordinatable, FavoritesPodcastControllerCoordinatorDelegate {
     var child: Coordinatable!
     var navigationController: UINavigationController!
     

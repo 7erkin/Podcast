@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class DownloadsBarRootCoordinator: RootCoordinator {
+final class DownloadsBarRootCoordinator: RootCoordinator {
     override init() {
         super.init()
         navigationController = UINavigationController()

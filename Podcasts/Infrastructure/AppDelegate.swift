@@ -11,7 +11,7 @@ import AVKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    fileprivate func configureAudioSession() {
+    private func configureAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
             try AVAudioSession.sharedInstance().setActive(true, options: [])

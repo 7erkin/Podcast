@@ -12,11 +12,11 @@ protocol FavoritesPodcastControllerCoordinatorDelegate: class {
     func choose(podcast: Podcast)
 }
 
-class FavoritesPodcastController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
-    fileprivate let cellId = "cellId"
-    fileprivate let sideInset: CGFloat = 16
-    fileprivate let spacingBetweenItems: CGFloat = 16
-    fileprivate var podcasts: [Podcast] = []
+final class FavoritesPodcastController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+    private let cellId = "cellId"
+    private let sideInset: CGFloat = 16
+    private let spacingBetweenItems: CGFloat = 16
+    private var podcasts: [Podcast] = []
     // MARK: - dependencies
     weak var coordinator: FavoritesPodcastControllerCoordinatorDelegate!
     var favoritePodcastsModel: FavoritePodcastsModel! {
@@ -42,7 +42,7 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
         collectionView.register(FavoritesPodcastCell.self, forCellWithReuseIdentifier: cellId)
     }
     
-    fileprivate func updateViewWithModel(withEvent event: FavoritePodcastsModel.Event) {
+    private func updateViewWithModel(withEvent event: FavoritePodcastsModel.Event) {
         switch event {
         case .initialized:
             podcasts = favoritePodcastsModel.podcasts
@@ -60,7 +60,7 @@ class FavoritesPodcastController: UICollectionViewController, UICollectionViewDe
     }
     
     @objc
-    fileprivate func onLongPressGestureHappened(_ gesture: UILongPressGestureRecognizer) {
+    private func onLongPressGestureHappened(_ gesture: UILongPressGestureRecognizer) {
         let gestureLocation = gesture.location(in: collectionView)
         if let indexPath = collectionView.indexPathForItem(at: gestureLocation) {
             let podcastIndex = indexPath.row

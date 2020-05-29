@@ -10,8 +10,8 @@ import Foundation
 import UIKit
 import PromiseKit
 
-class DownloadedEpisodesController: UITableViewController {
-    fileprivate let cellId = "cellId"
+final class DownloadedEpisodesController: UITableViewController {
+    private let cellId = "cellId"
     var model: DownloadedEpisodesModel! {
         didSet {
             model.subscriber = { [weak self] event in self?.updateViewWithModel(withEvent: event) }
@@ -63,9 +63,7 @@ class DownloadedEpisodesController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         switch (tableView.cellForRow(at: indexPath) as! EpisodeCell).episodeRecordStatus {
         case .downloading(_):
-            let action = UIContextualAction(style: .normal, title: "Cancel") { [weak self] (_, _, completionHandler) in
-                guard let self = self else { return }
-
+            let action = UIContextualAction(style: .normal, title: "Cancel") { (_, _, completionHandler) in
                 completionHandler(true)
             }
             let configuration = UISwipeActionsConfiguration(actions: [action])
@@ -83,7 +81,7 @@ class DownloadedEpisodesController: UITableViewController {
         }
     }
     // MARK: - helpers
-    fileprivate func updateViewWithModel(withEvent event: DownloadedEpisodesModel.Event) {
+    private func updateViewWithModel(withEvent event: DownloadedEpisodesModel.Event) {
         switch event {
         case .initialized:
             downloadingEpisodes = model.downloadingEpisodes

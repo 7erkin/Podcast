@@ -11,7 +11,7 @@ import PromiseKit
 
 // saved episode stored as directory where json { StoredItem } and recordsFile.
 // directory name is awCollectionId=510318&awEpisodeId=857652287 (number1.number2)
-class FileSystemRecordsStorage: EpisodeRecordsStoraging {
+final class FileSystemRecordsStorage: EpisodeRecordsStoraging {
     private let serviceQueue = DispatchQueue(
         label: "file.system.records.storage",
         qos: .userInitiated,

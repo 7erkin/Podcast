@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 // thread safe
-class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
+final class UserDefaultsFavoritePodcastsStorage: FavoritePodcastsStoraging {
     // MARK: - constants
     fileprivate let favoritePodcastKey = "favoritePodcastKey"
     fileprivate let serviceQueue = DispatchQueue(

@@ -10,8 +10,8 @@ import AVKit
 import PromiseKit
 import MediaPlayer
 
-class LockScreenPlayerController {
-    fileprivate var playerSubscription: Subscription!
+final class LockScreenPlayerController {
+    private var playerSubscription: Subscription!
     // MARK: - dependencies
     weak var player: Player! {
         didSet {
@@ -22,7 +22,7 @@ class LockScreenPlayerController {
     }
     var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
     // MARK: - helpers
-    fileprivate func updateViewWithModel(withEvent event: PlayerEvent) {
+    private func updateViewWithModel(withEvent event: PlayerEvent) {
         switch event {
         case .playerStateUpdated:
             updateLockscreenCurrentTime(withPlayerState: player.playerState)
@@ -33,7 +33,7 @@ class LockScreenPlayerController {
         }
     }
     
-    fileprivate func updateNowPlayingInfo(withEpisode episode: Episode) {
+    private func updateNowPlayingInfo(withEpisode episode: Episode) {
         let lockScreenMediaCenter = MPNowPlayingInfoCenter.default()
         if let imageUrl = episode.imageUrl {
             _ = firstly {
@@ -54,7 +54,7 @@ class LockScreenPlayerController {
         lockScreenMediaCenter.nowPlayingInfo = info
     }
     
-    fileprivate func updateLockscreenCurrentTime(withPlayerState playerState: PlayerState) {
+    private func updateLockscreenCurrentTime(withPlayerState playerState: PlayerState) {
         let lockScreenMediaCenter = MPNowPlayingInfoCenter.default()
         lockScreenMediaCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playerState.timePast.roundedSeconds
         lockScreenMediaCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = playerState.duration.roundedSeconds

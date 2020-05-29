@@ -54,7 +54,10 @@ class AppPlayerView: UIView {
     var isDissmised: Bool! {
         didSet {
             if self.isDissmised {
-                self.frame = .init(origin: .init(x: 0, y: self.superview!.bounds.height - 2 * minimizePlayerViewHeight + 20), size: self.frame.size)
+                self.frame = .init(
+                    origin: .init(x: 0, y: self.superview!.bounds.height - 2 * minimizePlayerViewHeight + 20),
+                    size: self.frame.size
+                )
                 self.minimizePlayerView.alpha = 1
                 self.maximizePlayerView.alpha = 0
             } else {

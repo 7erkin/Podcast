@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PodcastSearchCoordinator: Coordinatable, PodcastsSearchControllerCoordinatorDelegate {
+final class PodcastSearchCoordinator: Coordinatable, PodcastsSearchControllerCoordinatorDelegate {
     var child: Coordinatable!
     var navigationController: UINavigationController!
     

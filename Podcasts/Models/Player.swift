@@ -27,7 +27,7 @@ struct PlayerState {
     var isPlaying: Bool
 }
 
-class Player {
+final class Player {
     // MARK: - private properties
     fileprivate lazy var player: AVPlayer = {
         let player = AVPlayer()

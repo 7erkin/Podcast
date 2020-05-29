@@ -11,7 +11,7 @@ import UIKit
 import FeedKit
 import PromiseKit
 
-class FavoriteButtonItem: UIBarButtonItem {
+final class FavoriteButtonItem: UIBarButtonItem {
     var isFavorite: Bool! {
         didSet {
             if self.isFavorite {
@@ -24,13 +24,13 @@ class FavoriteButtonItem: UIBarButtonItem {
     }
 }
 
-class EpisodesController: UITableViewController {
+final class EpisodesController: UITableViewController {
     private let cellId = "episodeCell"
     private var storedEpisodes: [Episode] = []
-    fileprivate var favoriteButton: FavoriteButtonItem {
+    private var favoriteButton: FavoriteButtonItem {
         return navigationItem.rightBarButtonItem as! FavoriteButtonItem
     }
-    fileprivate var isModelInitialized = false
+    private var isModelInitialized = false
     // MARK: - dependencies
     var model: EpisodesModel! {
         didSet {
@@ -62,24 +62,24 @@ class EpisodesController: UITableViewController {
     }
     // MARK: - interaction handlers
     @objc
-    fileprivate func onFavoriteButtonTapped() {
+    private func onFavoriteButtonTapped() {
         if !favoriteButton.isFavorite {
             model.addPodcastToFavorites()
         }
     }
     // MARK: - helpers
-    fileprivate func setupTableView() {
+    private func setupTableView() {
         let nib = UINib(nibName: "EpisodeCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: cellId)
         tableView.tableFooterView = UIView()
     }
     
-    fileprivate func selectRow(at indexPath: IndexPath) {
+    private func selectRow(at indexPath: IndexPath) {
         tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
         tableView.cellForRow(at: indexPath)!.isSelected = true
     }
     
-    fileprivate func updateViewWithModel(withEvent event: EpisodesModel.Event) {
+    private func updateViewWithModel(withEvent event: EpisodesModel.Event) {
         switch event {
         case .initialized:
             tableView.reloadData()

@@ -9,7 +9,7 @@
 import UIKit
 import PromiseKit
 
-class ImageFetcherProxi: ImageFetching {
+final class ImageFetcherProxi: ImageFetching {
     private let cache: ImageCaching
     private let fetcher: ImageFetching
     init(cache: ImageCaching, fetcher: ImageFetching) {

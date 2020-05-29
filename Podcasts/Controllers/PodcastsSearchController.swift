@@ -14,7 +14,7 @@ protocol PodcastsSearchControllerCoordinatorDelegate: class {
     func choose(podcast: Podcast)
 }
 
-class PodcastsSearchController: UITableViewController, UISearchBarDelegate {
+final class PodcastsSearchController: UITableViewController, UISearchBarDelegate {
     let cellId = "podcastCell"
     // MARK: - dependencies
     weak var coordinator: PodcastsSearchControllerCoordinatorDelegate?
@@ -36,21 +36,21 @@ class PodcastsSearchController: UITableViewController, UISearchBarDelegate {
     }
     
     // MARK: - Common setup
-    fileprivate func setupSearchBar() {
+    private func setupSearchBar() {
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.delegate = self
     }
     
-    fileprivate func setupTableView() {
+    private func setupTableView() {
         let nib = UINib(nibName: "PodcastCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: cellId)
         // hack to remove empty rows when no podcast is provided
         tableView.tableFooterView = UIView()
     }
     
-    fileprivate func fetchPodcasts(withSearchText searchText: String) {
+    private func fetchPodcasts(withSearchText searchText: String) {
         podcastsSearchModel.fetchPodcasts(bySearchText: searchText)
     }
     

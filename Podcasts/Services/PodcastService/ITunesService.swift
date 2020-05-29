@@ -10,7 +10,7 @@ import Foundation
 import Alamofire
 import FeedKit
 
-class ITunesService: PodcastServicing {
+final class ITunesService: PodcastServicing {
     struct SearchResults: Decodable {
         let resultCount: Int
         let results: [Podcast]

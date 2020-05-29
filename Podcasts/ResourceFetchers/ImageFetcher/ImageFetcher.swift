@@ -10,7 +10,7 @@ import UIKit
 import PromiseKit
 import Alamofire
 
-class ImageFetcher: ImageFetching {
+final class ImageFetcher: ImageFetching {
     func fetchImage(withImageUrl imageUrl: URL) -> Promise<UIImage> {
         return Promise { (resolver) in
             AF.request(imageUrl).response { (dataResponse) in

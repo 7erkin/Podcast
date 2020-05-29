@@ -16,7 +16,7 @@ struct EpisodeModelToken: EpisodePlayListCreatorToken {
     }
 }
 
-class EpisodesModel {
+final class EpisodesModel {
     enum Event {
         case initialized
         case episodePicked

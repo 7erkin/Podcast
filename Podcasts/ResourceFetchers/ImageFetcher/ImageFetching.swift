@@ -9,13 +9,7 @@
 import UIKit
 import PromiseKit
 
-struct ServiceError: Error {}
-
-struct NetworkError: Error {}
-
-enum ImageServicingError: Error {
-    case ISError
-}
+struct ImageServicingError: Error {}
 
 protocol ImageFetching: class {
     func fetchImage(withImageUrl imageUrl: URL) -> Promise<UIImage>

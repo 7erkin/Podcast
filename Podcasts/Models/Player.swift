@@ -14,7 +14,7 @@ protocol EpisodeListPlayable {
     func currentPlayList() -> EpisodePlayList?
 }
 
-enum PlayerEvent: AppEvent {
+enum PlayerEvent {
     case playingEpisodeUpdated
     case playerStateUpdated
     case playingPodcastUpdated
@@ -49,7 +49,15 @@ final class Player {
     private var playerListSubscription: Subscription!
     private var subscribers: [UUID:(PlayerEvent) -> Void] = [:]
     // MARK: - Singleton
-    private init() {}
+    private init() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback)
+            try AVAudioSession.sharedInstance().setActive(true, options: [])
+        } catch let sessionErr {
+            print("Configure AudioSession Error: \(sessionErr)")
+            fatalError("UB")
+        }
+    }
     static let shared = Player()
     // MARK: - data for client
     private var playingPodcast: Podcast! {
@@ -137,7 +145,7 @@ final class Player {
     }
     
     private func seekToTime(_ seekTime: CMTime) {
-        player.currentItem?.seek(to: seekTime, completionHandler: { [weak self] (res) in
+        player.currentItem?.seek(to: seekTime, completionHandler: { res in
             if res {
             }
         })

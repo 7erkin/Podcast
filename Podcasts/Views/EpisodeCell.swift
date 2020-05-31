@@ -16,10 +16,9 @@ enum EpisodeRecordStatus {
     case downloaded
 }
 
-class EpisodeCell: UITableViewCell {
+final class EpisodeCell: UITableViewCell {
     static var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
-    
-    fileprivate var timer: Timer?
+    private var timer: Timer?
     var episode: Episode! {
         didSet {
             updateViewWithEpisode()
@@ -31,7 +30,7 @@ class EpisodeCell: UITableViewCell {
         }
     }
     
-    fileprivate func updateViewWithEpisodeRecordStatus() {
+    private func updateViewWithEpisodeRecordStatus() {
         switch episodeRecordStatus! {
         case .none:
             episodeRecordDownloadIndicator.isHidden = true
@@ -46,7 +45,7 @@ class EpisodeCell: UITableViewCell {
         }
     }
     
-    fileprivate func updateViewWithEpisode() {
+    private func updateViewWithEpisode() {
         episodeNameLabel.text = episode.name
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MMM dd, yyyy"

@@ -9,7 +9,7 @@
 import UIKit
 import PromiseKit
 
-class FavoritesPodcastCell: UICollectionViewCell {
+final class FavoritesPodcastCell: UICollectionViewCell {
     var podcast: Podcast! {
         didSet {
             updateViewWithModel()
@@ -18,12 +18,12 @@ class FavoritesPodcastCell: UICollectionViewCell {
     
     static var imageFetcher: ImageFetching!
     
-    fileprivate let imageView = UIImageView()
-    fileprivate let nameLabel = UILabel()
-    fileprivate let artistNameLabel = UILabel()
-    fileprivate let loadingImageIndicator = UIActivityIndicatorView()
+    private let imageView = UIImageView()
+    private let nameLabel = UILabel()
+    private let artistNameLabel = UILabel()
+    private let loadingImageIndicator = UIActivityIndicatorView()
     
-    fileprivate func stylizeUI() {
+    private func stylizeUI() {
         nameLabel.text = "Podcast name"
         nameLabel.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         artistNameLabel.text = "Artist name"
@@ -31,7 +31,7 @@ class FavoritesPodcastCell: UICollectionViewCell {
         artistNameLabel.textColor = .lightGray
     }
     
-    fileprivate func setupView() {
+    private func setupView() {
         imageView.backgroundColor = .systemGroupedBackground
         imageView.contentMode = .scaleAspectFill
         imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
@@ -54,8 +54,8 @@ class FavoritesPodcastCell: UICollectionViewCell {
         addSubview(loadingImageIndicator)
     }
     
-    fileprivate var timer: Timer?
-    fileprivate func updateViewWithModel() {
+    private var timer: Timer?
+    private func updateViewWithModel() {
         artistNameLabel.text = podcast.artistName ?? ""
         nameLabel.text = podcast.name ?? ""
         if let imageUrl = podcast.imageUrl {

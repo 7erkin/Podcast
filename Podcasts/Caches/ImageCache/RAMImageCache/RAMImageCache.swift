@@ -57,7 +57,7 @@ final class RAMImageCache: ImageCaching {
                 if let image = self.cache[imageUrl] {
                     resolver.resolve(.fulfilled(image))
                 } else {
-                    resolver.reject(CacheError())
+                    resolver.reject(ImageCachingError())
                 }
             }
         }

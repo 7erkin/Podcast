@@ -10,11 +10,11 @@ import UIKit
 import AVKit
 import PromiseKit
 
-class MaximizePlayerView: UIView {
+final class MaximizePlayerView: UIView {
     // MARK: - constants
-    fileprivate let undefinedDurationPlaceholder = "--:--:--"
-    fileprivate let timeSliderDefaultMinValue: Float = 0
-    fileprivate let timeSliderDefaultMaxValue: Float = 1
+    private let undefinedDurationPlaceholder = "--:--:--"
+    private let timeSliderDefaultMinValue: Float = 0
+    private let timeSliderDefaultMaxValue: Float = 1
     //MARK: - outlets
     @IBOutlet var timeSlider: UISlider! {
         didSet {
@@ -65,23 +65,23 @@ class MaximizePlayerView: UIView {
     }
     
     @objc
-    fileprivate func onSwipe() {
+    private func onSwipe() {
         delegate.dissmis()
     }
     
-    // MARK: - dependency inversion
+    // MARK: - dependencies
     weak var delegate: PlayerViewDelegate!
     weak var playerManager: PlayerManaging!
     // MARK: - constants
-    fileprivate let shrinkTransform: CGAffineTransform = CGAffineTransform(scaleX: 0.7, y: 0.7)
-    fileprivate let playImage: UIImage = UIImage(named: "play")!
-    fileprivate let pauseImage: UIImage = UIImage(named: "pause")!
+    private let shrinkTransform: CGAffineTransform = CGAffineTransform(scaleX: 0.7, y: 0.7)
+    private let playImage: UIImage = UIImage(named: "play")!
+    private let pauseImage: UIImage = UIImage(named: "pause")!
     // MARK: - internal dependencies
     var imageFetcher: ImageFetching = ServiceLocator.imageFetcher
     // MARK: - for playback slider doesn't debounce after playback time manually update
-    fileprivate var playbackTimeBeforeUpdate: CMTime?
-    fileprivate var isPlaybackSliderUpdateAvailable: Bool = true
-    fileprivate var expectedPlaybackTime: CMTime?
+    private var playbackTimeBeforeUpdate: CMTime?
+    private var isPlaybackSliderUpdateAvailable: Bool = true
+    private var expectedPlaybackTime: CMTime?
     // MARK: -
     var episode: Episode! { didSet { updateViewWithEpisode() } }
     var playerState: PlayerState! { didSet { updateViewWithPlayerState() } }
@@ -94,13 +94,13 @@ class MaximizePlayerView: UIView {
     }
     
     // MARK: - setup functions
-    fileprivate func setupDissmisGesture() {
+    private func setupDissmisGesture() {
         let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(onSwipe))
         swipeGesture.direction = .down
         addGestureRecognizer(swipeGesture)
     }
     
-    fileprivate func setupInitialViewState() {
+    private func setupInitialViewState() {
         episodeDurationLabel.text = undefinedDurationPlaceholder
         timeSlider.maximumValue = timeSliderDefaultMaxValue
         timeSlider.value = timeSliderDefaultMinValue
@@ -109,7 +109,7 @@ class MaximizePlayerView: UIView {
     }
     
     // MARK: - update view functions
-    fileprivate func updateViewWithEpisode() {
+    private func updateViewWithEpisode() {
         episodeNameLabel.text = episode.name
         authorLabel.text = episode.author
         if let _ = episodeImageView.image {
@@ -123,7 +123,7 @@ class MaximizePlayerView: UIView {
         }
     }
     
-    fileprivate func updateViewWithPlayerState() {
+    private func updateViewWithPlayerState() {
         if playerState.duration.convertable {
             episodeDurationLabel.text = playerState.duration.toPlayerTimePresentation
             timeSlider.maximumValue = Float(playerState.duration.roundedSeconds)
@@ -155,7 +155,7 @@ class MaximizePlayerView: UIView {
     }
     
     // MARK: - perform animations functions
-    fileprivate func performEpisodeImageViewAnimatedShrink() {
+    private func performEpisodeImageViewAnimatedShrink() {
         UIView.animate(
             withDuration: 0.5,
             delay: 0,
@@ -169,7 +169,7 @@ class MaximizePlayerView: UIView {
         )
     }
     
-    fileprivate func performEpisodeImageViewAnimatedEnlarge() {
+    private func performEpisodeImageViewAnimatedEnlarge() {
         UIView.animate(
             withDuration: 0.5,
             delay: 0,
@@ -184,11 +184,11 @@ class MaximizePlayerView: UIView {
     }
     
     // MARK: - helpers
-    fileprivate func isEpisodeImageViewShrinked() -> Bool {
+    private func isEpisodeImageViewShrinked() -> Bool {
         return episodeImageView.transform == shrinkTransform
     }
     
-    fileprivate func blurEpisodeImage() {
+    private func blurEpisodeImage() {
         let image = episodeImageView.image!
         firstly {
             UIImage.blurImage(image, blurAmount: 20)
@@ -201,7 +201,7 @@ class MaximizePlayerView: UIView {
         }
     }
     
-    fileprivate func updateEpisodeImageWithImageService() {
+    private func updateEpisodeImageWithImageService() {
         let imageUrl = episode.imageUrl!
         firstly {
             imageFetcher.fetchImage(withImageUrl: imageUrl)
@@ -216,7 +216,7 @@ class MaximizePlayerView: UIView {
         })
     }
     
-    fileprivate func updatePlaybackTimeSliderAfterDirectlyUpdate() {
+    private func updatePlaybackTimeSliderAfterDirectlyUpdate() {
         let currentPlaybackTime = playerState.timePast.roundedSeconds
         if currentPlaybackTime == expectedPlaybackTime!.roundedSeconds {
             isPlaybackSliderUpdateAvailable = true
@@ -232,7 +232,7 @@ class MaximizePlayerView: UIView {
         }
     }
     
-    fileprivate func updateEpisodeImageWithDefaultImage() {
+    private func updateEpisodeImageWithDefaultImage() {
         episodeImageView.image = UIImage(named: "appicon")!
     }
 }

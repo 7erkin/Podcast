@@ -90,12 +90,13 @@ final class DownloadedEpisodesController: UITableViewController {
             break
         case .episodePicked:
             if let index = model.pickedEpisodeIndex {
-                let cell = tableView.cellForRow(at: index.toIndexPath)
+                let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0))
                 cell?.isHighlighted = true
             }
             break
         case .episodeDeleted:
             let nextEpisodes = model.storedEpisodes
+            // functional approach is here
             let index = episodes.firstIndex(where: not <<< nextEpisodes.contains)!
             episodes = nextEpisodes
             tableView.deleteRows(at: [IndexPath(row: index, section: 1)], with: .right)
@@ -111,6 +112,7 @@ final class DownloadedEpisodesController: UITableViewController {
             let nextDownloadingEpisodes = model.downloadingEpisodes
             let nextStoredEpisodes = model.storedEpisodes
             let dIndex = downloadingEpisodes.firstIndex(where: { nextDownloadingEpisodes[$0.key] == nil })!
+            // functional approach is here
             let sIndex = nextStoredEpisodes.firstIndex(where: not <<< episodes.contains)!
             episodes = nextStoredEpisodes
             downloadingEpisodes = nextDownloadingEpisodes

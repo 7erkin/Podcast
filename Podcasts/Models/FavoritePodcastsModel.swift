@@ -61,9 +61,7 @@ final class FavoritePodcastsModel {
             }
         }.done { subscription in
             self.storageSubscription = subscription
-        }.catch { _ in
-            
-        }
+        }.catch { _ in }
     }
     
     private func updatePodcastsWithStorage() -> Promise<Void> {

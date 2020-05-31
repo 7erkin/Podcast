@@ -9,7 +9,7 @@
 import UIKit
 import PromiseKit
 
-class MinimizePlayerView: UIStackView {
+final class MinimizePlayerView: UIStackView {
     @IBOutlet var episodeImageView: UIImageView!
     @IBOutlet var episodeNameLabel: UILabel!
     @IBOutlet var playPauseButton: UIButton!
@@ -21,8 +21,8 @@ class MinimizePlayerView: UIStackView {
         playerManager?.fastForward15()
     }
     
-    fileprivate let playImage: UIImage = UIImage(named: "play")!
-    fileprivate let pauseImage: UIImage = UIImage(named: "pause")!
+    private let playImage: UIImage = UIImage(named: "play")!
+    private let pauseImage: UIImage = UIImage(named: "pause")!
     
     var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
     
@@ -66,11 +66,11 @@ class MinimizePlayerView: UIStackView {
     }
     
     @objc
-    fileprivate func onTapped() {
+    private func onTapped() {
         delegate?.enlarge()
     }
     
-    fileprivate func blurEpisodeImageView() {
+    private func blurEpisodeImageView() {
         guard let ciImage = CIImage(image: episodeImageView.image!) else { return }
         
         let blurFilter = CIFilter(name: "CIGaussianBlur")

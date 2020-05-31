@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-enum EpisodePlayListEvent: AppEvent {
+enum EpisodePlayListEvent {
     case playingEpisodeChanged
     case episodeListChanged
 }

@@ -22,7 +22,6 @@ final class PodcastsSearchModel {
     
     func fetchPodcasts(bySearchText searchText: String) {
         podcastService.fetchPodcasts(searchText: searchText) { [weak self] podcasts in
-            // Question in Trello
             DispatchQueue.main.async {
                 self?.podcasts = podcasts
                 self?.subscriber(.podcastsFetched)

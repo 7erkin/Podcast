@@ -14,7 +14,7 @@ func invokeAppearingAnimation(withTabBar tabBar: UITabBar) -> UITabBar {
         withDuration: 0.5,
         delay: 0,
         options: [.curveEaseIn],
-        animations: { tabBar.isHidden = true },
+        animations: { tabBar.isHidden = false },
         completion: nil
     )
     return tabBar
@@ -26,7 +26,7 @@ func invokeHiddingAnimation(withTabBar tabBar: UITabBar) -> UITabBar {
         withDuration: 0.5,
         delay: 0,
         options: [.curveEaseIn],
-        animations: { tabBar.isHidden = false },
+        animations: { tabBar.isHidden = true },
         completion: nil
     )
     return tabBar

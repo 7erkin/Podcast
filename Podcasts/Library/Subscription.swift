@@ -1,12 +1,12 @@
 //
-//  Observable.swift
+//  Subscription.swift
 //  Podcasts
 //
-//  Created by Олег Черных on 11/05/2020.
+//  Created by Олег Черных on 31/05/2020.
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
-import PromiseKit
+import Foundation
 
 class Subscription {
     typealias SubscriptionCanceller = () -> Void
@@ -15,10 +15,4 @@ class Subscription {
     deinit {
         canceller()
     }
-}
-
-protocol AppEvent {}
-
-protocol Observable {
-    func subscribe(_ subscriber: @escaping (AppEvent) -> Void) -> Promise<Subscription>
 }

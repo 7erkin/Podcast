@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import PromiseKit
 
-class PodcastCell: UITableViewCell {
+final class PodcastCell: UITableViewCell {
     @IBOutlet var podcastImageView: UIImageView!
     @IBOutlet var trackNameLabel: UILabel!
     @IBOutlet var artistNameLabel: UILabel!

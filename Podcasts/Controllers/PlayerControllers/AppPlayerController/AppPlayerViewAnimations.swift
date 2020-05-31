@@ -25,7 +25,7 @@ func invokeDissmisAnimation(withAppPlayerView view: AppPlayerView) -> AppPlayerV
 @discardableResult
 func invokeEnlargeAnimation(withAppPlayerView view: AppPlayerView) -> AppPlayerView {
     UIView.animate(
-        withDuration: 0.4,
+        withDuration: 0.5,
         delay: 0,
         usingSpringWithDamping: 1,
         initialSpringVelocity: 0,

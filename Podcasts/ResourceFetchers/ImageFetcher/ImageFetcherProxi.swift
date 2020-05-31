@@ -28,15 +28,15 @@ final class ImageFetcherProxi: ImageFetching {
             }.done { image in
                 resolver.resolve(.fulfilled(image))
             }.catch { error in
-                if error is NetworkError { resolver.reject(error) }
+                if error is ImageServicingError { resolver.reject(error) }
                 
-                if error is CacheError {
+                if error is ImageCachingError {
                     firstly {
                         self.fetcher.fetchImage(withImageUrl: imageUrl)
                     }.done { image in
                         resolver.resolve(.fulfilled(image))
                     }.catch { _ in
-                        resolver.reject(ServiceError())
+                        resolver.reject(ImageServicingError())
                     }
                 }
             }

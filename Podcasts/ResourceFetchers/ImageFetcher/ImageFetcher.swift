@@ -15,14 +15,14 @@ final class ImageFetcher: ImageFetching {
         return Promise { (resolver) in
             AF.request(imageUrl).response { (dataResponse) in
                 if let _ = dataResponse.error {
-                    resolver.reject(ImageServicingError.ISError)
+                    resolver.reject(ImageServicingError())
                     return
                 }
                 
                 if let data = dataResponse.data, let image = UIImage(data: data) {
                     resolver.resolve(.fulfilled(image))
                 } else {
-                    resolver.reject(ImageServicingError.ISError)
+                    resolver.reject(ImageServicingError())
                 }
             }
         }

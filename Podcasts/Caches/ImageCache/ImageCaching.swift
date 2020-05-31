@@ -10,9 +10,8 @@ import Foundation
 import UIKit
 import PromiseKit
 
-struct CacheError: Error {}
+struct ImageCachingError: Error {}
 
-// not thread safe cache
 protocol ImageCaching {
     @discardableResult
     func cache(_ image: UIImage, withImageUrl imageUrl: URL) -> Promise<Bool>

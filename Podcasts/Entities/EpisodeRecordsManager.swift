@@ -9,9 +9,9 @@
 import Foundation
 import PromiseKit
 
+// Error to interrupt Promise chain
 struct BreakPromiseChainError: Error {}
 
-// must be called from the main thread
 final class EpisodeRecordsManager {
     enum Event {
         case episodeDownloaded

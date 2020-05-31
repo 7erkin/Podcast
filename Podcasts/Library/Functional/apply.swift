@@ -18,7 +18,7 @@ func | <X,Y>(lhs: (X) -> Y, rhs: X) -> Y {
     return lhs(rhs)
 }
 
-// ERRORS...
+// ERRORS... WHY?
 //func | <Y, ...Args> (lhs: (Args...) -> Y, rhs: (Args...)) -> Y {
 //    return lhs(rhs)
 //}

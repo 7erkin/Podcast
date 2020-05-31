@@ -14,7 +14,14 @@ protocol PlayerViewDelegate: class {
     func enlarge()
 }
 
-class AppPlayerView: UIView {
+protocol PlayerManaging: class {
+    func fastForward15()
+    func rewind15()
+    func moveToPlaybackTime(_ playbackTime: CMTime)
+    func playPause()
+}
+
+final class AppPlayerView: UIView {
     private let minimizePlayerViewHeight: CGFloat = 75
     private lazy var minimizePlayerView: MinimizePlayerView = {
         let view = Bundle.main.loadNibNamed(
@@ -55,13 +62,14 @@ class AppPlayerView: UIView {
         didSet {
             if self.isDissmised {
                 self.frame = .init(
-                    origin: .init(x: 0, y: self.superview!.bounds.height - 2 * minimizePlayerViewHeight + 20),
+                    // bad decision
+                    origin: .init(x: 0, y: self.superview!.bounds.height - 2 * minimizePlayerViewHeight - 7),
                     size: self.frame.size
                 )
                 self.minimizePlayerView.alpha = 1
                 self.maximizePlayerView.alpha = 0
             } else {
-                self.frame = self.superview!.safeAreaLayoutGuide.layoutFrame
+                self.frame = self.superview!.frame
                 self.minimizePlayerView.alpha = 0
                 self.maximizePlayerView.alpha = 1
             }

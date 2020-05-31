@@ -59,9 +59,6 @@ final class DownloadedEpisodesModel {
         recordsManager.deleteEpisode(episode)
     }
     
-    func cancelDownloading(episode: Episode) {
-    }
-    
     func pickEpisode(episodeIndex index: Int) {
         firstly {
             recordsManager.storedEpisodeList
@@ -98,7 +95,7 @@ final class DownloadedEpisodesModel {
         }
     }
     // MARK: - update functions
-    fileprivate func updateModelWithPlayList(withEvent event: EpisodePlayListEvent) {
+    private func updateModelWithPlayList(withEvent event: EpisodePlayListEvent) {
         switch event {
         case .episodeListChanged:
             pickedEpisodeIndex = nil
@@ -111,7 +108,7 @@ final class DownloadedEpisodesModel {
         }
     }
     
-    fileprivate func updateModelWithRecordsManager(withEvent event: EpisodeRecordsManager.Event) {
+    private func updateModelWithRecordsManager(withEvent event: EpisodeRecordsManager.Event) {
         switch event {
         case .episodeDownloadingProgress:
             subscriber(.episodeDownloadingProgressUpdated)
@@ -125,7 +122,7 @@ final class DownloadedEpisodesModel {
         }
     }
     
-    fileprivate func updateStoredEpisodeList(withEvent event: DownloadedEpisodesModel.Event) {
+    private func updateStoredEpisodeList(withEvent event: DownloadedEpisodesModel.Event) {
         firstly {
             recordsManager.storedEpisodeList
         }.done {

@@ -47,14 +47,12 @@ final class FileSystemRecordsStorage: EpisodeRecordsStoraging {
             var recordUrl = directoryUrl
             recordUrl.appendPathComponent("record.mp3")
             try! record.write(to: recordUrl)
-            //precondition(FileManager.default.createFile(atPath: recordUrl.absoluteString, contents: record, attributes: nil))
             // create description file in record directory
             var itemDesriptionUrl = directoryUrl
             itemDesriptionUrl.appendPathComponent("description")
             let itemDescription = StoredEpisodeItem(episode: episode, podcast: podcast, recordUrl: recordUrl)
             let serializedItemDescription = try! JSONEncoder().encode(itemDescription)
             try! serializedItemDescription.write(to: itemDesriptionUrl)
-            //precondition(FileManager.default.createFile(atPath: itemDesriptionUrl.absoluteString, contents: serializedItemDescription, attributes: nil))
             return Promise.value
         }
     }
@@ -90,8 +88,6 @@ final class FileSystemRecordsStorage: EpisodeRecordsStoraging {
             ).compactMap { recordDirectoryUrl -> Data? in
                 var itemDescriptionUrl = recordDirectoryUrl
                 itemDescriptionUrl.appendPathComponent("description")
-                //let fd = try? FileHandle(forReadingFrom: itemDescriptionUrl)
-                //let serializedItemDescription = FileManager.default.contents(atPath: itemDescriptionUrl.absoluteString)
                 return try? FileHandle(forReadingFrom: itemDescriptionUrl).readDataToEndOfFile()
             }.compactMap { data in
                 return try? JSONDecoder().decode(StoredEpisodeItem.self, from: data)

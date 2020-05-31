@@ -10,5 +10,6 @@ import Foundation
 
 protocol PodcastServicing {
     func fetchEpisodes(url: URL, _ completionHandler: @escaping ([Episode]) -> Void)
+    
     func fetchPodcasts(searchText: String, _ completionHandler: @escaping ([Podcast]) -> Void)
 }

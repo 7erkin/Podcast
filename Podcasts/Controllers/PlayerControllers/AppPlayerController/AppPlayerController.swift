@@ -41,7 +41,7 @@ final class AppPlayerController: UIViewController {
     // MARK: - helpers
     private func updateWithPlayer(withEvent event: PlayerEvent) {
         if !hasAppPlayerViewBeenPresented {
-            invokeEnlargeAnimation(withAppPlayerView: appPlayerView)
+            enlargeAnimationInvoker(appPlayerView)
             hasAppPlayerViewBeenPresented = true
         }
         
@@ -78,10 +78,10 @@ extension AppPlayerController: PlayerManaging {
 
 extension AppPlayerController: PlayerViewDelegate {
     func dissmis() {
-        invokeDissmisAnimation(withAppPlayerView: appPlayerView)
+        dissmisAnimationInvoker(appPlayerView)
     }
     
     func enlarge() {
-        invokeEnlargeAnimation(withAppPlayerView: appPlayerView)
+        enlargeAnimationInvoker(appPlayerView)
     }
 }

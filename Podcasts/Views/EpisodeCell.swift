@@ -9,6 +9,8 @@
 import UIKit
 import Alamofire
 import PromiseKit
+import Foundation
+import CoreImage
 
 enum EpisodeRecordStatus {
     case none
@@ -57,24 +59,36 @@ final class EpisodeCell: UITableViewCell {
             }
             
             timer?.invalidate()
-            timer = Timer(timeInterval: 1.0, repeats: false) { [weak self] _ in
+            timer = Timer(timeInterval: 1, repeats: false) { [weak self] _ in
                 guard let self = self else { return }
                 
-                firstly {
+                let imageViewSize = self.episodeImageView.frame.size
+                let scale = self.traitCollection.displayScale
+                firstly { () -> Promise<UIImage> in
                     EpisodeCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
-                }.done(on: .main, flags: nil) { (image) in
+                }.then(on: DispatchQueue.global(qos: .userInitiated), flags: nil) { image -> Promise<UIImage> in
+                    let data = image.jpegData(compressionQuality: 1.0) ?? image.pngData()!
+                    let image = downsample(imageData: data, to: imageViewSize, scale: scale)
+                    return Promise { resolver in resolver.fulfill(image) }
+                }.done { image in
                     if let actualUrl = self.episode.imageUrl, imageUrl == actualUrl {
-                        self.episodeImageView.image = image
+                        UIView.transition(
+                            with: self.imageView!,
+                            duration: 1.0,
+                            options: [.curveEaseOut, .transitionCrossDissolve],
+                            animations: { [unowned self] in self.episodeImageView.image = image },
+                            completion: nil
+                        )
                     }
                 }.ensure(on: .main, flags: nil) {
                     self.loadingImageIndicator.stopAnimating()
-                }.catch(on: .main, flags: nil, policy: .allErrors) { (_) in
-                }
+                }.catch(on: .main, flags: nil, policy: .allErrors) { _ in }
             }
-            timer?.tolerance = 0.2
-            RunLoop.current.add(timer!, forMode: .common)
         }
+        timer?.tolerance = 0.2
+        RunLoop.current.add(timer!, forMode: .common)
     }
+
     
     // MARK: - outlets
     @IBOutlet var episodeImageView: UIImageView! {

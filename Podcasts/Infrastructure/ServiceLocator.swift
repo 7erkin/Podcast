@@ -11,10 +11,9 @@ import Foundation
 final class ServiceLocator {
     static let podcastService: PodcastServicing = ITunesService.shared
     static let defferedPodcastService: PodcastServicing = DefferedPodcastService(timeout: 1.5, wrappedPodcastService: ServiceLocator.podcastService)
-    static let imageCache = RAMImageCache(withFlushPolicy: LatestImageFlushPolicy(withCacheMemoryLimit: 300))
     static let imageFetcher: ImageFetching = {
         let imageFetcher = ImageFetcher()
-        return ImageFetcherProxi(cache: ServiceLocator.imageCache, fetcher: imageFetcher)
+        return imageFetcher
     }()
     static let favoritePodcastStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastsStorage.shared
     static let episodeRecordStorage: EpisodeRecordsStoraging = FileSystemRecordsStorage.shared!

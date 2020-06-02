@@ -33,9 +33,7 @@ struct ForwardList<Element: Equatable> {
     }
     
     mutating func popFront() -> Element? {
-        if headNode == nil {
-            return nil
-        }
+        if headNode == nil { return nil }
         
         let node = headNode
         // one element in list

@@ -77,7 +77,6 @@ final class MaximizePlayerView: UIView {
     private let playImage: UIImage = UIImage(named: "play")!
     private let pauseImage: UIImage = UIImage(named: "pause")!
     // MARK: - internal dependencies
-    var imageFetcher: ImageFetching = ServiceLocator.imageFetcher
     // MARK: - for playback slider doesn't debounce after playback time manually update
     private var playbackTimeBeforeUpdate: CMTime?
     private var isPlaybackSliderUpdateAvailable: Bool = true
@@ -202,18 +201,18 @@ final class MaximizePlayerView: UIView {
     }
     
     private func updateEpisodeImageWithImageService() {
-        let imageUrl = episode.imageUrl!
-        firstly {
-            imageFetcher.fetchImage(withImageUrl: imageUrl)
-        }.done(on: .main, flags: nil) { (image) in
-            if imageUrl == self.episode.imageUrl {
-                self.episodeImageView.image = image
-            }
-        }.ensure(on: .main, flags: nil) {
-            // hide loading indicator on episode image
-        }.catch({ _ in
-            // inform user with error
-        })
+//        let imageUrl = episode.imageUrl!
+//        firstly {
+//            imageFetcher.fetchImage(withImageUrl: imageUrl)
+//        }.done(on: .main, flags: nil) { (image) in
+//            if imageUrl == self.episode.imageUrl {
+//                self.episodeImageView.image = image
+//            }
+//        }.ensure(on: .main, flags: nil) {
+//            // hide loading indicator on episode image
+//        }.catch { _ in
+//            // inform user with error
+//        }
     }
     
     private func updatePlaybackTimeSliderAfterDirectlyUpdate() {

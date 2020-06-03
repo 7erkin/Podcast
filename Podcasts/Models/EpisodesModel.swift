@@ -27,7 +27,7 @@ final class EpisodesModel {
         case episodeStartDownloading
     }
     
-    var subscriber: ((Event) -> Void)!
+    private var subscribers: [UUID:(Event) -> Void] = [:]
     // MARK: - data for client
     private(set) var podcast: Podcast
     private(set) var episodes: [Episode] = []
@@ -133,6 +133,12 @@ final class EpisodesModel {
     func downloadEpisode(episodeIndex index: Int) {
         recordsManager.downloadEpisode(episodes[index], ofPodcast: podcast)
     }
+    
+    func subscribe(_ subscriber: @escaping (Event) -> Void) -> Subscription {
+        let key = UUID()
+        subscribers[key] = subscriber
+        return Subscription { [weak self] in self?.subscribers.removeValue(forKey: key) }
+    }
     // MARK: - helpers
     private func fetchEpisodes() -> Promise<[Episode]> {
         return Promise { resolver in
@@ -152,9 +158,9 @@ final class EpisodesModel {
     }
     
     private func notifyAll(withEvent event: Event) {
-        subscriber(event)
+        subscribers.values.forEach { $0(event) }
     }
-    // MARK: - Subscribe model functions
+    // MARK: - Subscribe functions
     private func subscribeToPlayList(_ playList: EpisodePlayList) {
         playListSubscription = playList.subscribe { event in
             DispatchQueue.main.async { [weak self] in
@@ -219,7 +225,7 @@ final class EpisodesModel {
             recordsManager.storedEpisodeList
         }.done {
             self.storedEpisodes = $0.map { $0.episode }
-            self.subscriber(event)
+            self.notifyAll(withEvent: event)
         }.catch { _ in }
     }
 }

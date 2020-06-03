@@ -20,7 +20,6 @@ final class LockScreenPlayerController {
             }
         }
     }
-    var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
     // MARK: - helpers
     private func updateViewWithModel(withEvent event: PlayerEvent) {
         switch event {
@@ -35,18 +34,18 @@ final class LockScreenPlayerController {
     
     private func updateNowPlayingInfo(withEpisode episode: Episode) {
         let lockScreenMediaCenter = MPNowPlayingInfoCenter.default()
-        if let imageUrl = episode.imageUrl {
-            _ = firstly {
-                imageFetcher.fetchImage(withImageUrl: imageUrl)
-            }.done(on: .main, flags: nil) { (image) in
-                let artwork = MPMediaItemArtwork(boundsSize: image.size) { (_) -> UIImage in
-                    return image
-                }
-                lockScreenMediaCenter.nowPlayingInfo![MPMediaItemPropertyArtwork] = artwork
-            }
-        } else {
-            
-        }
+//        if let imageUrl = episode.imageUrl {
+//            _ = firstly {
+//                imageFetcher.fetchImage(withImageUrl: imageUrl)
+//            }.done(on: .main, flags: nil) { (image) in
+//                let artwork = MPMediaItemArtwork(boundsSize: image.size) { (_) -> UIImage in
+//                    return image
+//                }
+//                lockScreenMediaCenter.nowPlayingInfo![MPMediaItemPropertyArtwork] = artwork
+//            }
+//        } else {
+//            
+//        }
         
         var info = [String:Any]()
         info[MPMediaItemPropertyTitle] = episode.name

@@ -11,7 +11,6 @@ import Foundation
 precedencegroup ApplyPrecendence {
     lowerThan: MultiplicationPrecedence
 }
-
 infix operator |: ApplyPrecendence
 
 func | <X,Y>(lhs: (X) -> Y, rhs: X) -> Y {

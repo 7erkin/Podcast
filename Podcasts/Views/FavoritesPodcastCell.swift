@@ -16,8 +16,6 @@ final class FavoritesPodcastCell: UICollectionViewCell {
         }
     }
     
-    static var imageFetcher: ImageFetching!
-    
     private let imageView = UIImageView()
     private let nameLabel = UILabel()
     private let artistNameLabel = UILabel()
@@ -64,20 +62,19 @@ final class FavoritesPodcastCell: UICollectionViewCell {
             }
             
             timer?.invalidate()
-            timer = Timer(timeInterval: 1.0, repeats: false) { [weak self] _ in
-                guard let self = self else { return }
-                
-                firstly {
-                    EpisodeCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
-                }.done(on: .main, flags: nil) { (image) in
-                    if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
-                        self.imageView.image = image
-                    }
-                }.ensure(on: .main, flags: nil) {
-                    self.loadingImageIndicator.stopAnimating()
-                }.catch(on: .main, flags: nil, policy: .allErrors) { (_) in
-                }
-            }
+//            timer = Timer(timeInterval: 1.0, repeats: false) { [weak self] _ in
+//                guard let self = self else { return }
+//                
+//                firstly {
+//                    EpisodeCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
+//                }.done(on: .main, flags: nil) { (image) in
+//                    if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
+//                        self.imageView.image = image
+//                    }
+//                }.ensure(on: .main, flags: nil) {
+//                    self.loadingImageIndicator.stopAnimating()
+//                }.catch(on: .main, flags: nil, policy: .allErrors) { _ in }
+//            }
             timer?.tolerance = 0.2
             RunLoop.current.add(timer!, forMode: .common)
         }

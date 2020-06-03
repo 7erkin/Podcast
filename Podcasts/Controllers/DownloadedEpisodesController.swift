@@ -97,7 +97,7 @@ final class DownloadedEpisodesController: UITableViewController {
         case .episodeDeleted:
             let nextEpisodes = model.storedEpisodes
             // functional approach is here
-            let index = episodes.firstIndex(where: not <<< nextEpisodes.contains)!
+            let index = episodes.firstIndex(where: not • nextEpisodes.contains)!
             episodes = nextEpisodes
             tableView.deleteRows(at: [IndexPath(row: index, section: 1)], with: .right)
             break
@@ -113,7 +113,7 @@ final class DownloadedEpisodesController: UITableViewController {
             let nextStoredEpisodes = model.storedEpisodes
             let dIndex = downloadingEpisodes.firstIndex(where: { nextDownloadingEpisodes[$0.key] == nil })!
             // functional approach is here
-            let sIndex = nextStoredEpisodes.firstIndex(where: not <<< episodes.contains)!
+            let sIndex = nextStoredEpisodes.firstIndex(where: not • episodes.contains)!
             episodes = nextStoredEpisodes
             downloadingEpisodes = nextDownloadingEpisodes
             tableView.performBatchUpdates({

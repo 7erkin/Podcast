@@ -24,8 +24,6 @@ final class MinimizePlayerView: UIStackView {
     private let playImage: UIImage = UIImage(named: "play")!
     private let pauseImage: UIImage = UIImage(named: "pause")!
     
-    var imageFetcher: ImageFetching! = ServiceLocator.imageFetcher
-    
     var episode: Episode! {
         didSet {
             episodeNameLabel.text = self.episode.name
@@ -34,17 +32,17 @@ final class MinimizePlayerView: UIStackView {
             }
             
             if let episodeImageUrl = self.episode.imageUrl {
-                firstly {
-                    imageFetcher.fetchImage(withImageUrl: episodeImageUrl)
-                }.done(on: .main, flags: nil) { (image) in
-                    if episodeImageUrl == self.episode.imageUrl {
-                        self.episodeImageView.image = image
-                    }
-                }.ensure(on: .main, flags: nil) {
-                    // hide loading indicator on episode image
-                }.catch({ (_) in
-                    // inform user with error
-                })
+//                firstly {
+//                    // imageFetcher.fetchImage(withImageUrl: episodeImageUrl)
+//                }.done(on: .main, flags: nil) { (image) in
+//                    if episodeImageUrl == self.episode.imageUrl {
+//                        self.episodeImageView.image = image
+//                    }
+//                }.ensure(on: .main, flags: nil) {
+//                    // hide loading indicator on episode image
+//                }.catch({ (_) in
+//                    // inform user with error
+//                })
             }
         }
     }

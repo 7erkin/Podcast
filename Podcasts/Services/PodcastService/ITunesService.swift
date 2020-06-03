@@ -9,17 +9,14 @@
 import Foundation
 import Alamofire
 import FeedKit
+import PromiseKit
 
 final class ITunesService: PodcastServicing {
     struct SearchResults: Decodable {
         let resultCount: Int
         let results: [Podcast]
     }
-    
     static let shared = ITunesService()
-    
-    private init() {}
-    
     func fetchEpisodes(url: URL, _ completionHandler: @escaping ([Episode]) -> Void) {
         let secureFeedUrl = url.isSecure ? url : url.secured
         let parser = FeedParser(URL: secureFeedUrl)
@@ -52,6 +49,28 @@ final class ITunesService: PodcastServicing {
                 completionHandler(searchResults.results)
             } catch let decodeErr {
                 
+            }
+        }
+    }
+    
+    func fetchRecord(episode: Episode, _ progressHandler: ((Double) -> Void)?) -> Promise<Data> {
+        return  Promise { resolver in
+            let downloadRequest = AF.download(episode.streamUrl)
+            downloadRequest.downloadProgress { progress in
+                progressHandler?(progress.fractionCompleted)
+            }
+            downloadRequest.responseData { dataResponse in
+                if let _ = dataResponse.error {
+                    resolver.reject(BreakPromiseChainError())
+                    return
+                }
+                
+                guard let data = dataResponse.value else {
+                    resolver.reject(BreakPromiseChainError())
+                    return
+                }
+                
+                resolver.fulfill(data)
             }
         }
     }

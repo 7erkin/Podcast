@@ -20,7 +20,7 @@ final class EpisodesCoordintator: Coordinatable {
         let episodesController = EpisodesController()
         let recordsManager = EpisodeRecordsManager.shared
         recordsManager.recordsStorage = ServiceLocator.episodeRecordStorage
-        recordsManager.recordFetcher = ServiceLocator.episodeRecordFetcher
+        recordsManager.podcastService = ServiceLocator.podcastService
         let model = EpisodesModel(
             podcast: podcast,
             player: Player.shared,
@@ -28,7 +28,8 @@ final class EpisodesCoordintator: Coordinatable {
             recordsManager: ServiceLocator.recordsManager,
             favoritePodcastsStorage: ServiceLocator.favoritePodcastStorage
         )
-        episodesController.model = model
+        let viewModel = EpisodesViewModel(model: model)
+        episodesController.viewModel = viewModel
         navigationController.pushViewController(episodesController, animated: true)
     }
 }

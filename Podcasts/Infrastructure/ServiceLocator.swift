@@ -11,16 +11,10 @@ import Foundation
 final class ServiceLocator {
     static let podcastService: PodcastServicing = ITunesService.shared
     static let defferedPodcastService: PodcastServicing = DefferedPodcastService(timeout: 1.5, wrappedPodcastService: ServiceLocator.podcastService)
-    static let imageFetcher: ImageFetching = {
-        let imageFetcher = ImageFetcher()
-        return imageFetcher
-    }()
     static let favoritePodcastStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastsStorage.shared
     static let episodeRecordStorage: EpisodeRecordsStoraging = FileSystemRecordsStorage.shared!
-    static let episodeRecordFetcher: EpisodeRecordFetching = EpisodeRecordFetcher()
     static let recordsManager: EpisodeRecordsManager = {
         var recordsManager = EpisodeRecordsManager.shared
-        recordsManager.recordFetcher = ServiceLocator.episodeRecordFetcher
         recordsManager.recordsStorage = ServiceLocator.episodeRecordStorage
         return recordsManager
     }()

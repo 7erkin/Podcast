@@ -23,7 +23,7 @@ final class EpisodeRecordsManager {
     private(set) var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
     // MARK: - dependencies
     var recordsStorage: EpisodeRecordsStoraging!
-    var recordFetcher: EpisodeRecordFetching!
+    var podcastService: PodcastServicing!
     // MARK: -
     private var subscribers: [UUID:(Event) -> Void] = [:]
     static let shared = EpisodeRecordsManager()
@@ -39,7 +39,7 @@ final class EpisodeRecordsManager {
         }.then { hasEpisode -> Promise<Data> in
             if hasEpisode { return Promise(error: BreakPromiseChainError()) }
             var isStartDownloadingNotified = false
-            return self.recordFetcher.fetch(episode: episode) { progress in
+            return self.podcastService.fetchRecord(episode: episode) { progress in
                 DispatchQueue.main.async { [weak self] in
                     if !isStartDownloadingNotified {
                         isStartDownloadingNotified = true

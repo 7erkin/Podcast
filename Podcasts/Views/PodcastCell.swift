@@ -25,7 +25,6 @@ final class PodcastCell: UITableViewCell {
         podcastImageView.image = nil
     }
     
-    static var imageFetcher: ImageFetching = ServiceLocator.imageFetcher
     var timer: Timer?
     var podcast: Podcast! {
         didSet {
@@ -41,16 +40,15 @@ final class PodcastCell: UITableViewCell {
                 timer = Timer(timeInterval: 1.0, repeats: false) { [weak self] _ in
                     guard let self = self else { return }
                     
-                    firstly {
-                        PodcastCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
-                    }.done(on: .main, flags: nil) { (image) in
-                        if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
-                            self.podcastImageView.image = image
-                        }
-                    }.ensure(on: .main, flags: nil) {
-                        self.loadingImageIndicator.stopAnimating()
-                    }.catch(on: .main, flags: nil, policy: .allErrors) { (_) in
-                    }
+//                    firstly {
+//                        PodcastCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
+//                    }.done(on: .main, flags: nil) { (image) in
+//                        if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
+//                            self.podcastImageView.image = image
+//                        }
+//                    }.ensure(on: .main, flags: nil) {
+//                        self.loadingImageIndicator.stopAnimating()
+//                    }.catch(on: .main, flags: nil, policy: .allErrors) { _ in }
                 }
                 timer?.tolerance = 0.2
                 RunLoop.current.add(timer!, forMode: .common)

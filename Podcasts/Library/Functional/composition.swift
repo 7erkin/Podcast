@@ -14,8 +14,9 @@ precedencegroup CompositionPrecendence {
     higherThan: MultiplicationPrecedence
 }
 
-infix operator <<<: CompositionPrecendence
+infix operator •: CompositionPrecendence
 
-func <<< <T, U, V> (lhs: @escaping (V) -> T, rhs: @escaping (U) -> V) -> (U) -> T {
+func • <T, U, V> (lhs: @escaping (V) -> T, rhs: @escaping (U) -> V) -> (U) -> T {
     return { lhs(rhs($0)) }
 }
+

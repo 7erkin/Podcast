@@ -12,7 +12,7 @@ import PromiseKit
 // Error to interrupt Promise chain
 struct BreakPromiseChainError: Error {}
 
-final class EpisodeRecordsManager {
+final class EpisodeRecordsRepository {
     enum Event {
         case episodeDownloaded
         case episodeDeleted

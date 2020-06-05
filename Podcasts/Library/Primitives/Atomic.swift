@@ -11,7 +11,6 @@ import Foundation
 final class Atomic<T> {
     private let queue = DispatchQueue(label: "Atomic\(UUID.init())")
     private var _value: T
-
     init(_ value: T) {
         self._value = value
     }

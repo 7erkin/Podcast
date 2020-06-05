@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-final class FileSystemLFUCache<TKey: Hashable, TValue>: Caching {
+final class FileSystemLRUCache<TKey: Hashable, TValue>: Caching {
     typealias Key = TKey
     typealias Value = TValue
     

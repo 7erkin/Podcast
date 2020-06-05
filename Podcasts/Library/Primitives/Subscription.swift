@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Subscription {
+final class Subscription {
     typealias SubscriptionCanceller = () -> Void
     private let canceller: SubscriptionCanceller
     init(_ canceller: @escaping SubscriptionCanceller) { self.canceller = canceller }

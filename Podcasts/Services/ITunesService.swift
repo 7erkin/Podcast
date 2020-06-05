@@ -11,7 +11,7 @@ import Alamofire
 import FeedKit
 import PromiseKit
 
-final class ITunesService: PodcastServicing {
+final class ITunesService: EpisodeFetching, PodcastFetching, EpisodeRecordFetching {
     struct SearchResults: Decodable {
         let resultCount: Int
         let results: [Podcast]
@@ -53,7 +53,11 @@ final class ITunesService: PodcastServicing {
         }
     }
     
-    func fetchRecord(episode: Episode, _ progressHandler: ((Double) -> Void)?) -> Promise<Data> {
+    func fetchEpisodeRecord(
+        episode: Episode,
+        _ progressHandler: ((Double) -> Void)?,
+        _ completionHandler: @escaping (Data) -> Void
+    ) {
         return  Promise { resolver in
             let downloadRequest = AF.download(episode.streamUrl)
             downloadRequest.downloadProgress { progress in

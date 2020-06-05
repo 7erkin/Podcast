@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ObservedValue<T> {
+final class ObservedValue<T> {
     var value: T { didSet { valueChanged?(self.value) } }
     var valueChanged: ((T) -> Void)! { didSet { self.valueChanged(value) } }
     init(_ value: T) {

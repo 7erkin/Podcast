@@ -7,29 +7,10 @@
 //
 
 import AVKit
-import PromiseKit
 
-protocol EpisodeListPlayable {
-    func applyPlayList(_ playList: EpisodePlayList)
-    func currentPlayList() -> EpisodePlayList?
-}
-
-enum PlayerEvent {
-    case playingEpisodeUpdated
-    case playerStateUpdated
-    case playingPodcastUpdated
-}
-
-struct PlayerState {
-    var timePast: CMTime
-    var duration: CMTime
-    var volumeLevel: Int
-    var isPlaying: Bool
-}
-
-final class Player {
+final class Player: PlayingTrackManaging, TrackListPlaying {
     // MARK: - private properties
-    fileprivate lazy var player: AVPlayer = {
+    private lazy var player: AVPlayer = {
         let player = AVPlayer()
         player.automaticallyWaitsToMinimizeStalling = false
         let interval = CMTime(seconds: 1, preferredTimescale: 1)
@@ -46,8 +27,6 @@ final class Player {
         }
         return player
     }()
-    private var playerListSubscription: Subscription!
-    private var subscribers: [UUID:(PlayerEvent) -> Void] = [:]
     // MARK: - Singleton
     private init() {
         do {
@@ -59,35 +38,6 @@ final class Player {
         }
     }
     static let shared = Player()
-    // MARK: - data for client
-    private var playingPodcast: Podcast! {
-        didSet {
-            notifyAll(withEvent: PlayerEvent.playingPodcastUpdated)
-        }
-    }
-    private(set) var playerState: PlayerState! {
-        didSet {
-            notifyAll(withEvent: PlayerEvent.playerStateUpdated)
-        }
-    }
-    private(set) var playingEpisode: Episode! {
-        didSet {
-            let playerItem = AVPlayerItem(url: self.playingEpisode.fileUrl ?? self.playingEpisode.streamUrl)
-            player.replaceCurrentItem(with: playerItem)
-            player.play()
-            notifyAll(withEvent: PlayerEvent.playingEpisodeUpdated)
-        }
-    }
-    private var playList: EpisodePlayList! {
-        didSet {
-            playerListSubscription = self.playList.subscribe { [weak self] event in
-                self?.updateWithPlayList(withEvent: event)
-            }
-            let item = self.playList.getPlayingEpisodeItem()
-            self.playingEpisode = item.episode
-            self.playingPodcast = item.podcast
-        }
-    }
     // MARK: - player api
     func fastForward15() {
         shiftByTime(15)
@@ -98,21 +48,11 @@ final class Player {
     }
     
     func playPause() {
-        if player.timeControlStatus == .playing {
-            player.pause()
-            playerState.isPlaying = false
-        } else {
-            player.play()
-            playerState.isPlaying = true
-        }
+
     }
     
     func moveToPlaybackTime(_ playbackTime: CMTime) {
         seekToTime(playbackTime)
-    }
-    
-    func pause() {
-        playerState.isPlaying = false
     }
     
     func nextEpisode() {
@@ -130,12 +70,6 @@ final class Player {
     func hasPreviousEpisode() -> Bool {
         return playList.hasPreviousEpisode()
     }
-    
-    func subscribe(_ subscriber: @escaping (PlayerEvent) -> Void) -> Subscription {
-        let key = UUID.init()
-        subscribers[key] = subscriber
-        return Subscription { [weak self] in self?.subscribers.removeValue(forKey: key) }
-    }
     // MARK: - helpers
     private func shiftByTime(_ time: Int64) {
         let playbackTime = player.currentTime()
@@ -149,32 +83,5 @@ final class Player {
             if res {
             }
         })
-    }
-    
-    private func updateWithPlayList(withEvent event: EpisodePlayListEvent) {
-        switch event {
-        case .playingEpisodeChanged:
-            let item = playList.getPlayingEpisodeItem()
-            playingEpisode = item.episode
-            if playingPodcast != item.podcast {
-                playingPodcast = item.podcast
-            }
-        default:
-            break
-        }
-    }
-    
-    private func notifyAll(withEvent event: PlayerEvent) {
-        subscribers.values.forEach { $0(event) }
-    }
-}
-
-extension Player: EpisodeListPlayable {
-    func applyPlayList(_ playList: EpisodePlayList) {
-        self.playList = playList
-    }
-    
-    func currentPlayList() -> EpisodePlayList? {
-        return playList
     }
 }

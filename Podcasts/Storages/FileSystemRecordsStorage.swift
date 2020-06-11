@@ -37,7 +37,7 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
     }
     // MARK: - EpisodeRecordStoraging
     func saveRecord(_ recordData: Data, ofEpisode episode: Episode, ofPodcast podcast: Podcast) -> Promise<[EpisodeRecordDescriptor]> {
-        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<Void> in
+        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[EpisodeRecordDescriptor]> in
             // create record directory
             let directoryName = self.getRecordDirectoryName(forSavedEpisode: episode)
             var directoryUrl = self.recordsDirectoryRootUrl
@@ -53,17 +53,17 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
             let recordDescriptor = EpisodeRecordDescriptor(episode: episode, podcast: podcast, recordUrl: recordUrl)
             let serializedRecordDescription = try! JSONEncoder().encode(recordDescriptor)
             try! serializedRecordDescription.write(to: recordDescriptorUrl)
-            return Promise.value
+            return self.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
         }
     }
     
     func removeRecord(_ recordDescriptor: EpisodeRecordDescriptor) -> Promise<[EpisodeRecordDescriptor]> {
-        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<Void> in
+        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[EpisodeRecordDescriptor]> in
             let deletedDirectoryName = self.getRecordDirectoryName(forSavedEpisode: recordDescriptor.episode)
             var directoryUrl = self.recordsDirectoryRootUrl
             directoryUrl.appendPathComponent(deletedDirectoryName)
             try? FileManager.default.removeItem(at: directoryUrl)
-            return Promise.value
+            return self.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
         }
     }
     

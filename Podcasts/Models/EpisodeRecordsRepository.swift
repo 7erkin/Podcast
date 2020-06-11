@@ -13,7 +13,7 @@ import PromiseKit
 struct BreakPromiseChainError: Error {}
 
 final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
-    private(set) var downloadingEpisodes: [DownloadingEpisode] = []
+    private(set) var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
     private var subscribers = Subscribers<EpisodeRecordRepositoryEvent>()
     private var downloadingRecordCancellers: [Episode:AsyncOperationCanceller] = [:]
     // MARK: - dependencies
@@ -36,7 +36,7 @@ final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
     func downloadRecord(ofEpisode episode: Episode, ofPodcast podcast: Podcast) {
         let progressHandler: (Double) -> Void = { _ in }
         let canceller = recordFetcher.fetchEpisodeRecord(episode: episode, progressHandler) { recordData in
-            self.downloadingEpisodes.remove(episode)
+            self.downloadingEpisodes.removeValue(forKey: episode)
             firstly {
                 self.recordStorage.saveRecord(recordData, ofEpisode: episode, ofPodcast: podcast)
             }.done {
@@ -49,7 +49,7 @@ final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
     func cancelDownloadingRecord(ofEpisode episode: Episode) {
         if let canceller = downloadingRecordCancellers.removeValue(forKey: episode) {
             canceller.cancel()
-            downloadingEpisodes.remove(episode)
+            downloadingEpisodes.removeValue(forKey: episode)
             subscribers.fire(.downloadingCancelled(episode, downloadingEpisodes))
         }
     }
@@ -61,13 +61,5 @@ final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
             subscriber(.initial($0, self.downloadingEpisodes))
         }.catch { _ in }
         return subscribers.subscribe(action: subscriber)
-    }
-}
-
-extension Array where Element == DownloadingEpisode {
-    mutating func remove(_ episode: Episode) {
-        if let index = self.firstIndex(where: { $0.0 == episode }) {
-            self.remove(at: index)
-        }
     }
 }

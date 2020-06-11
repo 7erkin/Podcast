@@ -20,7 +20,7 @@ final class EpisodesModel {
     private(set) var isPodcastFavorite: Bool!
     // MARK: - dependencies
     private var podcastStorage: FavoritePodcastStoraging
-    private var trackListManaging: PlayingTrackListManaging
+    private var trackListPlayer: TrackListPlaying
     private var episodeFetcher: EpisodeFetching
     // MARK: - subscriptions
     private var favoritePodcastsStorageSubscription: Subscription!
@@ -29,10 +29,12 @@ final class EpisodesModel {
         podcast: Podcast,
         podcastStorage: FavoritePodcastStoraging,
         episodeFetcher: EpisodeFetching,
-        trackListManager: PlayingTrackListManaging
+        trackListPlayer: TrackListPlaying
     ) {
         self.podcast = podcast
         self.podcastStorage = podcastStorage
+        self.episodeFetcher = episodeFetcher
+        self.trackListPlayer = trackListPlayer
     }
     // MARK: - public api
     func initialize() {

@@ -29,7 +29,6 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastStoraging {
             storage.set(emptyPodcasts, forKey: favoritePodcastKey)
         }
     }
-    static var shared = UserDefaultsFavoritePodcastStorage()
     // MARK: - FavoritePodcastStoraging
     func saveAsFavorite(podcast: Podcast) {
         serviceQueue.async { [weak self] in

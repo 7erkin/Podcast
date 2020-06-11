@@ -14,11 +14,17 @@ struct Track {
     var url: URL
 }
 
-protocol PlayingTrackListManaging: class {
-    var playingTrack: Track { get }
-    var trackList: [Track] { get set }
+enum TrackListPlayerEvent {
+    
+}
+
+protocol TrackListPlaying: class {
+    func setTrackList(_ trackList: [Track])
     func playNextTrack()
     func playPreviousTrack()
     func hasNextTrack() -> Bool
     func hasPreviousTrack() -> Bool
+    func subscribe(
+        _ subscriber: @escaping (TrackListPlayerEvent) -> Void
+    ) -> Subscription
 }

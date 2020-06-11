@@ -8,9 +8,9 @@
 
 import Foundation
 
-struct EpisodeRecord: Codable {
+struct EpisodeRecordDescriptor: Codable {
     var episode: Episode
     var podcast: Podcast
     var recordUrl: URL
-    var dateOfCreate = Date()
+    var dateOfCreate: Date = .init()
 }

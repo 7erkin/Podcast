@@ -10,27 +10,16 @@ import Foundation
 import PromiseKit
 
 final class FavoritePodcastsModel {
-    enum Event {
-        case initialized
-        case podcastDeleted
-        case podcastSaved
-    }
-    
     private(set) var podcasts: [Podcast] = []
     private var storageSubscription: Subscription!
     private let storage: FavoritePodcastsStoraging
     var subscriber: ((Event) -> Void)!
-    init(favoritePodcastsStorage: FavoritePodcastsStoraging) {
+    init(favoritePodcastsStorage: FavoritePodcastSaving) {
         self.storage = favoritePodcastsStorage
         subscribeToFavoritePodcastsStorage()
     }
     
     func initialize() {
-        firstly {
-            updatePodcastsWithStorage()
-        }.done {
-            self.subscriber(.initialized)
-        }.catch { _ in }
     }
     
     func deletePodcast(podcastIndex index: Int) {

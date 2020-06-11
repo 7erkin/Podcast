@@ -9,22 +9,16 @@
 import Foundation
 
 final class PodcastsSearchModel {
-    enum Event {
-        case podcastsFetched
-    }
-    
-    private let podcastService: PodcastServicing
+    private let podcastFetcher: PodcastFetching
     private(set) var podcasts: [Podcast] = []
-    var subscriber: ((Event) -> Void)!
-    init(podcastService: PodcastServicing) {
-        self.podcastService = podcastService
+    init(podcastFetcher: PodcastFetching) {
+        self.podcastFetcher = podcastFetcher
     }
     
     func fetchPodcasts(bySearchText searchText: String) {
-        podcastService.fetchPodcasts(searchText: searchText) { [weak self] podcasts in
+        podcastFetcher.fetchPodcasts(searchText: searchText) { [weak self] podcasts in
             DispatchQueue.main.async {
                 self?.podcasts = podcasts
-                self?.subscriber(.podcastsFetched)
             }
         }
     }

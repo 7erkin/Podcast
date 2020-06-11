@@ -9,12 +9,11 @@
 import Foundation
 import PromiseKit
 
-// thread safe
-final class UserDefaultsFavoritePodcastStorage: FavoritePodcastSaving, FavoritePodcastRemoving {
+final class UserDefaultsFavoritePodcastStorage: FavoritePodcastStoraging {
     // MARK: - constants
     fileprivate let favoritePodcastKey = "favoritePodcastKey"
     fileprivate let serviceQueue = DispatchQueue(
-        label: "user.defaults.favorite.podcasts.storage",
+        label: "favorite.podcasts.storage",
         qos: .userInitiated,
         attributes: [],
         autoreleaseFrequency: .workItem,
@@ -22,6 +21,7 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastSaving, FavoriteP
     )
     private var storage: UserDefaults { return UserDefaults.standard }
     private var _podcasts: [Podcast] = []
+    private var subscribers = Subscribers<FavoritePodcastStorageEvent>()
     // MARK: -
     private init() {
         if storage.value(forKey: favoritePodcastKey) == nil {
@@ -30,29 +30,7 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastSaving, FavoriteP
         }
     }
     static var shared = UserDefaultsFavoritePodcastStorage()
-    // MARK: - 
-    func hasPodcast(_ podcast: Podcast) -> Promise<Bool> {
-        return Promise { resolver in
-            serviceQueue.async { [weak self] in
-                guard let self = self else { return }
-                
-                self.loadPodcastsIfNeeded()
-                resolver.fulfill(self._podcasts.contains(podcast))
-            }
-        }
-    }
-    
-    var podcasts: Promise<[Podcast]> {
-        return Promise { resolver in
-            serviceQueue.async { [weak self] in
-                guard let self = self else { return }
-                
-                self.loadPodcastsIfNeeded()
-                resolver.resolve(.fulfilled(self._podcasts))
-            }
-        }
-    }
-    
+    // MARK: - FavoritePodcastStoraging
     func saveAsFavorite(podcast: Podcast) {
         serviceQueue.async { [weak self] in
             guard let self = self else { return }
@@ -82,25 +60,29 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastSaving, FavoriteP
             }
         }
     }
+    
+    func subscribe(_ subscriber: @escaping (FavoritePodcastStorageEvent) -> Void) -> Subscription {
+        return subscribers.subscribe(action: subscriber)
+    }
     // MARK: - helpers
-    fileprivate func loadPodcastsIfNeeded() {
+    private func loadPodcastsIfNeeded() {
         if _podcasts.isEmpty {
             _podcasts = loadPodcastsFromStorage()
         }
     }
     
-    fileprivate func loadPodcastsFromStorage() -> [Podcast] {
+    private func loadPodcastsFromStorage() -> [Podcast] {
         guard let serializedPodcasts = self.storage.value(forKey: self.favoritePodcastKey) as? Data else { fatalError("UB") }
         
         return [Podcast].deserialize(from: serializedPodcasts)
     }
     
-    fileprivate func save(_ serializedPodcasts: Data) {
+    private func save(_ serializedPodcasts: Data) {
         self.storage.set(serializedPodcasts, forKey: self.favoritePodcastKey)
     }
 }
 
-fileprivate extension Array where Element == Podcast {
+private extension Array where Element == Podcast {
     var serialized: Data {
         return try! JSONEncoder().encode(self)
     }

@@ -14,15 +14,6 @@ final class EpisodesController: UITableViewController {
     private var favoriteButton: FavoriteButtonItem {
         return navigationItem.rightBarButtonItem as! FavoriteButtonItem
     }
-    private lazy var controllerBindOnceInvoker: () -> Void = {
-        let bind = { [unowned self] in
-            self.viewModel.podcastName.valueChanged = { [unowned self] in self.navigationItem.title = $0 }
-            self.viewModel.isPodcastFavorite.valueChanged = { [unowned self] in self.favoriteButton.isFavorite = $0 }
-            self.viewModel.episodeCellViewModels.valueChanged = { [unowned self] _ in self.tableView.reloadData() }
-            self.viewModel.initialize()
-        }
-        return executeOnce | bind
-    }()
     // MARK: - dependencies
     var viewModel: EpisodesViewModel!
     // MARK: - view life cycles
@@ -40,7 +31,6 @@ final class EpisodesController: UITableViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        controllerBindOnceInvoker()
     }
     // MARK: - interaction handlers
     @objc

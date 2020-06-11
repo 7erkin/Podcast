@@ -13,5 +13,5 @@ protocol EpisodeRecordFetching: class {
         episode: Episode,
         _ progressHandler: ((Double) -> Void)?,
         _ completionHandler: @escaping (Data) -> Void
-    )
+    ) -> AsyncOperationCanceller
 }

@@ -12,73 +12,62 @@ import PromiseKit
 // Error to interrupt Promise chain
 struct BreakPromiseChainError: Error {}
 
-final class EpisodeRecordsRepository {
-    enum Event {
-        case episodeDownloaded
-        case episodeDeleted
-        case episodeDownloadingProgress
-        case episodeStartDownloading
-    }
-    
-    private(set) var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
+final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
+    private(set) var downloadingEpisodes: [DownloadingEpisode] = []
+    private var subscribers = Subscribers<EpisodeRecordRepositoryEvent>()
+    private var downloadingRecordCancellers: [Episode:AsyncOperationCanceller] = [:]
     // MARK: - dependencies
-    var recordsStorage: EpisodeRecordsStoraging!
-    var podcastService: PodcastServicing!
+    var recordStorage: EpisodeRecordStoraging
+    var recordFetcher: EpisodeRecordFetching
     // MARK: -
-    private var subscribers: [UUID:(Event) -> Void] = [:]
-    static let shared = EpisodeRecordsManager()
-    private init() {}
-    
-    func isEpisodeSaved(_ episode: Episode) -> Promise<Bool> {
-        return recordsStorage.hasEpisode(episode)
+    init(recordStorage: EpisodeRecordStoraging, recordFetcher: EpisodeRecordFetching) {
+        self.recordStorage = recordStorage
+        self.recordFetcher = recordFetcher
     }
-    
-    func downloadEpisode(_ episode: Episode, ofPodcast podcast: Podcast) {
-        firstly { () -> Promise<Bool> in
-            recordsStorage.hasEpisode(episode)
-        }.then { hasEpisode -> Promise<Data> in
-            if hasEpisode { return Promise(error: BreakPromiseChainError()) }
-            var isStartDownloadingNotified = false
-            return self.podcastService.fetchRecord(episode: episode) { progress in
-                DispatchQueue.main.async { [weak self] in
-                    if !isStartDownloadingNotified {
-                        isStartDownloadingNotified = true
-                        self?.notifyAll(withEvent: .episodeStartDownloading)
-                    }
-                    self?.downloadingEpisodes[episode] = progress
-                    self?.notifyAll(withEvent: .episodeDownloadingProgress)
-                }
-            }
-        }.then { data -> Promise<Void> in
-            self.recordsStorage.save(episode: episode, ofPodcast: podcast, withRecord: data)
-        }.done {
-            self.downloadingEpisodes.removeValue(forKey: episode)
-            self.notifyAll(withEvent: .episodeDownloaded)
-        }.catch { _ in }
-    }
-    
-    func deleteEpisode(_ episode: Episode) {
+    // MARK: - EpisodeRecordRepositoring impl
+    func remove(recordDescriptor: EpisodeRecordDescriptor) {
         firstly {
-            recordsStorage.delete(episode: episode)
+            recordStorage.removeRecord(recordDescriptor)
         }.done {
-            self.notifyAll(withEvent: .episodeDeleted)
+            self.subscribers.fire(.removed(recordDescriptor, $0))
         }.catch { _ in }
     }
     
-    var storedEpisodeList: Promise<[StoredEpisodeItem]> {
-        let sortPolicy: (StoredEpisodeItem, StoredEpisodeItem) -> Bool = { $0.dateOfCreate > $1.dateOfCreate }
-        return recordsStorage.getStoredEpisodeRecordList(withSortPolicy: sortPolicy)
+    func downloadRecord(ofEpisode episode: Episode, ofPodcast podcast: Podcast) {
+        let progressHandler: (Double) -> Void = { _ in }
+        let canceller = recordFetcher.fetchEpisodeRecord(episode: episode, progressHandler) { recordData in
+            self.downloadingEpisodes.remove(episode)
+            firstly {
+                self.recordStorage.saveRecord(recordData, ofEpisode: episode, ofPodcast: podcast)
+            }.done {
+                self.subscribers.fire(.downloadingFulfilled(episode, self.downloadingEpisodes, $0))
+            }.catch { _ in }
+        }
+        downloadingRecordCancellers[episode] = canceller
     }
     
-    func subscribe(_ subscriber: @escaping (Event) -> Void) -> Subscription {
-        let key = UUID.init()
-        subscribers[key] = subscriber
-        return Subscription { [weak self] in
-            self?.subscribers.removeValue(forKey: key)
+    func cancelDownloadingRecord(ofEpisode episode: Episode) {
+        if let canceller = downloadingRecordCancellers.removeValue(forKey: episode) {
+            canceller.cancel()
+            downloadingEpisodes.remove(episode)
+            subscribers.fire(.downloadingCancelled(episode, downloadingEpisodes))
         }
     }
-    // MARK: - helpers
-    fileprivate func notifyAll(withEvent event: Event) {
-        subscribers.values.forEach { $0(event) }
+    
+    func subscribe(_ subscriber: @escaping (EpisodeRecordRepositoryEvent) -> Void) -> Subscription {
+        firstly {
+            recordStorage.getEpisodeRecordDescriptors(withSortPolicy: { _, _ in return true })
+        }.done {
+            subscriber(.initial($0, self.downloadingEpisodes))
+        }.catch { _ in }
+        return subscribers.subscribe(action: subscriber)
+    }
+}
+
+extension Array where Element == DownloadingEpisode {
+    mutating func remove(_ episode: Episode) {
+        if let index = self.firstIndex(where: { $0.0 == episode }) {
+            self.remove(at: index)
+        }
     }
 }

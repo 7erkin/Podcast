@@ -23,7 +23,6 @@ final class EpisodeCellViewModel {
    
     init(model: EpisodeCellModel) {
         self.model = model
-        model.subscriber = { [unowned self] in self.updateWithModel(withEvent: $0) }
         let episode = model.episode
         episodeName.value = episode.name
         let dateFormatter = DateFormatter()
@@ -43,20 +42,5 @@ final class EpisodeCellViewModel {
         }
         timer?.tolerance = 0.2
         RunLoop.current.add(timer!, forMode: .common)
-    }
-    
-    private func updateWithModel(withEvent event: EpisodeCellModel.Event) {
-        switch event {
-        case .episodeDownloaded:
-            progress.value = nil
-            isEpisodeDownloadIndicatorHidden.value = false
-            break
-        case .episodeDownloadingProgressUpdated:
-            break
-        case .episodePicked:
-            break
-        default:
-            break
-        }
     }
 }

@@ -1,0 +1,244 @@
+<diagram program="umletino" version="14.3.0"><zoom_level>10</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLClass</id><coordinates><x>2566</x><y>513</y><w>300</w><h>150</h></coordinates><panel_attributes>EpisodesViewModel
+--
+# Binding
+podcastName: String
+isPodcastFavorite: Bool
+episodes: [EpisodeCellViewModel]
+--
+# Public API
+init(:EpisodesModel)
+initialize()
+playEpisode()
+markPodcastAsFavorite()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2236</x><y>493</y><w>250</w><h>310</h></coordinates><panel_attributes>EpisodesModel
+--
+# Data for client
+podcast: Podcast
+isPodcastFavorite: Bool
+episodes: [Episode]
+--
+# Dependencies
+podcastStorage: FavoritePodcastStoraging
+episodeFetcher: EpisodeFetching
+trackListPlayer: TrackListPlaying 
+--
+# Public API
+init(
+   :Podcast
+   :FavoritePodcastStoraging
+   :EpisodeFetching,
+   :TrackListPlaying 
+)
+initialize()
+playEpisode()
+savePodcastAsFavorite()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>3186</x><y>534</y><w>190</w><h>60</h></coordinates><panel_attributes>EpisodesController</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2856</x><y>534</y><w>350</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;330;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2476</x><y>554</y><w>110</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;90;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2226</x><y>854</y><w>280</w><h>220</h></coordinates><panel_attributes>EpisodeCellModel
+--
+# Data for client
+episode: Episode
+isEpisodeDownloaded: Bool
+downloadingProgress: Double
+--
+# Dependencies
+recordRepository: EpisodeRecordRepositoring
+--
+# Public API
+init(
+   :EpisodeRecordRepositoring
+)
+downloadEpisode()
+cancelEpisodeDownloading()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2576</x><y>854</y><w>320</w><h>110</h></coordinates><panel_attributes>EpisodeCellViewModel
+--
+# Public API
+init(:EpisodeCellModel)
+initialize()
+downloadEpisode()
+cancelEpisodeDownloading()
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>3576</x><y>624</y><w>200</w><h>80</h></coordinates><panel_attributes>EpisodeCellView
+--
+# Dependencies
+viewModel: EpisodeCellViewModel</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1456</x><y>1654</y><w>330</w><h>50</h></coordinates><panel_attributes>EpisodeRecordRepository
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2236</x><y>1648</y><w>280</w><h>120</h></coordinates><panel_attributes>FavoritePodcastsModel
+--
+# Dependencies
+podcastStorage: FavoritePodcastStoraging
+--
+# Public API
+init(podcastStorage: FavoritePodcastStoraging)
+initialize()
+removePodcastFromFavorites()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2606</x><y>1588</y><w>290</w><h>140</h></coordinates><panel_attributes>FavoritePodcastsViewModel
+--
+# Binding
+badgeText: String?
+favoritePodcasts: [FavoritePodcastCellViewModel]
+--
+# Public API
+init(FavoritePodcastModel:)
+initialize()
+removePodcastFromFavorites()
+
+
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>3066</x><y>1618</y><w>200</w><h>30</h></coordinates><panel_attributes>FavoritePodcastsController
+
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>3046</x><y>1223</y><w>220</w><h>40</h></coordinates><panel_attributes>EpisodesRecordsController
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2576</x><y>1183</y><w>380</w><h>180</h></coordinates><panel_attributes>EpisodeRecordsViewModel
+--
+# Binding
+downloadingRecords: OrderedDictionary&lt;Episode, Double&gt;
+records: [EpisodeRecordCellViewModel]
+--
+# Public API
+init(EpisodeRecordsModel:)
+initialize()
+removeEpisodeRecord()
+cancelEpisodeRecordDownloading()
+playEpisode()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2226</x><y>1183</y><w>270</w><h>210</h></coordinates><panel_attributes>EpisodeRecordsModel
+--
+# Public API
+init(
+   :EpisodeRecordRepositoring
+   :TrackListPlaying 
+)
+initialize()
+removeEpisodeRecord()
+playEpisode()
+cancelEpisodeRecordDownloading()
+--
+#Dependencies
+recordRepository: EpisodeRecordRepositoring
+trackListPlayer: TrackListPlaying </panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2856</x><y>566</y><w>80</w><h>330</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>40;310;60;310;60;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2886</x><y>556</y><w>320</w><h>370</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>10;350;160;350;160;10;300;10</additional_attributes></element><element><id>Relation</id><coordinates><x>3146</x><y>576</y><w>450</w><h>110</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>430;90;10;90;10;10;40;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1466</x><y>1483</y><w>310</w><h>120</h></coordinates><panel_attributes>/EpisodeRecordRepositoring Protocol*/
+--
+remove(:EpisodeRecord)
+downloadRecord(:Episode)
+cancelDownloadingRecord(:Episode)
+subscribe(
+   :@escaping (EpisodeRecordRepositoryEvent) -&gt; Void
+) -&gt; Subscription</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2946</x><y>1223</y><w>120</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;100;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2486</x><y>1223</y><w>110</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;90;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>2736</x><y>1743</y><w>180</w><h>120</h></coordinates><panel_attributes>FavoritePodcastCellViewModel
+--
+# Bindings
+podcastName: String
+artistName: String
+podcastImage: Data
+--
+# Public API
+init(Podcast:)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2630</x><y>1913</y><w>160</w><h>30</h></coordinates><panel_attributes>PodcastsController</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2140</x><y>1913</y><w>300</w><h>120</h></coordinates><panel_attributes>PodcastsViewModel
+--
+# Binding
+podcasts: [PodcastCellViewModel]
+--
+Public API
+init(:PodcastFetching)
+fetchPodcasts(:String)
+getPodcastUrl(:Int)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2340</x><y>2093</y><w>170</w><h>130</h></coordinates><panel_attributes>PodcastCellViewModel
+--
+# Binding
+name: String
+description: String
+episodeCount: String
+--
+# Public API
+init(:Podcast)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2610</x><y>2093</y><w>100</w><h>30</h></coordinates><panel_attributes>PodcastCell
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2500</x><y>2093</y><w>130</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;60;100;60;100;10;110;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2430</x><y>1913</y><w>220</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;200;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2450</x><y>1923</y><w>200</w><h>190</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>10;170;10;130;120;130;120;10;180;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2660</x><y>1933</y><w>30</w><h>180</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>10;160;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2890</x><y>1593</y><w>190</w><h>60</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;130;10;130;40;170;40</additional_attributes></element><element><id>UMLClass</id><coordinates><x>3010</x><y>1783</y><w>160</w><h>30</h></coordinates><panel_attributes>FavoritePodcastCell</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2910</x><y>1633</y><w>170</w><h>150</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>10;130;70;130;70;10;150;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2910</x><y>1783</y><w>120</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;100;10</additional_attributes></element><element><id>Relation</id><coordinates><x>3080</x><y>1643</y><w>30</w><h>160</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>10;140;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1670</x><y>828</y><w>210</w><h>30</h></coordinates><panel_attributes>UserDefaultsFavoritePodcastStorage
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1770</x><y>618</y><w>480</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;50;10;20;460;15</additional_attributes></element><element><id>Relation</id><coordinates><x>1950</x><y>673</y><w>300</w><h>1010</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;110;10;110;990;280;985</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1580</x><y>1233</y><w>160</w><h>30</h></coordinates><panel_attributes>ITunesService</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1360</x><y>1103</y><w>200</w><h>90</h></coordinates><panel_attributes>/EpisodeFetching Protocol*/
+--
+fetchEpisodes(
+   :URL
+  :@escaping ([Episode]) -&gt; Void
+)</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1770</x><y>1073</y><w>190</w><h>110</h></coordinates><panel_attributes>/EpisodeRecordFetching Protocol*/
+--
+fetchEpisodeRecord(
+   :URL
+   :((Double) -&gt; Void)?
+   :@escaping (Data) -&gt; Void
+) -&gt; AsyncOperationCanceller
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1570</x><y>1083</y><w>190</w><h>100</h></coordinates><panel_attributes>/PodcastFetching Protocol*/
+--
+fetchPodcasts(
+   :String
+   :@escaping ([Podcast]) -&gt; Void
+)</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1730</x><y>1178</y><w>110</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>90;10;90;70;10;70</additional_attributes></element><element><id>Relation</id><coordinates><x>1650</x><y>1178</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>1480</x><y>1188</y><w>120</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;60;100;60</additional_attributes></element><element><id>Relation</id><coordinates><x>1410</x><y>608</y><w>840</w><h>510</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;495;10;20;820;15</additional_attributes></element><element><id>Relation</id><coordinates><x>1670</x><y>1013</y><w>490</w><h>960</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;70;10;10;330;10;330;940;470;940</additional_attributes></element><element><id>Relation</id><coordinates><x>1590</x><y>1593</y><w>30</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;61</additional_attributes></element><element><id>Relation</id><coordinates><x>1636</x><y>1233</y><w>610</w><h>270</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;250;10;170;240;170;240;10;590;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1530</x><y>953</y><w>710</w><h>550</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;530;10;420;330;420;330;240;510;240;510;10;690;11</additional_attributes></element><element><id>UMLClass</id><coordinates><x>930</x><y>963</y><w>170</w><h>30</h></coordinates><panel_attributes>PlayerManager
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>390</x><y>723</y><w>180</w><h>30</h></coordinates><panel_attributes>LockScreenPlayerController</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>180</x><y>723</y><w>200</w><h>30</h></coordinates><panel_attributes>MediaCenterPlayerController</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>903</y><w>190</w><h>30</h></coordinates><panel_attributes>AppPlayerController</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>140</x><y>903</y><w>100</w><h>30</h></coordinates><panel_attributes>AppPlayerView
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>200</x><y>1013</y><w>160</w><h>30</h></coordinates><panel_attributes>MaximizeAppPlayerView
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>0</x><y>1013</y><w>150</w><h>30</h></coordinates><panel_attributes>MinimizeAppPlayerView
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>450</x><y>903</y><w>80</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>60;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>230</x><y>903</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;40;10</additional_attributes></element><element><id>Relation</id><coordinates><x>70</x><y>923</y><w>100</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;90;10;70;80;70;80;10</additional_attributes></element><element><id>Relation</id><coordinates><x>210</x><y>923</y><w>80</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>60;90;60;70;10;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>1090</x><y>963</y><w>140</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>120;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1210</x><y>963</y><w>100</w><h>30</h></coordinates><panel_attributes>AVPlayer</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>780</x><y>723</y><w>310</w><h>160</h></coordinates><panel_attributes>/PlayingTrackManaging Protocol/
+--
+setPlaybackTime(:CMTime)
+fastForward15()
+rewind15()
+playPause()
+setVolumeLevel(:Int)
+subscribe(
+   :@escaping (PlayerStateManagerEvent) -&gt; Void
+) -&gt; Subscription
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1100</x><y>723</y><w>300</w><h>150</h></coordinates><panel_attributes>/TrackListPlaying Protocol/
+--
+setTrackList(:[Track]:Int)
+playNextTrack()
+playPreviousTrack()
+hasNextTrack()
+hasPreviousTrack()
+subscribe(
+   :@escaping (PlayingTrackListManagerEvent) -&gt; Void
+) -&gt; Subscription</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1070</x><y>863</y><w>110</w><h>120</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>90;10;90;60;10;60;10;100</additional_attributes></element><element><id>Relation</id><coordinates><x>990</x><y>873</y><w>30</w><h>110</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;90</additional_attributes></element><element><id>Relation</id><coordinates><x>620</x><y>598</y><w>380</w><h>320</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>360;120;360;10;10;10;10;300</additional_attributes></element><element><id>Relation</id><coordinates><x>1300</x><y>568</y><w>950</w><h>170</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;150;10;20;930;15</additional_attributes></element><element><id>Relation</id><coordinates><x>1250</x><y>533</y><w>990</w><h>700</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;190;10;10;890;10;890;680;970;680</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1580</x><y>673</y><w>380</w><h>110</h></coordinates><panel_attributes>/FavoritePodcastStoraging Protocol*/
+--
+saveAsFavorite(:Podcast)
+removeFromFavorite(:Podcast)
+func subscribe(
+        _ subscriber: @escaping (FavoritePodcastStorageEvent) -&gt; Void
+) -&gt; Subscription</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1770</x><y>773</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>480</x><y>530</y><w>760</w><h>210</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>740;190;740;10;10;10;10;190</additional_attributes></element><element><id>Relation</id><coordinates><x>260</x><y>460</y><w>1000</w><h>280</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>980;260;980;10;10;10;10;260</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1770</x><y>0</y><w>390</w><h>160</h></coordinates><panel_attributes>MainTabBarController
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1100</x><y>1280</y><w>270</w><h>70</h></coordinates><panel_attributes>/EpisodeRecordStoraging Protocol*/
+--
+save(:EpisodeRecord) -&gt; Promise&lt;Void&gt;
+remove(:EpisodeRecord) -&gt; Promise&lt;Void&gt;
+episodeRecords: Promise&lt;[EpisodeRecord]&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1140</x><y>1390</y><w>200</w><h>30</h></coordinates><panel_attributes>FileSystemRecordStorage</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1220</x><y>1340</y><w>30</w><h>70</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>10;10;10;50</additional_attributes></element><element><id>Relation</id><coordinates><x>1050</x><y>1300</y><w>420</w><h>390</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>50;10;10;10;10;370;400;370</additional_attributes></element><element><id>Relation</id><coordinates><x>1780</x><y>1080</y><w>230</w><h>610</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>180;10;210;10;210;590;10;590</additional_attributes></element><element><id>Relation</id><coordinates><x>510</x><y>550</y><w>540</w><h>190</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>520;170;520;10;10;10;10;170</additional_attributes></element><element><id>Relation</id><coordinates><x>320</x><y>490</y><w>600</w><h>250</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>580;230;580;10;10;10;10;230</additional_attributes></element><element><id>Relation</id><coordinates><x>2510</x><y>1590</y><w>110</w><h>90</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;70;50;70;50;10;90;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>510</x><y>903</y><w>260</w><h>280</h></coordinates><panel_attributes>AppPlayerViewModel
+--
+# Bindings
+playbackTime: String
+duration: String
+artistName: String
+trackName: String
+trackImage: Data
+isPlayerPlaying: Bool
+--
+# Public API
+init(:PlayingTrackManaging )
+setPlaybackTime(:CMTime)
+fastForward15()
+rewind15()
+playPause()
+setVolumeLevel(:Int)
+--
+# Dependencies
+playingTrackManager: PlayingTrackManaging 
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1460</x><y>1800</y><w>100</w><h>30</h></coordinates><panel_attributes>TrackList</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2230</x><y>1430</y><w>260</w><h>160</h></coordinates><panel_attributes>EpisodeRecordCellModel
+--
+# Dependencies
+recordRepository: EpisodeRecordRepositoring
+--
+# Public API
+init(
+   :EpisodeRecordRepositoring
+)
+cancelEpisodeDownloading()
+removeRecord()
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>2580</x><y>1430</y><w>340</w><h>90</h></coordinates><panel_attributes>EpisodeRecordCellViewModel
+--
+# Public API
+init(:EpisodeRecordCellModel)
+cancelEpisodeDownloading()
+removeRecord()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>3110</x><y>750</y><w>400</w><h>130</h></coordinates><panel_attributes>/EpisodeCellOutput Protocol*/
+--
+publishDatePublisher: Published&lt;String?&gt;.Publisher { get }
+episodeName: Published&lt;String?&gt;.Publisher { get }
+***// Data, not UIImage, because VM framework agnostic ***
+episodeImage: Published&lt;Data?&gt;.Publisher { get }
+description: Published&lt;String?&gt;.Publisher { get }
+downloadingProgress: Published&lt;String?&gt;.Publisher { get }
+isDownloadEpisodeIndicatorVisible: Published&lt;Bool&gt;.Publisher { get }
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>2770</x><y>770</y><w>360</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>340;10;10;10;10;80</additional_attributes></element><element><id>Relation</id><coordinates><x>2760</x><y>870</y><w>590</w><h>580</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>560;10;570;520;10;520;10;560</additional_attributes></element><element><id>Relation</id><coordinates><x>2500</x><y>890</y><w>90</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;70;10</additional_attributes></element><element><id>Relation</id><coordinates><x>3500</x><y>680</y><w>90</w><h>170</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;150;40;150;40;10;70;10</additional_attributes></element><element><id>Relation</id><coordinates><x>2480</x><y>1460</y><w>120</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;100;10</additional_attributes></element><element><id>Relation</id><coordinates><x>3260</x><y>700</y><w>380</w><h>560</h></coordinates><panel_attributes>lt=&lt;..</panel_attributes><additional_attributes>350;10;360;540;10;540</additional_attributes></element></diagram>

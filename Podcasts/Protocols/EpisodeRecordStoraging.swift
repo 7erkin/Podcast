@@ -16,3 +16,4 @@ protocol EpisodeRecordStoraging: class {
         withSortPolicy sortPolicy: @escaping (EpisodeRecordDescriptor, EpisodeRecordDescriptor) -> Bool
     ) -> Promise<[EpisodeRecordDescriptor]>
 }
+ 

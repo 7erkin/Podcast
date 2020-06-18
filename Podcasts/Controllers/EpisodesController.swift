@@ -35,7 +35,7 @@ final class EpisodesController: UITableViewController {
     // MARK: - interaction handlers
     @objc
     private func onFavoriteButtonTapped() {
-        viewModel.favoriteButtonTapped()
+        viewModel.savePodcastAsFavorite()
     }
     // MARK: - helpers
     private func setupTableView() {

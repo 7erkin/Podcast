@@ -8,39 +8,74 @@
 
 import Foundation
 import UIKit
+import Combine
 
-final class EpisodeCellViewModel {
-    var publishDate = ObservedValue<String?>(nil)
-    var episodeName = ObservedValue<String?>(nil)
-    var description = ObservedValue<String?>(nil)
-    var progress = ObservedValue<String?>(nil)
-    var episodeImage = ObservedValue<UIImage?>(nil)
-    var isLoadingEpisodeImageIndicatorActive = ObservedValue<Bool>(false)
-    var isEpisodeDownloadIndicatorHidden = ObservedValue<Bool>(false)
+final class EpisodeCellViewModel: ObservableObject {
+    @Published var publishDate: String?
+    @Published var episodeName: String?
+    @Published var description: String?
+    @Published var progress: String?
+    @Published var episodeImage: Data?
+    @Published var isEpisodeDownloaded: Bool?
     
     private let model: EpisodeCellModel
     private var timer: Timer?
+    
+    private var subscriptions: [Subscription] = []
    
     init(model: EpisodeCellModel) {
         self.model = model
-        let episode = model.episode
-        episodeName.value = episode.name
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd, yyyy"
-        publishDate.value = dateFormatter.string(from: episode.publishDate)
-        description.value = episode.description
+        self.model
+            .subscribe { [weak self] in self?.updateWithModel($0) }
+            .stored(in: &subscriptions)
     }
     
     deinit {
         timer?.invalidate()
     }
     
+    private func updateWithModel(_ event: EpisodeCellModelEvent) {
+        switch event {
+        case .initial(let episode, let downloadingStatus):
+            episodeName = episode.name
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MMM dd, yyyy"
+            publishDate = dateFormatter.string(from: episode.publishDate)
+            description = episode.description
+            updateWithDownloadingStatus(downloadingStatus)
+        case .episodeDownloadingStatusChanged(let downloadingStatus):
+            updateWithDownloadingStatus(downloadingStatus)
+        }
+    }
+    
+    private func updateWithDownloadingStatus(_ status: EpisodeDownloadingStatus) {
+        switch status {
+        case .downloaded:
+            isEpisodeDownloaded = true
+            progress = nil
+        case .notStarted:
+            isEpisodeDownloaded = false
+            progress = nil
+        case .inProgress(let progress):
+            self.progress = "\(progress)"
+        default:
+            break
+        }
+    }
+    
     func fetchImage(withSize imageSize: CGSize) {
         timer = Timer(timeInterval: 1, repeats: false) { [weak self] _ in
             guard let self = self else { return }
-            self.model.fetchImage()
         }
         timer?.tolerance = 0.2
         RunLoop.current.add(timer!, forMode: .common)
+    }
+    
+    func downloadEpisode() {
+        model.downloadEpisode()
+    }
+    
+    func cancelEpisodeDownloading() {
+        model.cancelEpisodeDownloading()
     }
 }

@@ -7,9 +7,9 @@
 //
 
 enum FavoritePodcastStorageEvent {
-    case initial
-    case saved
-    case removed
+    case initial([Podcast])
+    case saved(Podcast, [Podcast])
+    case removed(Podcast, [Podcast])
 }
 
 protocol FavoritePodcastStoraging: class {

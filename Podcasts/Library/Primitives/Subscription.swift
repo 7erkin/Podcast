@@ -16,3 +16,9 @@ final class Subscription {
         canceller()
     }
 }
+
+extension Subscription {
+    func stored(in subscriptions: inout [Subscription]) {
+        subscriptions.append(self)
+    }
+}

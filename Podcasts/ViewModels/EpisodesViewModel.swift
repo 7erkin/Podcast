@@ -9,31 +9,46 @@
 import Foundation
 import Combine
 
-final class EpisodesViewModel {
-    @Published
-    var podcastName: String?
-    var isPodcastFavorite: Bool = false
-    var episodeCellViewModels: [EpisodeCellViewModel] = []
-    var storedEpisodeIndices: Set<Int> = []
+func createEpisodeCellViewModel(episode: Episode, podcast: Podcast) -> EpisodeCellViewModel {
+    fatalError("Not implemented")
+}
+
+final class EpisodesViewModel: ObservableObject {
+    @Published var podcastName: String?
+    @Published var isPodcastFavorite: Bool?
+    @Published var episodeCellViewModels: [EpisodeCellViewModel] = []
     private let model: EpisodesModel
-    private var subscription: Subscription!
+    private var podcast: Podcast!
+    private var subscriptions: [Subscription] = []
     init(model: EpisodesModel) {
         self.model = model
-        podcastName.value = model.podcast.name
+        self.model
+            .subscribe { [weak self] in self?.updateWithModel($0) }
+            .stored(in: &subscriptions)
     }
     
-    func favoriteButtonTapped() {
-        if !isPodcastFavorite.value { model.addPodcastToFavorites() }
+    func savePodcastAsFavorite() {
+        if isPodcastFavorite != nil, isPodcastFavorite == true {
+            model.savePodcastAsFavorite()
+        }
     }
     
-    func pickEpisode(_ index: Int) {
-        model.pickEpisode(episodeIndex: index)
+    func playEpisode(withIndex index: Int) {
+        model.playEpisode(withIndex: index)
     }
     
-    func downloadEpisode(_ index: Int) {
-    }
-    
-    func initialize() {
-        model.initialize()
+    private func updateWithModel(_ event: EpisodesModelEvent) {
+        switch event {
+        case .initial(let podcast, let episodes, let isPodcastFavorite):
+            self.podcast = podcast
+            podcastName = podcast.name
+            episodeCellViewModels = episodes.map { createEpisodeCellViewModel(episode: $0, podcast: podcast) }
+            self.isPodcastFavorite = isPodcastFavorite
+        case .episodesFetched(let episodes):
+            episodeCellViewModels = episodes.map { createEpisodeCellViewModel(episode: $0, podcast: podcast) }
+            break
+        case .podcastStatusUpdated(let isPodcastFavorite):
+            self.isPodcastFavorite = isPodcastFavorite
+        }
     }
 }

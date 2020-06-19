@@ -67,7 +67,7 @@ final class FavoritesPodcastController: UICollectionViewController, UICollection
             let podcast = favoritePodcastsModel.podcasts[podcastIndex]
             let alertController = UIAlertController(title: "Delete \(podcast.name ?? "") podcast from favorites?", message: nil, preferredStyle: .actionSheet)
             let deleteAction = UIAlertAction(title: "Yes", style: .destructive) { [weak self] _ in
-                self?.favoritePodcastsModel.deletePodcast(podcastIndex: podcastIndex)
+                self?.favoritePodcastsModel.removeFromFavorites(podcastIndex: podcastIndex)
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
                 alertController.dismiss(animated: true, completion: nil)

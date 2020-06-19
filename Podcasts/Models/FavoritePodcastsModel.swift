@@ -9,56 +9,52 @@
 import Foundation
 import PromiseKit
 
+enum FavoritePodcastsModelEvent {
+    case initial([Podcast], Bool)
+    case favoritePodcastsUpdated([Podcast])
+}
+
 final class FavoritePodcastsModel {
-    private(set) var podcasts: [Podcast] = []
-    private var storageSubscription: Subscription!
-    private let storage: FavoritePodcastsStoraging
-    var subscriber: ((Event) -> Void)!
-    init(favoritePodcastsStorage: FavoritePodcastSaving) {
-        self.storage = favoritePodcastsStorage
-        subscribeToFavoritePodcastsStorage()
-    }
-    
-    func initialize() {
-    }
-    
-    func deletePodcast(podcastIndex index: Int) {
-        storage.delete(podcast: podcasts[index])
-    }
-    
-    private func subscribeToFavoritePodcastsStorage() {
-        storage.subscribe { event in
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                
-                switch event {
-                case .podcastSaved:
-                    firstly {
-                        self.updatePodcastsWithStorage()
-                    }.done {
-                        self.subscriber(.podcastSaved)
-                    }.catch { _ in }
-                    break
-                case .podcastDeleted:
-                    firstly {
-                        self.updatePodcastsWithStorage()
-                    }.done {
-                        self.subscriber(.podcastDeleted)
-                    }.catch { _ in }
-                    break
-                }
-            }
-        }.done { subscription in
-            self.storageSubscription = subscription
-        }.catch { _ in }
-    }
-    
-    private func updatePodcastsWithStorage() -> Promise<Void> {
-        firstly {
-            storage.getPodcasts()
-        }.then { podcasts -> Promise<Void> in
-            self.podcasts = podcasts
-            return Promise.value
+    private var podcasts: [Podcast] = [] {
+        didSet {
+            fetching = false
+            subscribers.fire(.favoritePodcastsUpdated(self.podcasts))
         }
+    }
+    private var fetching: Bool = true
+    private let storage: FavoritePodcastsStoraging
+    init(favoritePodcastsStorage: FavoritePodcastsStoraging) {
+        storage = favoritePodcastsStorage
+        storage
+            .subscribe { [unowned self] in self.updateWithFavoritePodcastsStorage($0) }
+            .stored(in: &subscriptions)
+    }
+    
+    func removeFromFavorites(podcastIndex index: Int) {
+        storage.removeFromFavorites(podcast: podcasts[index])
+    }
+    // MARK: - subscriptions
+    private var subscriptions: [Subscription] = []
+    
+    private func updateWithFavoritePodcastsStorage(_ event: FavoritePodcastsStorageEvent) {
+        switch event {
+        case .initial(let podcasts):
+            self.podcasts = podcasts
+            break
+        case .removed(_, let podcasts):
+            self.podcasts = podcasts
+            break
+        case .saved(_, let podcasts):
+            self.podcasts = podcasts
+            break
+        }
+    }
+    // MARK: - subscribers
+    private var subscribers = Subscribers<FavoritePodcastsModelEvent>()
+    func subscribe(
+        _ subscriber: @escaping (FavoritePodcastsModelEvent) -> Void
+    ) -> Subscription {
+        subscriber(.initial(podcasts, fetching))
+        return subscribers.subscribe(action: subscriber)
     }
 }

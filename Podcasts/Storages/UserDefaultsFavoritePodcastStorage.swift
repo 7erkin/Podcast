@@ -9,7 +9,7 @@
 import Foundation
 import PromiseKit
 
-final class UserDefaultsFavoritePodcastStorage: FavoritePodcastStoraging {
+final class UserDefaultsFavoritePodcastStorage: FavoritePodcastsStoraging {
     // MARK: - constants
     fileprivate let favoritePodcastKey = "favoritePodcastKey"
     fileprivate let serviceQueue = DispatchQueue(
@@ -21,7 +21,7 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastStoraging {
     )
     private var storage: UserDefaults { return UserDefaults.standard }
     private var _podcasts: [Podcast] = []
-    private var subscribers = Subscribers<FavoritePodcastStorageEvent>()
+    private var subscribers = Subscribers<FavoritePodcastsStorageEvent>()
     // MARK: -
     private init() {
         if storage.value(forKey: favoritePodcastKey) == nil {
@@ -49,7 +49,7 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastStoraging {
         }
     }
     
-    func removeFromFavorite(podcast: Podcast) {
+    func removeFromFavorites(podcast: Podcast) {
         serviceQueue.async { [weak self] in
             guard let self = self else { return }
             
@@ -60,7 +60,7 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastStoraging {
         }
     }
     
-    func subscribe(_ subscriber: @escaping (FavoritePodcastStorageEvent) -> Void) -> Subscription {
+    func subscribe(_ subscriber: @escaping (FavoritePodcastsStorageEvent) -> Void) -> Subscription {
         return subscribers.subscribe(action: subscriber)
     }
     // MARK: - helpers

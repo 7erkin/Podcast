@@ -21,7 +21,7 @@ enum TrackListPlayerEvent {
 }
 
 protocol TrackListPlaying: class {
-    func setTrackList(_ trackList: [Track], playingTrackIndex index: Int)
+    func setTrackList(_ trackList: [Track], withPlayingTrackIndex trackIndex: Int)
     func playNextTrack()
     func playPreviousTrack()
     func hasNextTrack() -> Bool

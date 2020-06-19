@@ -108,6 +108,6 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
     }
     
     private func getRecordDirectoryName(forSavedEpisode episode: Episode) -> String {
-        return "default"
+        return "record-\(UUID())"
     }
 }

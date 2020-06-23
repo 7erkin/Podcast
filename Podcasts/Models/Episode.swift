@@ -10,6 +10,12 @@ import Foundation
 import FeedKit
 
 struct Episode: Codable, Equatable {
+    static let dateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        return dateFormatter
+    }()
+    
     var name: String
     var author: String
     var publishDate: Date

@@ -46,7 +46,7 @@ final class FavoritePodcastsController: UICollectionViewController, UICollection
                         var snapshot = Snapshot()
                         snapshot.appendSections([.main])
                         snapshot.appendItems($0, toSection: .main)
-                        self.dataSource.apply(snapshot, animatingDifferences: false, completion: nil)
+                        self.dataSource.apply(snapshot, animatingDifferences: true, completion: nil)
                     }
             ].store(in: &self.subscriptions)
         }
@@ -54,9 +54,9 @@ final class FavoritePodcastsController: UICollectionViewController, UICollection
     
     private func setupCollectionView() {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGestureHappened(_:)))
-        longPressGesture.minimumPressDuration = 1
+        longPressGesture.minimumPressDuration = 0.5
+        longPressGesture.numberOfTapsRequired = 1
         collectionView.addGestureRecognizer(longPressGesture)
-        collectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: false)
         collectionView.backgroundColor = .white
         collectionView.register(FavoritePodcastCell.self, forCellWithReuseIdentifier: FavoritePodcastsController.cellId)
         collectionView.dataSource = dataSource
@@ -102,20 +102,36 @@ final class FavoritePodcastsController: UICollectionViewController, UICollection
         return dataSource.snapshot().numberOfItems
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
         let itemWidth = (collectionView.bounds.width - (2 * sideInset + spacingBetweenItems)) / 2
         return CGSize(width: itemWidth, height: itemWidth + 46)
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumInteritemSpacingForSectionAt section: Int
+    ) -> CGFloat {
         return spacingBetweenItems
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        minimumLineSpacingForSectionAt section: Int
+    ) -> CGFloat {
         return spacingBetweenItems
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        insetForSectionAt section: Int
+    ) -> UIEdgeInsets {
         return UIEdgeInsets(top: sideInset, left: sideInset, bottom: sideInset, right: sideInset)
     }
     

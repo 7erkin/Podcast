@@ -6,11 +6,8 @@
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
-import Foundation
+import Foundation 
 import PromiseKit
-
-// Error to interrupt Promise chain
-struct BreakPromiseChainError: Error {}
 
 final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
     private(set) var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]

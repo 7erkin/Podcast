@@ -16,14 +16,14 @@ enum EpisodeDownloadingStatus {
     case finishedWithCancelation
 }
 
-enum EpisodeCellModelEvent {
+enum EpisodeModelEvent {
     case initial(Episode, EpisodeDownloadingStatus)
     case episodeDownloadingStatusChanged(EpisodeDownloadingStatus)
 }
 
-final class EpisodeCellModel {
+final class EpisodeModel {
     private var subscriptions: [Subscription] = []
-    private var subscribers = Subscribers<EpisodeCellModelEvent>()
+    private var subscribers = Subscribers<EpisodeModelEvent>()
     private let episode: Episode
     private let podcast: Podcast
     private var episodeDownloadingStatus: EpisodeDownloadingStatus = .notStarted
@@ -76,7 +76,7 @@ final class EpisodeCellModel {
         }
     }
 
-    func subscribe(_ subscriber: @escaping (EpisodeCellModelEvent) -> Void) -> Subscription {
+    func subscribe(_ subscriber: @escaping (EpisodeModelEvent) -> Void) -> Subscription {
         subscriber(.initial(episode, episodeDownloadingStatus))
         return subscribers.subscribe(action: subscriber)
     }

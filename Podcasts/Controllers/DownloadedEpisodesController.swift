@@ -11,6 +11,12 @@ import UIKit
 import PromiseKit
 
 final class DownloadedEpisodesController: UITableViewController {
+    typealias DataSource = UITableViewDiffableDataSource<Section, _EpisodeCellViewModel>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, _EpisodeCellViewModel>
+    enum Section {
+        case currentDownloadings
+        case downloadedEpisodes
+    }
     private let cellId = "cellId"
     var viewModel: DownloadedEpisodesViewModel! {
         didSet {

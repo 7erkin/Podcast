@@ -10,7 +10,7 @@ import Foundation
 import Combine
 
 func createEpisodeCellViewModel(episode: Episode, podcast: Podcast) -> EpisodeCellViewModel {
-    let model = EpisodeCellModel(
+    let model = EpisodeModel(
         episode: episode,
         podcast: podcast,
         recordRepository: ServiceLocator.recordRepository
@@ -18,7 +18,7 @@ func createEpisodeCellViewModel(episode: Episode, podcast: Podcast) -> EpisodeCe
     return EpisodeCellViewModel(model: model)
 }
 
-final class EpisodesViewModel: ObservableObject {
+final class EpisodesViewModel {
     @Published private(set) var podcastName: String?
     @Published private(set) var isPodcastFavorite: Bool?
     @Published private(set) var episodeCellViewModels: [EpisodeCellViewModel] = []

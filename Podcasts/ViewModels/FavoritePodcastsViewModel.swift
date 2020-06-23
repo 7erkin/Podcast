@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-final class FavoritePodcastsViewModel: ObservableObject {
+final class FavoritePodcastsViewModel {
     @Published var badgeText: String? = "NEW!"
     @Published var favoritePodcastCellViewModels: [FavoritePodcastCellViewModel] = []
     @Published var favoritePodcastsFetching: Bool = true
@@ -50,6 +50,6 @@ final class FavoritePodcastsViewModel: ObservableObject {
     }
     
     private func isPodcastAdded(_ podcasts: [Podcast]) -> Bool {
-        return podcasts.count != favoritePodcastCellViewModels.count
+        return podcasts.count > favoritePodcastCellViewModels.count
     }
 }

@@ -13,30 +13,30 @@ import CoreImage
 
 final class EpisodeCell: UITableViewCell {
     private var subscriptions: Set<AnyCancellable> = []
-    var viewModel: EpisodeCellViewModel! {
+    var viewModel: EpisodeCellOutput! {
         didSet {
             if self.viewModel != nil {
                 let imageSize = episodeImageView.frame.size
                 loadingImageIndicator.startAnimating()
                 [
-                    self.viewModel.$publishDate.sink { [unowned self] in
+                    self.viewModel.publishDatePublisher.sink { [unowned self] in
                         self.publishDateLabel.text = $0
                     },
-                    self.viewModel.$episodeName.sink { [unowned self] in
+                    self.viewModel.episodeNamePublisher.sink { [unowned self] in
                         self.episodeNameLabel.text = $0
                     },
-                    self.viewModel.$description.sink { [unowned self] in
+                    self.viewModel.descriptionPublisher.sink { [unowned self] in
                         self.descriptionLabel.text = $0
                     },
-                    self.viewModel.$progress
+                    self.viewModel.downloadingProgressPublisher
                         .receive(on: DispatchQueue.main)
                         .sink { [unowned self] in
                             self.progressLabel.text = $0
                         },
-                    self.viewModel.$isEpisodeDownloaded
+                    self.viewModel.isEpisodeDownloadedPublisher
                         .receive(on: DispatchQueue.main)
                         .sink { [unowned self] in self.episodeDownloadedIndicator.isHidden = $0 },
-                    self.viewModel.episodeImage
+                    self.viewModel.episodeImagePublisher
                         .receive(on: DispatchQueue.global(qos: .userInitiated))
                         .map { downsample(imageData: $0, to: imageSize, scale: UITraitCollection.current.displayScale) }
                         .receive(on: DispatchQueue.main)

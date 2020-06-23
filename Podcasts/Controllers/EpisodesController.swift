@@ -114,7 +114,7 @@ final class EpisodesController: UITableViewController {
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
         if
-            let viewModel = (tableView.cellForRow(at: indexPath) as? EpisodeCell)?.viewModel,
+            let viewModel = (tableView.cellForRow(at: indexPath) as? EpisodeCell)?.viewModel as? EpisodeCellViewModel,
             viewModel.isEpisodeDownloaded == false
         {
             let action = UIContextualAction(style: .normal, title: "Download") { (_, _, completionHandler) in

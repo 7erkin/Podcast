@@ -14,16 +14,23 @@ final class AppPlayerController: UIViewController {
     typealias AppPlayerViewAnimator = (AppPlayerView) -> Void
     
     private var appPlayerView: AppPlayerView { return view as! AppPlayerView }
-    private var playerSubscription: Subscription!
+    private var subscriptions: [Subscription] = []
     private var hasAppPlayerViewBeenPresented = false
     // MARK: - dependencies
     var dissmisAnimationInvoker: AppPlayerViewAnimator!
     var enlargeAnimationInvoker: AppPlayerViewAnimator!
-    weak var player: Player! {
+    weak var player: PlayingTrackManaging! {
         didSet {
-            playerSubscription = self.player.subscribe { [weak self] event in
-                self?.updateWithPlayer(withEvent: event)
-            }
+            self.player
+                .subscribe { [unowned self] in
+                    switch $0 {
+                    case .initial(let playerState):
+                        self.updateViewWithModel(playerState)
+                    case .playerStateUpdated(let playerState):
+                        self.updateViewWithModel(playerState)
+                    }
+                }
+                .stored(in: &subscriptions)
         }
     }
     // MARK: - lifecycle methods
@@ -39,22 +46,12 @@ final class AppPlayerController: UIViewController {
         super.viewDidLoad()
     }
     // MARK: - helpers
-    private func updateWithPlayer(withEvent event: PlayerEvent) {
+    private func updateViewWithModel(_ playerState: PlayerState) {
         if !hasAppPlayerViewBeenPresented {
             enlargeAnimationInvoker(appPlayerView)
             hasAppPlayerViewBeenPresented = true
         }
         
-        switch event {
-        case .playerStateUpdated:
-            appPlayerView.playerState = player.playerState
-            break
-        case .playingEpisodeUpdated:
-            appPlayerView.episode = player.playingEpisode
-            break
-        case .playingPodcastUpdated:
-            break
-        }
     }
 }
 
@@ -68,7 +65,7 @@ extension AppPlayerController: PlayerManaging {
     }
     
     func moveToPlaybackTime(_ playbackTime: CMTime) {
-        player.moveToPlaybackTime(playbackTime)
+        player.setPlaybackTime(playbackTime)
     }
     
     func playPause() {

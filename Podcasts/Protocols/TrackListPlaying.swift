@@ -16,7 +16,7 @@ struct Track {
 
 enum TrackListPlayerEvent {
     case initial([Track], Int)
-    case playingTrackUpdated(Int)
+    case playingTrackUpdated([Track], Int)
     case trackListUpdated([Track], Int)
 }
 
@@ -24,8 +24,6 @@ protocol TrackListPlaying: class {
     func setTrackList(_ trackList: [Track], withPlayingTrackIndex trackIndex: Int)
     func playNextTrack()
     func playPreviousTrack()
-    func hasNextTrack() -> Bool
-    func hasPreviousTrack() -> Bool
     func subscribe(
         _ subscriber: @escaping (TrackListPlayerEvent) -> Void
     ) -> Subscription

@@ -7,18 +7,19 @@
 //
 
 import Foundation
+import Combine
 
-final class PodcastsSearchModel {
+final class PodcastsSearchViewModel {
+    @Published private(set) var podcastCellViewModels: [PodcastCellViewModel] = []
     private let podcastFetcher: PodcastFetching
-    private(set) var podcasts: [Podcast] = []
     init(podcastFetcher: PodcastFetching) {
         self.podcastFetcher = podcastFetcher
     }
     
-    func fetchPodcasts(bySearchText searchText: String) {
+    func findPodcasts(bySearchText searchText: String) {
         podcastFetcher.fetchPodcasts(searchText: searchText) { [weak self] podcasts in
             DispatchQueue.main.async {
-                self?.podcasts = podcasts
+                self?.podcastCellViewModels = podcasts.map { PodcastCellViewModel(podcast: $0) }
             }
         }
     }

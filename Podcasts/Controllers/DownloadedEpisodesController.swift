@@ -12,9 +12,8 @@ import PromiseKit
 
 final class DownloadedEpisodesController: UITableViewController {
     private let cellId = "cellId"
-    var model: DownloadedEpisodesModel! {
+    var viewModel: DownloadedEpisodesViewModel! {
         didSet {
-            model.subscriber = { [weak self] event in self?.updateViewWithModel(withEvent: event) }
         }
     }
     private var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
@@ -24,7 +23,6 @@ final class DownloadedEpisodesController: UITableViewController {
         super.viewDidLoad()
         let nib = UINib(nibName: "EpisodeCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: cellId)
-        model.initialize()
     }
     
     // MARK: - UITableView
@@ -44,10 +42,10 @@ final class DownloadedEpisodesController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! EpisodeCell
         let index = indexPath.row
         if indexPath.section == .zero {
-            cell.episode = downloadingEpisodes.keys[index]
+//            cell.episode = downloadingEpisodes.keys[index]
         } else {
-            cell.episode = episodes[index]
-            cell.episodeRecordStatus = EpisodeRecordStatus.none
+//            cell.episode = episodes[index]
+//            cell.episodeRecordStatus = EpisodeRecordStatus.none
         }
         return cell
     }
@@ -57,80 +55,27 @@ final class DownloadedEpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        model.pickEpisode(episodeIndex: indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        switch (tableView.cellForRow(at: indexPath) as! EpisodeCell).episodeRecordStatus {
-        case .downloading(_):
-            let action = UIContextualAction(style: .normal, title: "Cancel") { (_, _, completionHandler) in
-                completionHandler(true)
-            }
-            let configuration = UISwipeActionsConfiguration(actions: [action])
-            return configuration
-        default:
-            let action = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (_, _, completionHandler) in
-                guard let self = self else { return }
-                
-                let deletedEpisode = self.model.storedEpisodes[indexPath.row]
-                self.model.delete(episode: deletedEpisode)
-                completionHandler(true)
-            }
-            let configuration = UISwipeActionsConfiguration(actions: [action])
-            return configuration
-        }
-    }
-    // MARK: - helpers
-    private func updateViewWithModel(withEvent event: DownloadedEpisodesModel.Event) {
-        switch event {
-        case .initialized:
-            downloadingEpisodes = model.downloadingEpisodes
-            episodes = model.storedEpisodes
-            tableView.reloadData()
-            break
-        case .episodePicked:
-            if let index = model.pickedEpisodeIndex {
-                let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0))
-                cell?.isHighlighted = true
-            }
-            break
-        case .episodeDeleted:
-            let nextEpisodes = model.storedEpisodes
-            // functional approach is here
-            let index = episodes.firstIndex(where: not • nextEpisodes.contains)!
-            episodes = nextEpisodes
-            tableView.deleteRows(at: [IndexPath(row: index, section: 1)], with: .right)
-            break
-        case .episodeStartDownloading:
-            let nextDownloadingEpisodes = model.downloadingEpisodes
-            let index = nextDownloadingEpisodes.firstIndex(where: { downloadingEpisodes[$0.key] == nil })!
-            downloadingEpisodes = nextDownloadingEpisodes
-            tableView.performBatchUpdates({
-                tableView.insertRows(at: [IndexPath(row: index, section: 0)], with: .left)
-            }, completion: nil)
-        case .episodeDownloaded:
-            let nextDownloadingEpisodes = model.downloadingEpisodes
-            let nextStoredEpisodes = model.storedEpisodes
-            let dIndex = downloadingEpisodes.firstIndex(where: { nextDownloadingEpisodes[$0.key] == nil })!
-            // functional approach is here
-            let sIndex = nextStoredEpisodes.firstIndex(where: not • episodes.contains)!
-            episodes = nextStoredEpisodes
-            downloadingEpisodes = nextDownloadingEpisodes
-            tableView.performBatchUpdates({
-                tableView.deleteRows(at: [IndexPath(row: dIndex, section: 0)], with: .right)
-                tableView.insertRows(at: [IndexPath(row: sIndex, section: 1)], with: .left)
-            }, completion: nil)
-            break
-        case .episodeDownloadingProgressUpdated:
-            let cellsToUpdate = tableView.visibleCells
-                .filter { tableView.indexPath(for: $0)?.section == 0 }
-                .compactMap { $0 }
-                .map { $0 as! EpisodeCell }
-            for (episode, progress) in model.downloadingEpisodes {
-                if let index = cellsToUpdate.firstIndex(where: { $0.episode == episode }) {
-                    cellsToUpdate[index].episodeRecordStatus = .downloading(progress: progress)
-                }
-            }
-        }
+//        switch (tableView.cellForRow(at: indexPath) as! EpisodeCell).episodeRecordStatus {
+//        case .downloading(_):
+//            let action = UIContextualAction(style: .normal, title: "Cancel") { (_, _, completionHandler) in
+//                completionHandler(true)
+//            }
+//            let configuration = UISwipeActionsConfiguration(actions: [action])
+//            return configuration
+//        default:
+//            let action = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (_, _, completionHandler) in
+//                guard let self = self else { return }
+//
+//                let deletedEpisode = self.model.storedEpisodes[indexPath.row]
+//                self.model.delete(episode: deletedEpisode)
+//                completionHandler(true)
+//            }
+//            let configuration = UISwipeActionsConfiguration(actions: [action])
+//            return configuration
+//        }
+        return nil
     }
 }

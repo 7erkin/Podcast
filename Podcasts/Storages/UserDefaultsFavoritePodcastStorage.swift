@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PromiseKit
 
 final class UserDefaultsFavoritePodcastStorage: FavoritePodcastsStoraging {
     // MARK: - constants
@@ -19,14 +18,16 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastsStoraging {
         autoreleaseFrequency: .workItem,
         target: nil
     )
-    private var storage: UserDefaults { return UserDefaults.standard }
-    private var _podcasts: [Podcast] = []
-    private var subscribers = Subscribers<FavoritePodcastsStorageEvent>()
     // MARK: -
-    private init() {
-        if storage.value(forKey: favoritePodcastKey) == nil {
-            let emptyPodcasts = try! JSONEncoder().encode([Podcast]())
-            storage.set(emptyPodcasts, forKey: favoritePodcastKey)
+    private var podcasts: [Podcast]
+    private var subscribers = Subscribers<FavoritePodcastsStorageEvent>()
+    init() {
+        if let podcasts: [Podcast] = UserDefaults.standard.extract(withKey: favoritePodcastKey) {
+            self.podcasts = podcasts
+        } else {
+            let podcasts = try! JSONEncoder().encode([Podcast]())
+            UserDefaults.standard.set(podcasts, forKey: favoritePodcastKey)
+            self.podcasts = []
         }
     }
     // MARK: - FavoritePodcastStoraging
@@ -34,18 +35,16 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastsStoraging {
         serviceQueue.async { [weak self] in
             guard let self = self else { return }
             
-            self.loadPodcastsIfNeeded()
-            if self._podcasts.contains(podcast) {
-                return
-            }
+            if self.podcasts.contains(podcast) { return }
             
-            if self._podcasts.isEmpty {
-                self._podcasts.append(podcast)
+            if self.podcasts.isEmpty {
+                self.podcasts.append(podcast)
             } else {
-                self._podcasts.insert(podcast, at: 0)
+                self.podcasts.insert(podcast, at: 0)
             }
             
-            self.save(self._podcasts.serialized)
+            UserDefaults.standard.set(self.podcasts.serialized, forKey: self.favoritePodcastKey)
+            self.subscribers.fire(.saved(podcast, self.podcasts))
         }
     }
     
@@ -53,31 +52,17 @@ final class UserDefaultsFavoritePodcastStorage: FavoritePodcastsStoraging {
         serviceQueue.async { [weak self] in
             guard let self = self else { return }
             
-            if let index = self._podcasts.firstIndex(of: podcast) {
-                self._podcasts.remove(at: index)
-                self.save(self._podcasts.serialized)
+            if let index = self.podcasts.firstIndex(of: podcast) {
+                self.podcasts.remove(at: index)
+                UserDefaults.standard.set(self.podcasts.serialized, forKey: self.favoritePodcastKey)
+                self.subscribers.fire(.removed(podcast, self.podcasts))
             }
         }
     }
     
     func subscribe(_ subscriber: @escaping (FavoritePodcastsStorageEvent) -> Void) -> Subscription {
+        subscriber(.initial(podcasts))
         return subscribers.subscribe(action: subscriber)
-    }
-    // MARK: - helpers
-    private func loadPodcastsIfNeeded() {
-        if _podcasts.isEmpty {
-            _podcasts = loadPodcastsFromStorage()
-        }
-    }
-    
-    private func loadPodcastsFromStorage() -> [Podcast] {
-        guard let serializedPodcasts = self.storage.value(forKey: self.favoritePodcastKey) as? Data else { fatalError("UB") }
-        
-        return [Podcast].deserialize(from: serializedPodcasts)
-    }
-    
-    private func save(_ serializedPodcasts: Data) {
-        self.storage.set(serializedPodcasts, forKey: self.favoritePodcastKey)
     }
 }
 
@@ -86,7 +71,15 @@ private extension Array where Element == Podcast {
         return try! JSONEncoder().encode(self)
     }
     static func deserialize(from data: Data) -> Self {
-        return try! JSONDecoder().decode(Self.self, from: data)
+        return try! JSONDecoder().decode(self, from: data)
     }
 }
 
+extension UserDefaults {
+    func extract<T: Decodable>(withKey key: String) -> T? {
+        if let serializedObject = value(forKey: key) as? Data {
+            return try? JSONDecoder().decode(T.self, from: serializedObject)
+        }
+        return nil
+    }
+}

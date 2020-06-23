@@ -8,18 +8,75 @@
 
 import Foundation
 import UIKit
+import Combine
 
 final class EpisodesController: UITableViewController {
-    private let cellId = "episodeCell"
+    typealias DataSource = UITableViewDiffableDataSource<Section, EpisodeCellViewModel>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, EpisodeCellViewModel>
+    enum Section {
+        case main
+    }
+    private static let cellId = "episodeCell"
     private var favoriteButton: FavoriteButtonItem {
         return navigationItem.rightBarButtonItem as! FavoriteButtonItem
     }
+    private var subscriptions: Set<AnyCancellable> = []
+    private lazy var dataSource = makeDataSource()
     // MARK: - dependencies
     var viewModel: EpisodesViewModel!
-    // MARK: - view life cycles
+    // MARK: - view lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
+        setupFavoriteButton()
+        tableView.delegate = self
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setupBindings()
+    }
+    // MARK: - interaction handlers
+    @objc
+    private func onFavoriteButtonTapped() {
+        viewModel.savePodcastAsFavorite()
+    }
+    // MARK: - helpers
+    private func makeDataSource() -> DataSource {
+        return DataSource(tableView: tableView) { (tableView, indexPath, viewModel) -> UITableViewCell? in
+            let cell = tableView.dequeueReusableCell(withIdentifier: EpisodesController.cellId, for: indexPath) as! EpisodeCell
+            cell.viewModel = viewModel
+            return cell
+        }
+    }
+    
+    private func setupBindings() {
+        viewModel.$podcastName
+            .sink { [unowned self] in self.navigationItem.title = $0 }
+            .store(in: &subscriptions)
+        viewModel.$isPodcastFavorite
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] in self.favoriteButton.isFavorite = $0 }
+            .store(in: &subscriptions)
+        viewModel.$episodeCellViewModels
+            .receive(on: DispatchQueue.main)
+            .sink { [unowned self] in
+                var snapshot = Snapshot()
+                snapshot.appendSections([.main])
+                snapshot.appendItems($0, toSection: .main)
+                self.dataSource.apply(snapshot, animatingDifferences: false, completion: nil)
+            }
+            .store(in: &subscriptions)
+    }
+    
+    private func setupTableView() {
+        let nib = UINib(nibName: "EpisodeCell", bundle: nil)
+        tableView.register(nib, forCellReuseIdentifier: EpisodesController.cellId)
+        tableView.tableFooterView = UIView()
+        tableView.dataSource = dataSource
+    }
+    
+    private func setupFavoriteButton() {
         let favoriteButton = FavoriteButtonItem(
             title: "",
             style: .plain,
@@ -28,40 +85,9 @@ final class EpisodesController: UITableViewController {
         )
         navigationItem.rightBarButtonItem = favoriteButton
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
-    // MARK: - interaction handlers
-    @objc
-    private func onFavoriteButtonTapped() {
-        viewModel.savePodcastAsFavorite()
-    }
-    // MARK: - helpers
-    private func setupTableView() {
-        let nib = UINib(nibName: "EpisodeCell", bundle: nil)
-        tableView.register(nib, forCellReuseIdentifier: cellId)
-        tableView.tableFooterView = UIView()
-    }
-    
-//    private func selectRow(at indexPath: IndexPath) {
-//        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
-//        tableView.cellForRow(at: indexPath)!.isSelected = true
-//    }
-    
     // MARK: - UITableView
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! EpisodeCell
-        cell.viewModel = viewModel.episodeCellViewModels.value[indexPath.row]
-        return cell
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.episodeCellViewModels.value.count
-    }
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        viewModel.pickEpisode(indexPath.row)
+    
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -76,18 +102,29 @@ final class EpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return viewModel.episodeCellViewModels.value.isEmpty ? 200 : 0
+        return dataSource.snapshot().numberOfItems == 0 ? 250 : 0
     }
     
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        if !viewModel.storedEpisodeIndices.value.contains(indexPath.row) {
-            let action = UIContextualAction(style: .normal, title: "Download") { [weak self] (_, _, completionHandler) in
-                self?.viewModel.downloadEpisode(indexPath.row)
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
+        if
+            let viewModel = (tableView.cellForRow(at: indexPath) as? EpisodeCell)?.viewModel,
+            viewModel.isEpisodeDownloaded == false
+        {
+            let action = UIContextualAction(style: .normal, title: "Download") { (_, _, completionHandler) in
+                viewModel.downloadEpisode()
                 completionHandler(true)
             }
             let configuration = UISwipeActionsConfiguration(actions: [action])
             return configuration
         }
+        
         return nil
     }
 }

@@ -10,6 +10,9 @@ import AVKit
 
 final class Player: PlayingTrackManaging, TrackListPlaying {
     // MARK: - private properties
+    private var subscriptions: [Subscription] = []
+    private var playingTrackManagerSubscribers = Subscribers<PlayingTrackManagerEvent>()
+    private var trackListPlayerSubscribers = Subscribers<TrackListPlayerEvent>()
     private lazy var player: AVPlayer = {
         let player = AVPlayer()
         player.automaticallyWaitsToMinimizeStalling = false
@@ -17,12 +20,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] _ in
             guard let self = self else { return }
             if let item = self.player.currentItem {
-                self.playerState = PlayerState(
-                    timePast: item.currentTime(),
-                    duration: item.duration,
-                    volumeLevel: 10,
-                    isPlaying: self.player.timeControlStatus == .playing
-                )
+
             }
         }
         return player
@@ -38,7 +36,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         }
     }
     static let shared = Player()
-    // MARK: - player api
+    // MARK: - PlayingTrackManaging
     func fastForward15() {
         shiftByTime(15)
     }
@@ -47,28 +45,36 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         shiftByTime(-15)
     }
     
+    func setPlaybackTime(_ time: CMTime) {
+        seekToTime(time)
+    }
+    
+    func setVolumeLevel(_ volumeLevel: Int) {
+        
+    }
+    
+    func subscribe(_ subscriber: @escaping (PlayingTrackManagerEvent) -> Void) -> Subscription {
+        return playingTrackManagerSubscribers.subscribe(action: subscriber)
+    }
+    
     func playPause() {
 
     }
-    
-    func moveToPlaybackTime(_ playbackTime: CMTime) {
-        seekToTime(playbackTime)
+    // MARK: - TrackListPlaying
+    func setTrackList(_ trackList: [Track], withPlayingTrackIndex trackIndex: Int) {
+            
     }
     
-    func nextEpisode() {
-        playList.pickNextEpisode()
+    func playNextTrack() {
+        
     }
     
-    func previousEpisode() {
-        playList.pickPreviousEpisode()
+    func playPreviousTrack() {
+        
     }
     
-    func hasNextEpisode() -> Bool {
-        return playList.hasNextEpisode()
-    }
-    
-    func hasPreviousEpisode() -> Bool {
-        return playList.hasPreviousEpisode()
+    func subscribe(_ subscriber: @escaping (TrackListPlayerEvent) -> Void) -> Subscription {
+        trackListPlayerSubscribers.subscribe(action: subscriber)
     }
     // MARK: - helpers
     private func shiftByTime(_ time: Int64) {

@@ -11,51 +11,29 @@ import PromiseKit
 import MediaPlayer
 
 final class LockScreenPlayerController {
-    private var playerSubscription: Subscription!
-    // MARK: - dependencies
-    weak var player: Player! {
+    private var subscriptions: [Subscription] = []
+    var player: PlayingTrackManaging! {
         didSet {
-            self.playerSubscription = player.subscribe { [weak self] event in
-                self?.updateViewWithModel(withEvent: event)
-            }
-        }
-    }
-    // MARK: - helpers
-    private func updateViewWithModel(withEvent event: PlayerEvent) {
-        switch event {
-        case .playerStateUpdated:
-            updateLockscreenCurrentTime(withPlayerState: player.playerState)
-        case .playingEpisodeUpdated:
-            updateNowPlayingInfo(withEpisode: player.playingEpisode)
-        default:
-            break
+            self.player
+                .subscribe { [unowned self] in
+                    switch $0 {
+                    case .initial(let playerState):
+                        self.updateViewWithModel(playerState)
+                    case .playerStateUpdated(let playerState):
+                        self.updateViewWithModel(playerState)
+                    }
+                }
+                .stored(in: &subscriptions)
         }
     }
     
-    private func updateNowPlayingInfo(withEpisode episode: Episode) {
+    private func updateViewWithModel(_ playerState: PlayerState) {
         let lockScreenMediaCenter = MPNowPlayingInfoCenter.default()
-//        if let imageUrl = episode.imageUrl {
-//            _ = firstly {
-//                imageFetcher.fetchImage(withImageUrl: imageUrl)
-//            }.done(on: .main, flags: nil) { (image) in
-//                let artwork = MPMediaItemArtwork(boundsSize: image.size) { (_) -> UIImage in
-//                    return image
-//                }
-//                lockScreenMediaCenter.nowPlayingInfo![MPMediaItemPropertyArtwork] = artwork
-//            }
-//        } else {
-//            
-//        }
-        
         var info = [String:Any]()
-        info[MPMediaItemPropertyTitle] = episode.name
-        info[MPMediaItemPropertyArtist] = episode.author
+        info[MPMediaItemPropertyTitle] = playerState.track.episode.name
+        info[MPMediaItemPropertyArtist] = playerState.track.episode.author
         lockScreenMediaCenter.nowPlayingInfo = info
-    }
-    
-    private func updateLockscreenCurrentTime(withPlayerState playerState: PlayerState) {
-        let lockScreenMediaCenter = MPNowPlayingInfoCenter.default()
-        lockScreenMediaCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playerState.timePast.roundedSeconds
-        lockScreenMediaCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = playerState.duration.roundedSeconds
+        lockScreenMediaCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playerState.trackPlaybackTime.roundedSeconds
+        lockScreenMediaCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = playerState.trackDuration.roundedSeconds
     }
 }

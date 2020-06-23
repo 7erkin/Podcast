@@ -54,13 +54,13 @@
                         <rect key="frame" x="406" y="8" width="40" height="48"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XLu-WS-ofo">
-                                <rect key="frame" x="7" y="0.0" width="26" height="26"/>
+                                <rect key="frame" x="7" y="0.0" width="26" height="27"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="26" id="F6A-ub-PQg"/>
                                     <constraint firstAttribute="height" constant="26" id="OnH-X8-uaq"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="21"/>
-                                <state key="normal" backgroundImage="square.and.arrow.down" catalog="system">
+                                <state key="normal" backgroundImage="icloud.and.arrow.down" catalog="system">
                                     <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="medium" weight="bold"/>
                                 </state>
                             </button>
@@ -91,9 +91,9 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <connections>
                 <outlet property="descriptionLabel" destination="quF-JU-aLX" id="kAA-zl-P09"/>
+                <outlet property="episodeDownloadedIndicator" destination="XLu-WS-ofo" id="Sn8-fv-0wX"/>
                 <outlet property="episodeImageView" destination="0vJ-7f-Ba8" id="Pjq-7F-fAw"/>
                 <outlet property="episodeNameLabel" destination="ZHm-08-Ek9" id="i7D-eH-e3X"/>
-                <outlet property="episodeRecordDownloadIndicator" destination="XLu-WS-ofo" id="RMV-G7-3fh"/>
                 <outlet property="loadingImageIndicator" destination="iiK-nN-iQy" id="dkg-cl-EZY"/>
                 <outlet property="progressLabel" destination="ztN-L0-FqO" id="BOT-YS-u99"/>
                 <outlet property="publishDateLabel" destination="W31-Ox-3fD" id="zjr-Qu-1y4"/>
@@ -102,6 +102,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="square.and.arrow.down" catalog="system" width="60" height="64"/>
+        <image name="icloud.and.arrow.down" catalog="system" width="64" height="56"/>
     </resources>
 </document>

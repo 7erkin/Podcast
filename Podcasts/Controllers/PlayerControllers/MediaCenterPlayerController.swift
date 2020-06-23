@@ -11,13 +11,13 @@ import AVKit
 import MediaPlayer
 
 final class MediaCenterPlayerController {
-    private var playerSubscription: Subscription!
+    private var subscriptions: [Subscription] = []
     // MARK: - dependency
-    weak var player: Player! {
+    weak var player: (TrackListPlaying & PlayingTrackManaging)! {
         didSet {
-            playerSubscription = self.player.subscribe { [weak self] _ in
-                self?.updateViewWithModel()
-            }
+            self.player
+                .subscribe { [weak self] in self?.updateViewWithTrackListPlayer($0) }
+                .stored(in: &subscriptions)
         }
     }
     // MARK: -
@@ -33,11 +33,11 @@ final class MediaCenterPlayerController {
             return .success
         }
         let playPreviousEpisodeHandler: (MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus = { [weak self] _ in
-            self?.player.previousEpisode()
+            self?.player.playPreviousTrack()
             return .success
         }
         let playNextEpisodeHandler: (MPRemoteCommandEvent) -> MPRemoteCommandHandlerStatus = { [weak self] _ in
-            self?.player.nextEpisode()
+            self?.player.playNextTrack()
             return .success
         }
         
@@ -56,9 +56,20 @@ final class MediaCenterPlayerController {
         mediaCenter.nextTrackCommand.addTarget(handler: playNextEpisodeHandler)
     }
     
-    private func updateViewWithModel() {
-        let mediaCenter = MPRemoteCommandCenter.shared()
-        mediaCenter.nextTrackCommand.isEnabled = player.hasNextEpisode()
-        mediaCenter.previousTrackCommand.isEnabled = player.hasPreviousEpisode()
+    private func updateViewWithTrackListPlayer(_ event: TrackListPlayerEvent) {
+        let update: ([Track], Int) -> Void = {
+            let mediaCenter = MPRemoteCommandCenter.shared()
+            mediaCenter.nextTrackCommand.isEnabled = $0.count != $1 + 1
+            mediaCenter.previousTrackCommand.isEnabled = $1 != 0
+        }
+        
+        switch event {
+        case .initial(let trackList, let playingTrackIndex):
+            update(trackList, playingTrackIndex)
+        case .playingTrackUpdated(let trackList, let playingTrackIndex):
+            update(trackList, playingTrackIndex)
+        case .trackListUpdated(let trackList, let playingTrackIndex):
+            update(trackList, playingTrackIndex)
+        }
     }
 }

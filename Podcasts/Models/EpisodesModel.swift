@@ -11,16 +11,16 @@ import PromiseKit
 
 enum EpisodesModelEvent {
     case initial(Podcast, [Episode], Bool)
-    case episodesFetched([Episode])
+    case episodesFetched(Podcast, [Episode])
     case podcastStatusUpdated(Bool)
 }
 
 final class EpisodesModel {
     private var podcast: Podcast
-    private var episodes: [Episode] = [] { didSet { subscribers.fire(.episodesFetched(self.episodes)) } }
+    private var episodes: [Episode] = [] { didSet { subscribers.fire(.episodesFetched(podcast, self.episodes)) } }
     private var isPodcastFavorite: Bool = false { didSet { subscribers.fire(.podcastStatusUpdated(self.isPodcastFavorite)) } }
     // MARK: - dependencies
-    private var podcastStorage: FavoritePodcastStoraging
+    private var podcastStorage: FavoritePodcastsStoraging
     private var trackListPlayer: TrackListPlaying
     private var episodeFetcher: EpisodeFetching
     // MARK: -
@@ -29,7 +29,7 @@ final class EpisodesModel {
     // MARK: -
     init(
         podcast: Podcast,
-        podcastStorage: FavoritePodcastStoraging,
+        podcastStorage: FavoritePodcastsStoraging,
         episodeFetcher: EpisodeFetching,
         trackListPlayer: TrackListPlaying
     ) {
@@ -41,24 +41,27 @@ final class EpisodesModel {
         self.podcastStorage
             .subscribe { [weak self] in self?.updateWithFavoritePodcastsStorage($0) }
             .stored(in: &subscriptions)
+        
+        fetchEpisodes()
     }
-    // MARK: - public api
+    
     func subscribe(
         _ subscriber: @escaping (EpisodesModelEvent) -> Void
     ) -> Subscription {
         subscriber(.initial(podcast, episodes, isPodcastFavorite))
         return subscribers.subscribe(action: subscriber)
     }
+    
     func savePodcastAsFavorite() {
         podcastStorage.saveAsFavorite(podcast: podcast)
     }
     
     func playEpisode(withIndex index: Int) {
         let trackList = episodes.map { Track(episode: $0, podcast: podcast, url: $0.streamUrl) }
-        trackListPlayer.setTrackList(trackList, playingTrackIndex: index)
+        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
     }
-    
-    func fetchEpisodes() {
+    // MARK: - helpers
+    private func fetchEpisodes() {
         if let feedUrl = self.podcast.feedUrl {
             episodeFetcher.fetchEpisodes(url: feedUrl) { [weak self] episodes in
                 DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -70,7 +73,7 @@ final class EpisodesModel {
         }
     }
     
-    private func updateWithFavoritePodcastsStorage(_ event: FavoritePodcastStorageEvent) {
+    private func updateWithFavoritePodcastsStorage(_ event: FavoritePodcastsStorageEvent) {
         switch event {
         case .initial(let podcasts):
             isPodcastFavorite = podcasts.contains(podcast)

@@ -7,67 +7,87 @@
 //
 
 import UIKit
+import Combine
 
-protocol FavoritesPodcastControllerCoordinatorDelegate: class {
-    func choose(podcast: Podcast)
-}
-
-final class FavoritesPodcastController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
-    private let cellId = "cellId"
+final class FavoritePodcastsController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
+    typealias DataSource = UICollectionViewDiffableDataSource<Section, FavoritePodcastCellViewModel>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, FavoritePodcastCellViewModel>
+    enum Section {
+        case main
+    }
+    private static let cellId = "favoritePodcastCell"
     private let sideInset: CGFloat = 16
     private let spacingBetweenItems: CGFloat = 16
-    private var podcasts: [Podcast] = []
+    private var subscriptions: Set<AnyCancellable> = []
+    private lazy var dataSource = makeDataSource()
     // MARK: - dependencies
-    weak var coordinator: FavoritesPodcastControllerCoordinatorDelegate!
-    var favoritePodcastsModel: FavoritePodcastsModel! {
-        didSet {
-            self.favoritePodcastsModel.initialize()
-            self.favoritePodcastsModel.subscriber = { [weak self] in
-                self?.updateViewWithModel(withEvent: $0)
-            }
-        }
-    }
+    var viewModel: FavoritePodcastsViewModel!
     // MARK: -
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        navigationController?.tabBarItem.badgeValue = nil
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupCollectionView()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setupBindings()
+        viewModel.viewBecomeVisible()
+    }
+    // MARK: - setup
+    private lazy var setupBindings: () -> Void = { [unowned self] in
+        executeOnce {
+            [
+                self.viewModel.$badgeText
+                    .receive(on: DispatchQueue.main)
+                    .sink { self.navigationController?.tabBarItem.badgeValue = $0 },
+                self.viewModel.$favoritePodcastCellViewModels
+                    .receive(on: DispatchQueue.main)
+                    .sink {
+                        var snapshot = Snapshot()
+                        snapshot.appendSections([.main])
+                        snapshot.appendItems($0, toSection: .main)
+                        self.dataSource.apply(snapshot, animatingDifferences: false, completion: nil)
+                    }
+            ].store(in: &self.subscriptions)
+        }
+    }()
+    
+    private func setupCollectionView() {
         let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(onLongPressGestureHappened(_:)))
         longPressGesture.minimumPressDuration = 1
         collectionView.addGestureRecognizer(longPressGesture)
+        collectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: false)
         collectionView.backgroundColor = .white
-        collectionView.register(FavoritesPodcastCell.self, forCellWithReuseIdentifier: cellId)
+        collectionView.register(FavoritePodcastCell.self, forCellWithReuseIdentifier: FavoritePodcastsController.cellId)
+        collectionView.dataSource = dataSource
     }
-    
-    private func updateViewWithModel(withEvent event: FavoritePodcastsModel.Event) {
-        switch event {
-        case .initialized:
-            podcasts = favoritePodcastsModel.podcasts
-            collectionView.reloadData()
-        case .podcastSaved:
-            let index = favoritePodcastsModel.podcasts.firstIndex(where: { !podcasts.contains($0) })!
-            podcasts = favoritePodcastsModel.podcasts
-            collectionView.insertItems(at: [IndexPath(item: index, section: 0)])
-            navigationController?.tabBarItem.badgeValue = "NEW"
-        case .podcastDeleted:
-            let index = podcasts.firstIndex(where: { !favoritePodcastsModel.podcasts.contains($0) })!
-            podcasts = favoritePodcastsModel.podcasts
-            collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
+    // MARK: - helpers
+    private func makeDataSource() -> DataSource {
+        return DataSource(collectionView: collectionView) { (collectionView, indexPath, viewModel) -> UICollectionViewCell? in
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: FavoritePodcastsController.cellId,
+                for: indexPath
+            ) as! FavoritePodcastCell
+            cell.viewModel = viewModel
+            return cell
         }
     }
-    
+    // MARK: - interaction handlers
     @objc
     private func onLongPressGestureHappened(_ gesture: UILongPressGestureRecognizer) {
         let gestureLocation = gesture.location(in: collectionView)
-        if let indexPath = collectionView.indexPathForItem(at: gestureLocation) {
-            let podcastIndex = indexPath.row
-            let podcast = favoritePodcastsModel.podcasts[podcastIndex]
-            let alertController = UIAlertController(title: "Delete \(podcast.name ?? "") podcast from favorites?", message: nil, preferredStyle: .actionSheet)
+        if
+            let indexPath = collectionView.indexPathForItem(at: gestureLocation),
+            let cell = collectionView.cellForItem(at: indexPath) as? FavoritePodcastCell
+        {
+            let podcast = cell.viewModel.podcast
+            let alertController = UIAlertController(
+                title: "Delete \(podcast.name ?? "") podcast from favorites?",
+                message: nil,
+                preferredStyle: .actionSheet
+            )
             let deleteAction = UIAlertAction(title: "Yes", style: .destructive) { [weak self] _ in
-                self?.favoritePodcastsModel.removeFromFavorites(podcastIndex: podcastIndex)
+                self?.viewModel.removePodcastFromFavorites(podcast)
             }
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { _ in
                 alertController.dismiss(animated: true, completion: nil)
@@ -79,13 +99,7 @@ final class FavoritesPodcastController: UICollectionViewController, UICollection
     }
     // MARK: - UICollectionView
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return podcasts.count
-    }
-
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! FavoritesPodcastCell
-        cell.podcast = podcasts[indexPath.row]
-        return cell
+        return dataSource.snapshot().numberOfItems
     }
 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -106,7 +120,17 @@ final class FavoritesPodcastController: UICollectionViewController, UICollection
     }
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let podcast = podcasts[indexPath.row]
-        coordinator.choose(podcast: podcast)
+        if let podcast = dataSource.itemIdentifier(for: indexPath)?.podcast {
+            let model = EpisodesModel(
+                podcast: podcast,
+                podcastStorage: ServiceLocator.favoritePodcastsStorage,
+                episodeFetcher: ServiceLocator.podcastService,
+                trackListPlayer: Player.shared
+            )
+            let viewModel = EpisodesViewModel(model: model)
+            let controller = EpisodesController()
+            controller.viewModel = viewModel
+            navigationController?.pushViewController(controller, animated: true)
+        }
     }
 }

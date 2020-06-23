@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum EpisodeRecordsModelEvent {
+enum DownloadedEpisodesModelEvent {
     case initial([EpisodeRecordDescriptor], OrderedDictionary<Episode, Double>)
     case episodeDownloadingFinishWithCancel(Episode, OrderedDictionary<Episode, Double>)
     case episodeDownloadingFinishWithError(Episode, OrderedDictionary<Episode, Double>)
@@ -16,8 +16,8 @@ enum EpisodeRecordsModelEvent {
     case episodeRecordRemoved(Episode, [EpisodeRecordDescriptor])
 }
 
-final class EpisodeRecordsModel {
-    private var subscribers = Subscribers<EpisodeRecordsModelEvent>()
+final class DownloadedEpisodesModel {
+    private var subscribers = Subscribers<DownloadedEpisodesModelEvent>()
     private var subscriptions: [Subscription] = []
     private var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
     private var episodeRecords: [EpisodeRecordDescriptor] = []
@@ -40,7 +40,7 @@ final class EpisodeRecordsModel {
     }
     
     func subscribe(
-        _ subscriber: @escaping (EpisodeRecordsModelEvent) -> Void
+        _ subscriber: @escaping (DownloadedEpisodesModelEvent) -> Void
     ) -> Subscription {
         subscriber(.initial(episodeRecords, downloadingEpisodes))
         return subscribers.subscribe(action: subscriber)
@@ -65,7 +65,7 @@ final class EpisodeRecordsModel {
     
     func playEpisode(withIndex index: Int) {
         let trackList = episodeRecords.map { Track(episode: $0.episode, podcast: $0.podcast, url: $0.recordUrl) }
-        trackListPlayer.setTrackList(trackList, playingTrackIndex: index)
+        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
     }
     
     func cancelEpisodeRecordDownloading(withIndex index: Int) {

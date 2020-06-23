@@ -10,7 +10,10 @@ import Foundation
 
 final class ServiceLocator {
     static let podcastService: PodcastFetching & EpisodeFetching & EpisodeRecordFetching = ITunesService.shared
-    static let favoritePodcastStorage: FavoritePodcastSaving & FavoritePodcastRemoving = UserDefaultsFavoritePodcastStorage.shared
-    static let episodeRecordStorage: EpisodeRecordStoraging = FileSystemRecordsStorage.shared!
-    static let episodeRecordRepository: EpisodeRecordDownloading & EpisodeRecordRemoving = EpisodeRecordsRepository.shared
+    static let recordStorage: EpisodeRecordStoraging = FileSystemRecordsStorage()!
+    static let recordRepository: EpisodeRecordRepositoring = EpisodeRecordsRepository(
+        recordStorage: ServiceLocator.recordStorage,
+        recordFetcher: ServiceLocator.podcastService
+    )
+    static let favoritePodcastsStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastStorage()
 }

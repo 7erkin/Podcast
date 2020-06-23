@@ -7,19 +7,23 @@
 //
 
 import UIKit
-import PromiseKit
+import Combine
 
-final class FavoritesPodcastCell: UICollectionViewCell {
-    var podcast: Podcast! {
-        didSet {
-            updateViewWithModel()
-        }
-    }
-    
+final class FavoritePodcastCell: UICollectionViewCell {
     private let imageView = UIImageView()
     private let nameLabel = UILabel()
     private let artistNameLabel = UILabel()
     private let loadingImageIndicator = UIActivityIndicatorView()
+    private var imageSubscription: AnyCancellable?
+    var viewModel: FavoritePodcastCellViewModel! {
+        didSet {
+            if self.viewModel != nil {
+                artistNameLabel.text = self.viewModel.artistName
+                nameLabel.text = self.viewModel.podcastName
+                loadingImageIndicator.startAnimating()
+            }
+        }
+    }
     
     private func stylizeUI() {
         nameLabel.text = "Podcast name"
@@ -52,36 +56,9 @@ final class FavoritesPodcastCell: UICollectionViewCell {
         addSubview(loadingImageIndicator)
     }
     
-    private var timer: Timer?
-    private func updateViewWithModel() {
-        artistNameLabel.text = podcast.artistName ?? ""
-        nameLabel.text = podcast.name ?? ""
-        if let imageUrl = podcast.imageUrl {
-            if !loadingImageIndicator.isAnimating {
-                loadingImageIndicator.startAnimating()
-            }
-            
-            timer?.invalidate()
-//            timer = Timer(timeInterval: 1.0, repeats: false) { [weak self] _ in
-//                guard let self = self else { return }
-//                
-//                firstly {
-//                    EpisodeCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
-//                }.done(on: .main, flags: nil) { (image) in
-//                    if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
-//                        self.imageView.image = image
-//                    }
-//                }.ensure(on: .main, flags: nil) {
-//                    self.loadingImageIndicator.stopAnimating()
-//                }.catch(on: .main, flags: nil, policy: .allErrors) { _ in }
-//            }
-            timer?.tolerance = 0.2
-            RunLoop.current.add(timer!, forMode: .common)
-        }
-    }
-    
     override func prepareForReuse() {
         imageView.image = nil
+        viewModel = nil
     }
     
     override init(frame: CGRect) {
@@ -95,7 +72,25 @@ final class FavoritesPodcastCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private func updateImage() {
+        let imageSize = imageView.frame.size
+        imageSubscription?.cancel()
+        imageSubscription = viewModel.podcastImagePublisher
+//            .receive(on: DispatchQueue.global(qos: .userInitiated))
+//            .map { downsample(imageData: $0, to: imageSize, scale: UITraitCollection.current.displayScale) }
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { _ in },
+                receiveValue: { [unowned self] in
+                    self.imageView.image = UIImage(data: $0)!
+                    self.loadingImageIndicator.stopAnimating()
+                }
+            )
+    }
+    
     override func layoutSubviews() {
+        super.layoutSubviews()
         loadingImageIndicator.center = .init(x: bounds.width / 2, y: bounds.width / 2)
+        updateImage()
     }
 }

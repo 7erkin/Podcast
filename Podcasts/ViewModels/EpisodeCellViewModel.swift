@@ -10,19 +10,25 @@ import Foundation
 import UIKit
 import Combine
 
-final class EpisodeCellViewModel: ObservableObject {
+final class EpisodeCellViewModel {
     @Published var publishDate: String?
     @Published var episodeName: String?
     @Published var description: String?
     @Published var progress: String?
-    @Published var episodeImage: Data?
-    @Published var isEpisodeDownloaded: Bool?
+    var episodeImage: AnyPublisher<Data, URLError> {
+        URLSession.shared
+            .dataTaskPublisher(for: imageUrl)
+            .map(\.data)
+            .eraseToAnyPublisher()
+    }
+    @Published var isEpisodeDownloaded: Bool = false
     
+    private var imageUrl: URL!
     private let model: EpisodeCellModel
     private var timer: Timer?
-    
+    // fileprivate because of extension in the same file
+    fileprivate let identifier = UUID()
     private var subscriptions: [Subscription] = []
-   
     init(model: EpisodeCellModel) {
         self.model = model
         self.model
@@ -37,6 +43,8 @@ final class EpisodeCellViewModel: ObservableObject {
     private func updateWithModel(_ event: EpisodeCellModelEvent) {
         switch event {
         case .initial(let episode, let downloadingStatus):
+            // must be fixed
+            imageUrl = episode.imageUrl!
             episodeName = episode.name
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MMM dd, yyyy"
@@ -63,19 +71,21 @@ final class EpisodeCellViewModel: ObservableObject {
         }
     }
     
-    func fetchImage(withSize imageSize: CGSize) {
-        timer = Timer(timeInterval: 1, repeats: false) { [weak self] _ in
-            guard let self = self else { return }
-        }
-        timer?.tolerance = 0.2
-        RunLoop.current.add(timer!, forMode: .common)
-    }
-    
     func downloadEpisode() {
         model.downloadEpisode()
     }
     
     func cancelEpisodeDownloading() {
         model.cancelEpisodeDownloading()
+    }
+}
+
+extension EpisodeCellViewModel: Hashable {
+    static func == (lhs: EpisodeCellViewModel, rhs: EpisodeCellViewModel) -> Bool {
+        return lhs.identifier == rhs.identifier
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(identifier)
     }
 }

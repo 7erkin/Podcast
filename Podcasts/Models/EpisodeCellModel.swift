@@ -26,7 +26,7 @@ final class EpisodeCellModel {
     private var subscribers = Subscribers<EpisodeCellModelEvent>()
     private let episode: Episode
     private let podcast: Podcast
-    private var episodeDownloadingStatus: EpisodeDownloadingStatus!
+    private var episodeDownloadingStatus: EpisodeDownloadingStatus = .notStarted
     private let recordRepository: EpisodeRecordRepositoring
     init(episode: Episode, podcast: Podcast, recordRepository: EpisodeRecordRepositoring) {
         self.episode = episode

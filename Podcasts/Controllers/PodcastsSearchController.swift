@@ -8,34 +8,52 @@
 
 import Foundation
 import UIKit
-import Alamofire
-
-protocol PodcastsSearchControllerCoordinatorDelegate: class {
-    func choose(podcast: Podcast)
-}
+import Combine
 
 final class PodcastsSearchController: UITableViewController, UISearchBarDelegate {
-    let cellId = "podcastCell"
-    // MARK: - dependencies
-    weak var coordinator: PodcastsSearchControllerCoordinatorDelegate?
-    var podcastsSearchModel: PodcastsSearchModel! {
-        didSet {
-            self.podcastsSearchModel.subscriber = { [weak self]  _ in
-                self?.tableView.reloadData()
-            }
-        }
+    typealias DataSource = UITableViewDiffableDataSource<Section, PodcastCellViewModel>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, PodcastCellViewModel>
+    enum Section {
+        case main
     }
-    // MARK: -
-    let searchController = UISearchController(searchResultsController: nil)
-    
+    private static let cellId = "podcastCell"
+    private var subscriptions: Set<AnyCancellable> = []
+    private let searchController = UISearchController(searchResultsController: nil)
+    private lazy var dataSource = makeDataSource()
+    // MARK: - dependencies
+    var viewModel: PodcastsSearchViewModel!
+    // MARK: - view lifecycles
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupSearchBar()
         setupTableView()
     }
     
-    // MARK: - Common setup
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // MARK: - must be executed once
+        setupBindings()
+    }
+    // MARK: - helpers
+    private func makeDataSource() -> DataSource {
+        return DataSource(tableView: tableView) { (tableView, indexPath, viewModel) -> UITableViewCell? in
+            let cell = tableView.dequeueReusableCell(withIdentifier: PodcastsSearchController.cellId, for: indexPath) as! PodcastCell
+            cell.viewModel = viewModel
+            return cell
+        }
+    }
+    // MARK: - Setup
+    private lazy var setupBindings = { [unowned self] in
+        executeOnce {
+            self.viewModel.$podcastCellViewModels.sink { [unowned self] in
+                var snapshot = Snapshot()
+                snapshot.appendSections([.main])
+                snapshot.appendItems($0, toSection: .main)
+                self.dataSource.apply(snapshot, animatingDifferences: false, completion: nil)
+            }.store(in: &self.subscriptions)
+        }
+    }()
+    
     private func setupSearchBar() {
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
@@ -45,35 +63,20 @@ final class PodcastsSearchController: UITableViewController, UISearchBarDelegate
     
     private func setupTableView() {
         let nib = UINib(nibName: "PodcastCell", bundle: nil)
-        tableView.register(nib, forCellReuseIdentifier: cellId)
+        tableView.register(nib, forCellReuseIdentifier: PodcastsSearchController.cellId)
+        tableView.dataSource = dataSource
         // hack to remove empty rows when no podcast is provided
         tableView.tableFooterView = UIView()
     }
-    
-    private func fetchPodcasts(withSearchText searchText: String) {
-        podcastsSearchModel.fetchPodcasts(bySearchText: searchText)
+    // MARK: - UISearchBarDelegate
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.findPodcasts(bySearchText: searchText)
     }
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        fetchPodcasts(withSearchText: searchText)
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        viewModel.findPodcasts(bySearchText: searchBar.text ?? "")
     }
     // MARK: - UITableView
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let podcast = podcastsSearchModel.podcasts[indexPath.row]
-        coordinator?.choose(podcast: podcast)
-    }
-    
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return podcastsSearchModel.podcasts.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellId, for: indexPath) as! PodcastCell
-        let podcast = podcastsSearchModel.podcasts[indexPath.row]
-        cell.podcast = podcast
-        return cell
-    }
-    
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let label = UILabel()
         label.text = "Please enter a Search Term"
@@ -83,10 +86,25 @@ final class PodcastsSearchController: UITableViewController, UISearchBarDelegate
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return podcastsSearchModel.podcasts.count == 0 ? 250 : 0
+        return dataSource.snapshot().numberOfItems == 0 && !searchController.hasSearchText ? 250 : 0
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 132
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let podcast = dataSource.itemIdentifier(for: indexPath)?.podcast {
+            let model = EpisodesModel(
+                podcast: podcast,
+                podcastStorage: ServiceLocator.favoritePodcastsStorage,
+                episodeFetcher: ServiceLocator.podcastService,
+                trackListPlayer: Player.shared
+            )
+            let viewModel = EpisodesViewModel(model: model)
+            let controller = EpisodesController()
+            controller.viewModel = viewModel
+            navigationController?.pushViewController(controller, animated: true)
+        }
     }
 }

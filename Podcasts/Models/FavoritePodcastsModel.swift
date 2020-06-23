@@ -11,16 +11,12 @@ import PromiseKit
 
 enum FavoritePodcastsModelEvent {
     case initial([Podcast], Bool)
+    case favoritePodcastsFetched([Podcast])
     case favoritePodcastsUpdated([Podcast])
 }
 
 final class FavoritePodcastsModel {
-    private var podcasts: [Podcast] = [] {
-        didSet {
-            fetching = false
-            subscribers.fire(.favoritePodcastsUpdated(self.podcasts))
-        }
-    }
+    private var podcasts: [Podcast] = []
     private var fetching: Bool = true
     private let storage: FavoritePodcastsStoraging
     init(favoritePodcastsStorage: FavoritePodcastsStoraging) {
@@ -30,8 +26,8 @@ final class FavoritePodcastsModel {
             .stored(in: &subscriptions)
     }
     
-    func removeFromFavorites(podcastIndex index: Int) {
-        storage.removeFromFavorites(podcast: podcasts[index])
+    func removeFromFavorites(podcast: Podcast) {
+        storage.removeFromFavorites(podcast: podcast)
     }
     // MARK: - subscriptions
     private var subscriptions: [Subscription] = []
@@ -40,13 +36,16 @@ final class FavoritePodcastsModel {
         switch event {
         case .initial(let podcasts):
             self.podcasts = podcasts
-            break
+            fetching = false
+            subscribers.fire(.favoritePodcastsFetched(podcasts))
         case .removed(_, let podcasts):
+            fetching = false
             self.podcasts = podcasts
-            break
+            subscribers.fire(.favoritePodcastsUpdated(podcasts))
         case .saved(_, let podcasts):
+            fetching = false
             self.podcasts = podcasts
-            break
+            subscribers.fire(.favoritePodcastsUpdated(podcasts))
         }
     }
     // MARK: - subscribers

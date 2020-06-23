@@ -9,50 +9,47 @@
 import Foundation
 import UIKit
 import PromiseKit
+import Combine
 
 final class PodcastCell: UITableViewCell {
-    @IBOutlet var podcastImageView: UIImageView!
-    @IBOutlet var trackNameLabel: UILabel!
-    @IBOutlet var artistNameLabel: UILabel!
-    @IBOutlet var episodeCountLabel: UILabel!
-    @IBOutlet var loadingImageIndicator: UIActivityIndicatorView! {
+    @IBOutlet private var podcastImageView: UIImageView!
+    @IBOutlet private var trackNameLabel: UILabel!
+    @IBOutlet private var artistNameLabel: UILabel!
+    @IBOutlet private var episodeCountLabel: UILabel!
+    @IBOutlet private var loadingImageIndicator: UIActivityIndicatorView! {
         didSet {
             self.loadingImageIndicator.hidesWhenStopped = true
+        }
+    }
+    private var subscriptions: Set<AnyCancellable> = []
+    var viewModel: PodcastCellViewModel! {
+        didSet {
+            if self.viewModel != nil {
+                loadingImageIndicator.startAnimating()
+                trackNameLabel.text = self.viewModel.podcastName
+                artistNameLabel.text = self.viewModel.artistName
+                episodeCountLabel.text = self.viewModel.episodeCount
+                let imageSize = podcastImageView.frame.size
+                self.viewModel.podcastImagePublisher
+                    .receive(on: DispatchQueue.global(qos: .userInitiated))
+                    .map { downsample(imageData: $0, to: imageSize, scale: UITraitCollection.current.displayScale) }
+                    .receive(on: DispatchQueue.main)
+                    .sink(
+                        receiveCompletion: { _ in },
+                        receiveValue: { [weak self] in
+                            self?.podcastImageView.image = $0
+                            self?.loadingImageIndicator.stopAnimating()
+                        }
+                    )
+                    .store(in: &subscriptions)
+            }
         }
     }
     
     override func prepareForReuse() {
         podcastImageView.image = nil
-    }
-    
-    var timer: Timer?
-    var podcast: Podcast! {
-        didSet {
-            trackNameLabel.text = podcast.name
-            artistNameLabel.text = podcast.artistName
-            episodeCountLabel.text = "\(podcast.episodeCount ?? 0) Episodes"
-            if let imageUrl = podcast.imageUrl {
-                if !loadingImageIndicator.isAnimating {
-                    loadingImageIndicator.startAnimating()
-                }
-                
-                timer?.invalidate()
-                timer = Timer(timeInterval: 1.0, repeats: false) { [weak self] _ in
-                    guard let self = self else { return }
-                    
-//                    firstly {
-//                        PodcastCell.imageFetcher.fetchImage(withImageUrl: imageUrl)
-//                    }.done(on: .main, flags: nil) { (image) in
-//                        if let actualUrl = self.podcast.imageUrl, imageUrl == actualUrl {
-//                            self.podcastImageView.image = image
-//                        }
-//                    }.ensure(on: .main, flags: nil) {
-//                        self.loadingImageIndicator.stopAnimating()
-//                    }.catch(on: .main, flags: nil, policy: .allErrors) { _ in }
-                }
-                timer?.tolerance = 0.2
-                RunLoop.current.add(timer!, forMode: .common)
-            }
-        }
+        subscriptions.forEach { $0.cancel() }
+        subscriptions = []
+        viewModel = nil
     }
 }

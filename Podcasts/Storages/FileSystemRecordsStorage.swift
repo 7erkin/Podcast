@@ -106,8 +106,18 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
             return Promise { resolver in resolver.fulfill(isExist) }
         }
     }
-    
+    // must be refactored
     private func getRecordDirectoryName(forSavedEpisode episode: Episode) -> String {
-        return "record-\(UUID())"
+        let streamUrl = episode.streamUrl
+        if let components = URLComponents(url: streamUrl, resolvingAgainstBaseURL: false) {
+            if let queryItems = components.queryItems {
+                let collectionIdIndex = queryItems.firstIndex(where: { $0.name == "awCollectionId" })!
+                let episodeIdIndex = queryItems.firstIndex(where: { $0.name == "awEpisodeId" })!
+                let collectionId = queryItems[collectionIdIndex].value!
+                let episodeId = queryItems[episodeIdIndex].value!
+                return "\(collectionId).\(episodeId)"
+            }
+        }
+        fatalError("UB")
     }
 }

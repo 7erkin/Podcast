@@ -9,17 +9,17 @@
 import Foundation
 
 enum DownloadedEpisodesModelEvent {
-    case initial([EpisodeRecordDescriptor], OrderedDictionary<Episode, Double>)
-    case episodeDownloadingFinishWithCancel(Episode, OrderedDictionary<Episode, Double>)
-    case episodeDownloadingFinishWithError(Episode, OrderedDictionary<Episode, Double>)
-    case episodeDownloaded(Episode, [EpisodeRecordDescriptor], OrderedDictionary<Episode, Double>)
+    case initial([EpisodeRecordDescriptor], [CurrentDownloadEpisode])
+    case episodeDownloadingFinishWithCancel(Episode, [CurrentDownloadEpisode])
+    case episodeDownloadingFinishWithError(Episode, [CurrentDownloadEpisode])
+    case episodeDownloaded(Episode, [EpisodeRecordDescriptor], [CurrentDownloadEpisode])
     case episodeRecordRemoved(Episode, [EpisodeRecordDescriptor])
 }
 
 final class DownloadedEpisodesModel {
     private var subscribers = Subscribers<DownloadedEpisodesModelEvent>()
     private var subscriptions: [Subscription] = []
-    private var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
+    private var downloadingEpisodes: [CurrentDownloadEpisode] = []
     private var episodeRecords: [EpisodeRecordDescriptor] = []
     // MARK: - dependencies
     private let recordRepository: EpisodeRecordRepositoring
@@ -59,7 +59,9 @@ final class DownloadedEpisodesModel {
     
     private func updateWithTrackListPlayer(_ event: TrackListPlayerEvent) {}
     
-    func removeEpisodeRecord(withIndex index: Int) {
+    func removeEpisodeRecord(_ episode: Episode) {
+        guard let index = episodeRecords.firstIndex(where: { $0.episode == episode }) else { fatalError() }
+        
         recordRepository.remove(recordDescriptor: episodeRecords[index])
     }
     

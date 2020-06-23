@@ -7,10 +7,39 @@
 //
 
 import Foundation
+import Combine
 
 final class DownloadedEpisodesViewModel {
+    @Published var downloadingEpisodes: [EpisodeCellViewModel] = []
+    @Published var downloadedEpisodes: [DownloadedEpisodeCellViewModel] = []
     private let model: DownloadedEpisodesModel
+    private var subscriptions: [Subscription] = []
     init(model: DownloadedEpisodesModel) {
         self.model = model
+        self.model
+            .subscribe { [unowned self] in self.updateWithModel($0) }
+            .stored(in: &subscriptions)
+    }
+    
+    func removeEpisodeRecord(_ episode: Episode) {
+        model.removeEpisodeRecord(episode)
+    }
+    
+    private func updateWithModel(_ event: DownloadedEpisodesModelEvent) {
+        switch event {
+        case .initial(let episodeRecords, let downloadingEpisodes):
+            self.downloadingEpisodes = downloadingEpisodes.map {
+                EpisodeCellViewModel(
+                    model: EpisodeModel(
+                        episode: $0.episode,
+                        podcast: $0.podcast,
+                        recordRepository: ServiceLocator.recordRepository
+                    )
+                )
+            }
+            downloadedEpisodes = episodeRecords.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
+        default:
+            break
+        }
     }
 }

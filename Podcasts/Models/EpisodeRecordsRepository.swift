@@ -10,7 +10,7 @@ import Foundation
 import PromiseKit
 
 final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
-    private(set) var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
+    private(set) var downloadingEpisodes: [CurrentDownloadEpisode] = []
     private var subscribers = Subscribers<EpisodeRecordRepositoryEvent>()
     private var downloadingRecordCancellers: [Episode:AsyncOperationCanceller] = [:]
     // MARK: - dependencies
@@ -33,7 +33,7 @@ final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
     func downloadRecord(ofEpisode episode: Episode, ofPodcast podcast: Podcast) {
         let progressHandler: (Double) -> Void = { _ in }
         let canceller = recordFetcher.fetchEpisodeRecord(episode: episode, progressHandler) { recordData in
-            self.downloadingEpisodes.removeValue(forKey: episode)
+            self.downloadingEpisodes.remove(withEpisode: episode)
             firstly {
                 self.recordStorage.saveRecord(recordData, ofEpisode: episode, ofPodcast: podcast)
             }.done {
@@ -46,7 +46,7 @@ final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
     func cancelDownloadingRecord(ofEpisode episode: Episode) {
         if let canceller = downloadingRecordCancellers.removeValue(forKey: episode) {
             canceller.cancel()
-            downloadingEpisodes.removeValue(forKey: episode)
+            downloadingEpisodes.remove(withEpisode: episode)
             subscribers.fire(.downloadingCancelled(episode, downloadingEpisodes))
         }
     }
@@ -58,5 +58,17 @@ final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
             subscriber(.initial($0, self.downloadingEpisodes))
         }.catch { _ in }
         return subscribers.subscribe(action: subscriber)
+    }
+}
+
+extension Array where Element == CurrentDownloadEpisode {
+    mutating func remove(withEpisode episode: Episode) {
+        if let index = self.firstIndex(where: { $0.episode == episode }) {
+            self.remove(at: index)
+        }
+    }
+    
+    subscript(episode: Episode) -> Double? {
+        return self.first(where: { $0.episode == episode })?.progress
     }
 }

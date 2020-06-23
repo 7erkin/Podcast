@@ -49,7 +49,8 @@ final class MainTabBarController: UITabBarController {
     private func setupRootViewControllers() {
         viewControllers = [
             createFavoritePodcastsController(),
-            createPodcastsSearchController()
+            createPodcastsSearchController(),
+            createDownloadedEpisodesController()
         ]
     }
     
@@ -74,6 +75,21 @@ final class MainTabBarController: UITabBarController {
         let navigationController = UINavigationController(rootViewController: controller)
         navigationController.tabBarItem.title = "Favorite"
         navigationController.tabBarItem.image = UIImage(named: "favorites")
+        navigationController.navigationBar.prefersLargeTitles = true
+        return navigationController
+    }
+    
+    private func createDownloadedEpisodesController() -> UIViewController {
+        let controller = DownloadedEpisodesController()
+        let model = DownloadedEpisodesModel(
+            recordRepository: ServiceLocator.recordRepository,
+            trackListPlayer: Player.shared
+        )
+        controller.viewModel = DownloadedEpisodesViewModel(model: model)
+        controller.navigationItem.title = "Downloads"
+        let navigationController = UINavigationController(rootViewController: controller)
+        navigationController.tabBarItem.title = "Downloads"
+        navigationController.tabBarItem.image = UIImage(named: "downloads")
         navigationController.navigationBar.prefersLargeTitles = true
         return navigationController
     }

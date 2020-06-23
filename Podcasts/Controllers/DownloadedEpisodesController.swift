@@ -21,11 +21,28 @@ final class DownloadedEpisodesController: UITableViewController {
     var viewModel: DownloadedEpisodesViewModel!
     private var downloadingEpisodes: OrderedDictionary<Episode, Double> = [:]
     private var episodes: [Episode] = []
-    private var dataSource: DataSource!
+    private lazy var dataSource = makeDataSource()
     override func viewDidLoad() {
         super.viewDidLoad()
         let nib = UINib(nibName: "EpisodeCell", bundle: nil)
         tableView.register(nib, forCellReuseIdentifier: DownloadedEpisodesController.cellId)
+        tableView.dataSource = dataSource
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setupBindings()
+    }
+    
+    private func makeDataSource() -> DataSource {
+        return DataSource(tableView: tableView) { (tableView, indexPath, viewModel) -> UITableViewCell? in
+            let cell = tableView.dequeueReusableCell(
+                withIdentifier: DownloadedEpisodesController.cellId,
+                for: indexPath
+            ) as! EpisodeCell
+            cell.viewModel = viewModel
+            return cell
+        }
     }
     
     private lazy var setupBindings: () -> Void = { [unowned self] in
@@ -53,27 +70,16 @@ final class DownloadedEpisodesController: UITableViewController {
     
     // MARK: - UITableView
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return section == .zero ? downloadingEpisodes.count : episodes.count
-    }
-    
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        let snapshot = dataSource.snapshot()
+        if section == snapshot.indexOfSection(.currentDownloadings) {
+            return snapshot.numberOfItems(inSection: .currentDownloadings)
+        } else {
+            return snapshot.numberOfItems(inSection: .downloadedEpisodes)
+        }
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return section == .zero ? "Downloading episodes" : " "
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: DownloadedEpisodesController.cellId, for: indexPath) as! EpisodeCell
-        let index = indexPath.row
-        if indexPath.section == .zero {
-//            cell.episode = downloadingEpisodes.keys[index]
-        } else {
-//            cell.episode = episodes[index]
-//            cell.episodeRecordStatus = EpisodeRecordStatus.none
-        }
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -83,25 +89,17 @@ final class DownloadedEpisodesController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     }
     
-    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-//        switch (tableView.cellForRow(at: indexPath) as! EpisodeCell).episodeRecordStatus {
-//        case .downloading(_):
-//            let action = UIContextualAction(style: .normal, title: "Cancel") { (_, _, completionHandler) in
-//                completionHandler(true)
-//            }
-//            let configuration = UISwipeActionsConfiguration(actions: [action])
-//            return configuration
-//        default:
-//            let action = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (_, _, completionHandler) in
-//                guard let self = self else { return }
-//
-//                let deletedEpisode = self.model.storedEpisodes[indexPath.row]
-//                self.model.delete(episode: deletedEpisode)
-//                completionHandler(true)
-//            }
-//            let configuration = UISwipeActionsConfiguration(actions: [action])
-//            return configuration
-//        }
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if section == dataSource.snapshot().indexOfSection(.downloadedEpisodes) {
+            return 250
+        }
+        return 0
+    }
+    
+    override func tableView(
+        _ tableView: UITableView,
+        trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+    ) -> UISwipeActionsConfiguration? {
         return nil
     }
 }

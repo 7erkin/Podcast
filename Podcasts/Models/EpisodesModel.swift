@@ -57,8 +57,8 @@ final class EpisodesModel {
     }
     
     func playEpisode(withIndex index: Int) {
-        let trackList = episodes.map { Track(episode: $0, podcast: podcast, url: $0.streamUrl) }
-        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
+//        let trackList = episodes.map { Track(episode: $0, podcast: podcast, url: $0.streamUrl) }
+//        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
     }
     // MARK: - helpers
     private func fetchEpisodes() {

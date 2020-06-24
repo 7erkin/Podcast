@@ -58,6 +58,18 @@ final class ITunesService: EpisodeFetching, PodcastFetching, EpisodeRecordFetchi
         _ progressHandler: ((Double) -> Void)?,
         _ completionHandler: @escaping (Data) -> Void
     ) -> AsyncOperationCanceller {
-        fatalError("Not implemented")
+        let downloadRequest = AF.download(episode.streamUrl)
+        downloadRequest.downloadProgress { progress in
+            progressHandler?(progress.fractionCompleted)
+        }
+        downloadRequest.responseData { dataResponse in
+            if let _ = dataResponse.error {
+                return
+            }
+            
+            let data = dataResponse.value!
+            completionHandler(data)
+        }
+        return { downloadRequest.cancel() }
     }
 }

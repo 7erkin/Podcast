@@ -10,17 +10,21 @@ import UIKit
 import Combine
 
 final class FavoritePodcastCell: UICollectionViewCell {
-    private let imageView = UIImageView()
+    private lazy var imageView: AsyncImageView = { [unowned self] in
+        let imageView = AsyncImageView()
+        imageView.startLoadingImage = { [unowned self] in self.loadingImageIndicator.startAnimating() }
+        imageView.finishLoadingImage = { [unowned self] in self.loadingImageIndicator.stopAnimating() }
+        return imageView
+    }()
     private let nameLabel = UILabel()
     private let artistNameLabel = UILabel()
     private let loadingImageIndicator = UIActivityIndicatorView()
-    private var imageSubscription: AnyCancellable?
     var viewModel: FavoritePodcastCellViewModel! {
         didSet {
             if self.viewModel != nil {
                 artistNameLabel.text = self.viewModel.artistName
                 nameLabel.text = self.viewModel.podcastName
-                loadingImageIndicator.startAnimating()
+                imageView.imageUrl = self.viewModel.podcastImageUrl
             }
         }
     }
@@ -72,25 +76,8 @@ final class FavoritePodcastCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func updateImage() {
-        let imageSize = imageView.frame.size
-        imageSubscription?.cancel()
-        imageSubscription = viewModel.podcastImagePublisher
-//            .receive(on: DispatchQueue.global(qos: .userInitiated))
-//            .map { downsample(imageData: $0, to: imageSize, scale: UITraitCollection.current.displayScale) }
-            .receive(on: DispatchQueue.main)
-            .sink(
-                receiveCompletion: { _ in },
-                receiveValue: { [unowned self] in
-                    self.imageView.image = UIImage(data: $0)!
-                    self.loadingImageIndicator.stopAnimating()
-                }
-            )
-    }
-    
     override func layoutSubviews() {
         super.layoutSubviews()
         loadingImageIndicator.center = .init(x: bounds.width / 2, y: bounds.width / 2)
-        updateImage()
     }
 }

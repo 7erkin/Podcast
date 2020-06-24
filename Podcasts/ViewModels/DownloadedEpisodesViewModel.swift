@@ -28,15 +28,17 @@ final class DownloadedEpisodesViewModel {
     private func updateWithModel(_ event: DownloadedEpisodesModelEvent) {
         switch event {
         case .initial(let episodeRecords, let downloadingEpisodes):
-            self.downloadingEpisodes = downloadingEpisodes.map {
+            self.downloadingEpisodes = downloadingEpisodes.keys.map {
                 EpisodeCellViewModel(
                     model: EpisodeModel(
-                        episode: $0.episode,
-                        podcast: $0.podcast,
+                        episode: $0,
+                        podcast: downloadingEpisodes[$0]!.podcast,
                         recordRepository: ServiceLocator.recordRepository
                     )
                 )
             }
+            downloadedEpisodes = episodeRecords.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
+        case .episodeRecordRemoved(_, let episodeRecords):
             downloadedEpisodes = episodeRecords.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
         default:
             break

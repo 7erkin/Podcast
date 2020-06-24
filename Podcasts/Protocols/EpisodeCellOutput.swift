@@ -12,8 +12,7 @@ import Combine
 protocol EpisodeCellOutput: class {
     var publishDatePublisher: Published<String?>.Publisher { get }
     var episodeNamePublisher: Published<String?>.Publisher { get }
-    // must be fixed to AnyPublisher<Data, Never>
-    var episodeImagePublisher: AnyPublisher<Data, URLError> { get }
+    var episodeImageUrlPublisher: Published<URL?>.Publisher { get }
     var descriptionPublisher: Published<String?>.Publisher { get }
     var downloadingProgressPublisher: Published<String?>.Publisher { get }
     var isEpisodeDownloadedPublisher: Published<Bool>.Publisher { get }

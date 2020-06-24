@@ -46,6 +46,10 @@
 		7CAA5DFE2473029400ADD087 /* FavoritePodcastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAA5DFD2473029400ADD087 /* FavoritePodcastCell.swift */; };
 		7CAA5E0524732E2300ADD087 /* UserDefaultsFavoritePodcastStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAA5E0424732E2300ADD087 /* UserDefaultsFavoritePodcastStorage.swift */; };
 		7CDB722924797EB600EF487D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7CDB722824797EB600EF487D /* Main.storyboard */; };
+		7CDCCB4F24A366DE00E26752 /* ImageFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDCCB4E24A366DE00E26752 /* ImageFetcher.swift */; };
+		7CDCCB5124A36EC900E26752 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDCCB5024A36EC900E26752 /* Cache.swift */; };
+		7CDCCB5324A3934E00E26752 /* AsyncImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDCCB5224A3934E00E26752 /* AsyncImageView.swift */; };
+		7CDCCB5524A39E2200E26752 /* DefferedBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDCCB5424A39E2200E26752 /* DefferedBlock.swift */; };
 		7CEC7A712485AB30008FB3FC /* downsample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEC7A702485AB30008FB3FC /* downsample.swift */; };
 		7CEC7A752485BF46008FB3FC /* Caching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEC7A742485BF46008FB3FC /* Caching.swift */; };
 		7CEC7A772485C497008FB3FC /* FileSystemLRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CEC7A762485C497008FB3FC /* FileSystemLRUCache.swift */; };
@@ -146,6 +150,10 @@
 		7CD902F9247A128D00838192 /* FavoritePodcastsStorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FavoritePodcastsStorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CD90307247A12F100838192 /* EpisodeRecordsStorageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EpisodeRecordsStorageTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7CDB722824797EB600EF487D /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		7CDCCB4E24A366DE00E26752 /* ImageFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFetcher.swift; sourceTree = "<group>"; };
+		7CDCCB5024A36EC900E26752 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
+		7CDCCB5224A3934E00E26752 /* AsyncImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImageView.swift; sourceTree = "<group>"; };
+		7CDCCB5424A39E2200E26752 /* DefferedBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefferedBlock.swift; sourceTree = "<group>"; };
 		7CEC7A702485AB30008FB3FC /* downsample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = downsample.swift; sourceTree = "<group>"; };
 		7CEC7A742485BF46008FB3FC /* Caching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Caching.swift; sourceTree = "<group>"; };
 		7CEC7A762485C497008FB3FC /* FileSystemLRUCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemLRUCache.swift; sourceTree = "<group>"; };
@@ -308,6 +316,7 @@
 				7C466D46246204F90014D33A /* EpisodeCell.xib */,
 				7CAA5DFD2473029400ADD087 /* FavoritePodcastCell.swift */,
 				7CEC7A8524871655008FB3FC /* FavoriteButtonItem.swift */,
+				7CDCCB5224A3934E00E26752 /* AsyncImageView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -409,7 +418,7 @@
 		7CEF30322468EDE80045AB91 /* Library */ = {
 			isa = PBXGroup;
 			children = (
-				B91E6D8C248A6CBB00019AEC /* Primitives */,
+				B91E6D8C248A6CBB00019AEC /* Helpers */,
 				B91E6D8B248A6C8100019AEC /* Functions */,
 				7CD90311247D976500838192 /* DataStructures */,
 			);
@@ -442,7 +451,7 @@
 			path = Functions;
 			sourceTree = "<group>";
 		};
-		B91E6D8C248A6CBB00019AEC /* Primitives */ = {
+		B91E6D8C248A6CBB00019AEC /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
 				7C3F93F92490021500835B7D /* AsyncOperationCanceller.swift */,
@@ -450,8 +459,11 @@
 				7C3F93FF2491852D00835B7D /* Subscribers.swift */,
 				7CEC7A782485C4BA008FB3FC /* AnyCache.swift */,
 				7CEC7A89248720C0008FB3FC /* Atomic.swift */,
+				7CDCCB4E24A366DE00E26752 /* ImageFetcher.swift */,
+				7CDCCB5024A36EC900E26752 /* Cache.swift */,
+				7CDCCB5424A39E2200E26752 /* DefferedBlock.swift */,
 			);
-			path = Primitives;
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		B91E6D9B248A7CD700019AEC /* Support */ = {
@@ -636,6 +648,7 @@
 				7C466D3F246188E10014D33A /* PodcastCell.swift in Sources */,
 				7CA423AB246788B0009C4A18 /* MinimizePlayerView.swift in Sources */,
 				7C35EE4D2460CBD30029DA95 /* AppDelegate.swift in Sources */,
+				7CDCCB5324A3934E00E26752 /* AsyncImageView.swift in Sources */,
 				B993FF1B249BB61200635B22 /* EpisodeCellOutput.swift in Sources */,
 				B9685B7E24A1ECEF0030DCAF /* _EpisodeCellViewModel.swift in Sources */,
 				7CAA5DFE2473029400ADD087 /* FavoritePodcastCell.swift in Sources */,
@@ -649,7 +662,9 @@
 				7CEC7A772485C497008FB3FC /* FileSystemLRUCache.swift in Sources */,
 				7C3654CE2475FE4700EB68C4 /* FavoritePodcastsModel.swift in Sources */,
 				7C35EE672460D6C30029DA95 /* Podcast.swift in Sources */,
+				7CDCCB4F24A366DE00E26752 /* ImageFetcher.swift in Sources */,
 				7CF47892249E02A70067D437 /* DownloadedEpisodesViewModel.swift in Sources */,
+				7CDCCB5124A36EC900E26752 /* Cache.swift in Sources */,
 				7C3654D02475FE8E00EB68C4 /* Array.swift in Sources */,
 				B9E57DF7247D4B560009A8E4 /* OrderedDictionary.swift in Sources */,
 				7C3F94022491A2A700835B7D /* EpisodeRecordStoraging.swift in Sources */,
@@ -660,6 +675,7 @@
 				7CEC7A82248711C6008FB3FC /* EpisodeCellViewModel.swift in Sources */,
 				7CA423AD246788BB009C4A18 /* MaximizePlayerView.swift in Sources */,
 				7C35EE642460D63D0029DA95 /* PodcastsSearchController.swift in Sources */,
+				7CDCCB5524A39E2200E26752 /* DefferedBlock.swift in Sources */,
 				7CF47890249A93D90067D437 /* FavoritePodcastCellViewModel.swift in Sources */,
 				7CEF3045246934B80045AB91 /* EpisodesModel.swift in Sources */,
 				7CEC7A8424871216008FB3FC /* EpisodeModel.swift in Sources */,

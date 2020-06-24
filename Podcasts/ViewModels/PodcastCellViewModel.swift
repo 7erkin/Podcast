@@ -13,22 +13,16 @@ final class PodcastCellViewModel {
     private(set) var podcastName: String?
     private(set) var artistName: String?
     private(set) var episodeCount: String?
-    private(set) var podcastImagePublisher: AnyPublisher<Data, URLError>
-    private var subscriptions: Set<AnyCancellable> = []
+    private(set) var podcastImageUrl: URL?
     let podcast: Podcast
     init(podcast: Podcast) {
         self.podcast = podcast
+        podcastImageUrl = podcast.imageUrl
         podcastName = podcast.name
         artistName = podcast.artistName
         if let count = podcast.episodeCount {
             self.episodeCount = "\(count)"
         }
-        
-        podcastImagePublisher = URLSession.shared
-            .dataTaskPublisher(for: podcast.imageUrl!)
-            .retry(1)
-            .map(\.data)
-            .eraseToAnyPublisher()
     }
 }
 

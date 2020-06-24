@@ -24,9 +24,13 @@ enum EpisodeModelEvent {
 final class EpisodeModel {
     private var subscriptions: [Subscription] = []
     private var subscribers = Subscribers<EpisodeModelEvent>()
-    private let episode: Episode
+    let episode: Episode
     private let podcast: Podcast
-    private var episodeDownloadingStatus: EpisodeDownloadingStatus = .notStarted
+    private var episodeDownloadingStatus: EpisodeDownloadingStatus = .notStarted {
+        didSet {
+            subscribers.fire(.episodeDownloadingStatusChanged(self.episodeDownloadingStatus))
+        }
+    }
     private let recordRepository: EpisodeRecordRepositoring
     init(episode: Episode, podcast: Podcast, recordRepository: EpisodeRecordRepositoring) {
         self.episode = episode
@@ -51,7 +55,7 @@ final class EpisodeModel {
             if let _ = recordDescriptors.first(where: { $0.episode == episode }) {
                 episodeDownloadingStatus = .downloaded
             } else {
-                if let progress = downloadingEpisodes[episode] {
+                if let progress = downloadingEpisodes[episode]?.progress {
                     episodeDownloadingStatus = .inProgress(progress)
                 } else {
                     episodeDownloadingStatus = .notStarted
@@ -72,6 +76,10 @@ final class EpisodeModel {
         case .downloadingStarted(let episode, _):
             if episode == self.episode {
                 episodeDownloadingStatus = .inProgress(0)
+            }
+        case .downloading(let downloadEpisodes):
+            if let progress = downloadEpisodes[episode]?.progress {
+                episodeDownloadingStatus = .inProgress(progress)
             }
         }
     }

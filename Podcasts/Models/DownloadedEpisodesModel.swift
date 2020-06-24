@@ -9,17 +9,17 @@
 import Foundation
 
 enum DownloadedEpisodesModelEvent {
-    case initial([EpisodeRecordDescriptor], [CurrentDownloadEpisode])
-    case episodeDownloadingFinishWithCancel(Episode, [CurrentDownloadEpisode])
-    case episodeDownloadingFinishWithError(Episode, [CurrentDownloadEpisode])
-    case episodeDownloaded(Episode, [EpisodeRecordDescriptor], [CurrentDownloadEpisode])
+    case initial([EpisodeRecordDescriptor], DownloadEpisodes)
+    case episodeDownloadingFinishWithCancel(Episode, DownloadEpisodes)
+    case episodeDownloadingFinishWithError(Episode, DownloadEpisodes)
+    case episodeDownloaded(Episode, [EpisodeRecordDescriptor], DownloadEpisodes)
     case episodeRecordRemoved(Episode, [EpisodeRecordDescriptor])
 }
 
 final class DownloadedEpisodesModel {
     private var subscribers = Subscribers<DownloadedEpisodesModelEvent>()
     private var subscriptions: [Subscription] = []
-    private var downloadingEpisodes: [CurrentDownloadEpisode] = []
+    private var downloadingEpisodes: DownloadEpisodes = [:]
     private var episodeRecords: [EpisodeRecordDescriptor] = []
     // MARK: - dependencies
     private let recordRepository: EpisodeRecordRepositoring
@@ -52,6 +52,9 @@ final class DownloadedEpisodesModel {
             self.episodeRecords = episodeRecords
             self.downloadingEpisodes = downloadingEpisodes
             subscribers.fire(.initial(self.episodeRecords, self.downloadingEpisodes))
+        case .removed(let episodeRecord, let episodeRecords):
+            self.episodeRecords = episodeRecords
+            subscribers.fire(.episodeRecordRemoved(episodeRecord.episode, episodeRecords))
         default:
             break
         }

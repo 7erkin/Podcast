@@ -9,13 +9,29 @@
 import Foundation
 import UIKit
 import Combine
-final class DownloadedEpisodesController: UITableViewController {
-    typealias DataSource = UITableViewDiffableDataSource<Section, _EpisodeCellViewModel>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, _EpisodeCellViewModel>
-    enum Section {
-        case currentDownloadings
-        case downloadedEpisodes
+
+enum DownloadedEpisodesSection {
+    case currentDownloadings
+    case downloadedEpisodes
+}
+
+final class DownloadedEpisodesDataSource: UITableViewDiffableDataSource<DownloadedEpisodesSection, _EpisodeCellViewModel> {
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if self.snapshot().itemIdentifiers(inSection: .currentDownloadings).isEmpty {
+            return nil
+        } else {
+            return section == self.snapshot().indexOfSection(.currentDownloadings) ? "Current downloadings" : ""
+        }
     }
+    
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+}
+
+final class DownloadedEpisodesController: UITableViewController {
+    typealias DataSource = DownloadedEpisodesDataSource
+    typealias Snapshot = NSDiffableDataSourceSnapshot<DownloadedEpisodesSection, _EpisodeCellViewModel>
     private var subscriptions: Set<AnyCancellable> = []
     private static let cellId = "cellId"
     var viewModel: DownloadedEpisodesViewModel!
@@ -67,21 +83,7 @@ final class DownloadedEpisodesController: UITableViewController {
             ].store(in: &self.subscriptions)
         }
     }()
-    
     // MARK: - UITableView
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let snapshot = dataSource.snapshot()
-        if section == snapshot.indexOfSection(.currentDownloadings) {
-            return snapshot.numberOfItems(inSection: .currentDownloadings)
-        } else {
-            return snapshot.numberOfItems(inSection: .downloadedEpisodes)
-        }
-    }
-    
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return section == .zero ? "Downloading episodes" : " "
-    }
-    
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 132
     }
@@ -90,16 +92,30 @@ final class DownloadedEpisodesController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        if section == dataSource.snapshot().indexOfSection(.downloadedEpisodes) {
-            return 250
-        }
-        return 0
+        return dataSource.snapshot().indexOfSection(.downloadedEpisodes) == nil ? 0 : 250
     }
     
     override func tableView(
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
     ) -> UISwipeActionsConfiguration? {
-        return nil
+        var actions: [UIContextualAction] = []
+        if indexPath.section == dataSource.snapshot().indexOfSection(.downloadedEpisodes) {
+            actions.append(UIContextualAction(style: .destructive, title: "Remove record") { [unowned self] (_, _, completionHandler) in
+                let episode = self.dataSource.snapshot().itemIdentifiers(inSection: .downloadedEpisodes)[indexPath.row].episode
+                self.viewModel.removeEpisodeRecord(episode)
+                completionHandler(true)
+            })
+        } else {
+            actions.append(UIContextualAction(style: .normal, title: "Cancel downloading") { [unowned self] (_, _, completionHandler) in
+                let viewModel = self.dataSource
+                    .snapshot()
+                    .itemIdentifiers(inSection: .currentDownloadings)[indexPath.row]
+                as! EpisodeCellViewModel
+                viewModel.cancelEpisodeDownloading()
+                completionHandler(true)
+            })
+        }
+        return UISwipeActionsConfiguration(actions: actions)
     }
 }

@@ -16,8 +16,6 @@ final class EpisodeCell: UITableViewCell {
     var viewModel: EpisodeCellOutput! {
         didSet {
             if self.viewModel != nil {
-                let imageSize = episodeImageView.frame.size
-                loadingImageIndicator.startAnimating()
                 [
                     self.viewModel.publishDatePublisher.sink { [unowned self] in
                         self.publishDateLabel.text = $0
@@ -35,37 +33,36 @@ final class EpisodeCell: UITableViewCell {
                         },
                     self.viewModel.isEpisodeDownloadedPublisher
                         .receive(on: DispatchQueue.main)
-                        .sink { [unowned self] in self.episodeDownloadedIndicator.isHidden = $0 },
-                    self.viewModel.episodeImagePublisher
-                        .receive(on: DispatchQueue.global(qos: .userInitiated))
-                        .map { downsample(imageData: $0, to: imageSize, scale: UITraitCollection.current.displayScale) }
+                        .sink { [unowned self] in
+                            self.episodeDownloadedIndicator.isHidden = $0
+                        },
+                    self.viewModel.episodeImageUrlPublisher
                         .receive(on: DispatchQueue.main)
-                        .sink(
-                            receiveCompletion: { _ in },
-                            receiveValue: { [unowned self] in
-                                self.loadingImageIndicator.stopAnimating()
-                                self.episodeImageView.image = $0
-                            }
-                        )
+                        .sink { [unowned self] in
+                            self.episodeImageView.imageUrl = $0
+                        }
                 ].store(in: &subscriptions)
             }
         }
     }
     // MARK: - outlets
-    @IBOutlet private var episodeImageView: UIImageView! {
+    @IBOutlet private var episodeImageView: AsyncImageView! {
         didSet {
             self.episodeImageView.contentMode = .scaleAspectFill
+            self.episodeImageView.finishLoadingImage = { [unowned self] in self.loadingImageIndicator.stopAnimating() }
+            self.episodeImageView.startLoadingImage = { [unowned self] in self.loadingImageIndicator.startAnimating() }
         }
     }
     @IBOutlet private var episodeDownloadedIndicator: UIButton! {
         didSet {
             self.episodeDownloadedIndicator.isEnabled = false
+            self.episodeDownloadedIndicator.isHidden = true
         }
     }
     @IBOutlet private var publishDateLabel: UILabel!
     @IBOutlet private var episodeNameLabel: UILabel!
     @IBOutlet private var descriptionLabel: UILabel!
-    @IBOutlet private var progressLabel: UILabel!
+    @IBOutlet private var progressLabel: UILabel! { didSet { self.progressLabel.text = nil } }
     @IBOutlet private var loadingImageIndicator: UIActivityIndicatorView! {
         didSet {
             self.loadingImageIndicator.hidesWhenStopped = true

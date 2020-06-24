@@ -16,36 +16,30 @@ class _EpisodeCellViewModel: EpisodeCellOutput, Hashable {
     var descriptionPublisher: Published<String?>.Publisher { $description }
     var downloadingProgressPublisher: Published<String?>.Publisher { $progress }
     var isEpisodeDownloadedPublisher: Published<Bool>.Publisher { $isEpisodeDownloaded }
-    var episodeImagePublisher: AnyPublisher<Data, URLError> {
-        URLSession.shared
-            .dataTaskPublisher(for: imageUrl)
-            .map(\.data)
-            .eraseToAnyPublisher()
-    }
+    var episodeImageUrlPublisher: Published<URL?>.Publisher { $episodeImageUrl }
     
     @Published var publishDate: String?
     @Published var episodeName: String?
     @Published var description: String?
-    @Published var progress: String?
-    @Published var isEpisodeDownloaded: Bool = false
-    
-    var imageUrl: URL!
-    private let identifier = UUID()
+    @Published var progress: String? = ""
+    @Published var isEpisodeDownloaded: Bool = true
+    @Published var episodeImageUrl: URL?
+
+    let episode: Episode
     // MARK: - Hashable
     static func == (lhs: _EpisodeCellViewModel, rhs: _EpisodeCellViewModel) -> Bool {
         return lhs.hashValue == rhs.hashValue
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(identifier)
+        hasher.combine(episode)
     }
     // MARK: - 
     init(_ episode: Episode) {
-        imageUrl = episode.imageUrl!
+        self.episode = episode
+        episodeImageUrl = episode.imageUrl
         episodeName = episode.name
         publishDate = Episode.dateFormatter.string(from: episode.publishDate)
         description = episode.description
     }
-    
-    init() {}
 }

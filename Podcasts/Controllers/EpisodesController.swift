@@ -10,12 +10,19 @@ import Foundation
 import UIKit
 import Combine
 
-final class EpisodesController: UITableViewController {
-    typealias DataSource = UITableViewDiffableDataSource<Section, EpisodeCellViewModel>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<Section, EpisodeCellViewModel>
-    enum Section {
-        case main
+enum EpisodesSection {
+    case main
+}
+
+final class EpisodesDataSource: UITableViewDiffableDataSource<EpisodesSection, EpisodeCellViewModel> {
+    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return self.itemIdentifier(for: indexPath)?.isEpisodeDownloaded == false
     }
+}
+
+final class EpisodesController: UITableViewController {
+    typealias DataSource = EpisodesDataSource
+    typealias Snapshot = NSDiffableDataSourceSnapshot<EpisodesSection, EpisodeCellViewModel>
     private static let cellId = "episodeCell"
     private var favoriteButton: FavoriteButtonItem {
         return navigationItem.rightBarButtonItem as! FavoriteButtonItem
@@ -87,7 +94,7 @@ final class EpisodesController: UITableViewController {
     }
     // MARK: - UITableView
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    
+        viewModel.playEpisode(withIndex: indexPath.row)
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -105,10 +112,6 @@ final class EpisodesController: UITableViewController {
         return dataSource.snapshot().numberOfItems == 0 ? 250 : 0
     }
     
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        return true
-    }
-    
     override func tableView(
         _ tableView: UITableView,
         trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
@@ -117,11 +120,21 @@ final class EpisodesController: UITableViewController {
             let viewModel = (tableView.cellForRow(at: indexPath) as? EpisodeCell)?.viewModel as? EpisodeCellViewModel,
             viewModel.isEpisodeDownloaded == false
         {
-            let action = UIContextualAction(style: .normal, title: "Download") { (_, _, completionHandler) in
-                viewModel.downloadEpisode()
-                completionHandler(true)
+            var actions: [UIContextualAction] = []
+            if viewModel.progress != nil {
+                let action = UIContextualAction(style: .normal, title: "Cancel") { (_, _, completionHandler) in
+                    viewModel.cancelEpisodeDownloading()
+                    completionHandler(true)
+                }
+                actions.append(action)
+            } else {
+                let action = UIContextualAction(style: .normal, title: "Download") { (_, _, completionHandler) in
+                    viewModel.downloadEpisode()
+                    completionHandler(true)
+                }
+                actions.append(action)
             }
-            let configuration = UISwipeActionsConfiguration(actions: [action])
+            let configuration = UISwipeActionsConfiguration(actions: actions)
             return configuration
         }
         

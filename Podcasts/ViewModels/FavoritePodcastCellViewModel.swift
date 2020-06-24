@@ -12,18 +12,14 @@ import Combine
 final class FavoritePodcastCellViewModel: Hashable {
     var artistName: String?
     var podcastName: String?
-    var podcastImagePublisher: AnyPublisher<Data, URLError>
+    var podcastImageUrl: URL?
     private var subscriptions: Set<AnyCancellable> = []
     let podcast: Podcast
     init(podcast: Podcast) {
         self.podcast = podcast
         artistName = podcast.artistName
         podcastName = podcast.name
-        podcastImagePublisher = URLSession.shared
-            .dataTaskPublisher(for: podcast.imageUrl!)
-            .retry(1)
-            .map(\.data)
-            .eraseToAnyPublisher()
+        podcastImageUrl = podcast.imageUrl
     }
     // MARK: - Hashable
     static func == (lhs: FavoritePodcastCellViewModel, rhs: FavoritePodcastCellViewModel) -> Bool {

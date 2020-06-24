@@ -15,7 +15,7 @@ final class EpisodeCellViewModel: _EpisodeCellViewModel {
     private var subscriptions: [Subscription] = []
     init(model: EpisodeModel) {
         self.model = model
-        super.init()
+        super.init(model.episode)
         self.model
             .subscribe { [weak self] in self?.updateWithModel($0) }
             .stored(in: &subscriptions)
@@ -24,8 +24,7 @@ final class EpisodeCellViewModel: _EpisodeCellViewModel {
     private func updateWithModel(_ event: EpisodeModelEvent) {
         switch event {
         case .initial(let episode, let downloadingStatus):
-            // must be fixed
-            imageUrl = episode.imageUrl!
+            episodeImageUrl = episode.imageUrl
             episodeName = episode.name
             publishDate = Episode.dateFormatter.string(from: episode.publishDate)
             description = episode.description
@@ -44,8 +43,11 @@ final class EpisodeCellViewModel: _EpisodeCellViewModel {
             isEpisodeDownloaded = false
             progress = nil
         case .inProgress(let progress):
-            self.progress = "\(progress)"
-        default:
+            self.progress = "\(Int(progress * 100))%"
+        case .finishedWithCancelation:
+            self.progress = nil
+            isEpisodeDownloaded = false
+        case .finishedWithError:
             break
         }
     }

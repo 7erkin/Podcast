@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import PromiseKit
 
 final class DownloadManager {
     typealias Handler = () -> Void
@@ -39,5 +40,5 @@ protocol EpisodeRecordDownloading: class {
     func downloadEpisodeRecord(
         episode: Episode,
         _ block: @escaping Handler
-    ) -> DownloadManager
+    ) -> Promise<DownloadManager>
 }

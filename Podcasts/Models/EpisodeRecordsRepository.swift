@@ -8,59 +8,94 @@
 
 import Foundation 
 import PromiseKit
+
 final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
-    private(set) var downloadingEpisodes: DownloadEpisodes = [:]
+    private(set) var downloads: EpisodesDownloads
     private var subscribers = Subscribers<EpisodeRecordRepositoryEvent>()
-    private var downloadingRecordCancellers: [Episode:AsyncOperationCanceller] = [:]
+    private var downloadManagers: [Episode:DownloadManager] = [:]
     // MARK: - dependencies
-    var recordStorage: EpisodeRecordStoraging
-    var recordFetcher: EpisodeRecordFetching
+    private let recordStorage: EpisodeRecordStoraging
+    private let recordDownloader: EpisodeRecordDownloading
     // MARK: -
-    init(recordStorage: EpisodeRecordStoraging, recordFetcher: EpisodeRecordFetching) {
+    init(recordStorage: EpisodeRecordStoraging, recordFetcher: EpisodeRecordDownloading) {
+        downloads = .init()
         self.recordStorage = recordStorage
-        self.recordFetcher = recordFetcher
+        self.recordDownloader = recordFetcher
+        firstly {
+            recordStorage.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
+        }.done {
+            self.downloads.fulfilled = $0
+            self.subscribers.fire(.initial(self.downloads))
+        }.catch { _ in }
     }
     // MARK: - EpisodeRecordRepositoring impl
     func remove(recordDescriptor: EpisodeRecordDescriptor) {
         firstly {
             recordStorage.removeRecord(recordDescriptor)
         }.done {
-            self.subscribers.fire(.removed(recordDescriptor, $0))
+            self.downloads.fulfilled = $0
+            self.subscribers.fire(.removed(recordDescriptor, self.downloads))
         }.catch { _ in }
     }
     
     func downloadRecord(ofEpisode episode: Episode, ofPodcast podcast: Podcast) {
-        let progressHandler: (Double) -> Void = { [unowned self] in
-            self.downloadingEpisodes[episode]?.progress = $0
-            self.subscribers.fire(.downloading(self.downloadingEpisodes))
+        let manager = recordDownloader.downloadEpisodeRecord(episode: episode) { [weak self] in
+            guard let self = self else { return }
+            
+            if case .event(let event) = $0 {
+                switch event {
+                case .fulfilled(let url):
+                    if let index = self.downloads.active.firstIndex(where: episode) {
+                        self.downloads.active.remove(at: index)
+                    }
+                    firstly {
+                        return self.recordStorage.saveRecord(withUrl: url, ofEpisode: episode, ofPodcast: podcast)
+                    }.done {
+                        self.downloads.fulfilled = $0
+                        self.subscribers.fire(.downloadFulfilled(episode, podcast, self.downloads))
+                    }.catch { _ in print("Err!") }
+                case .inProgress(let progress):
+                    if let index = self.downloads.active.firstIndex(where: { $0.episode == episode }) {
+                        self.downloads.active[index].progress = progress
+                        self.subscribers.fire(.download(self.downloads))
+                    }
+                case .started:
+                    self.downloads.active.append(.init(episode: episode, podcast: podcast, progress: 0))
+                    self.subscribers.fire(.downloadStarted(episode, podcast, self.downloads))
+                case .canceled:
+                    self.downloads.active.remove(where: episode)
+                    self.subscribers.fire(.downloadCancelled(episode, podcast, self.downloads))
+                case .suspended:
+                    if let download = self.downloads.active.remove(where: episode) {
+                        self.downloads.suspended.append(download)
+                        self.subscribers.fire(.downloadSuspended(episode, podcast, self.downloads))
+                    }
+                case .resumed:
+                    if let download = self.downloads.suspended.remove(where: episode) {
+                        self.downloads.active.append(download)
+                        self.subscribers.fire(.downloadResumed(episode, podcast, self.downloads))
+                    }
+                }
+            } else {}
         }
-        downloadingEpisodes[episode] = (podcast, 0)
-        let canceller = recordFetcher.fetchEpisodeRecord(episode: episode, progressHandler) { [unowned self] recordData in
-            self.downloadingEpisodes[episode] = nil
-            self.subscribers.fire(.downloading(self.downloadingEpisodes))
-            firstly {
-                self.recordStorage.saveRecord(recordData, ofEpisode: episode, ofPodcast: podcast)
-            }.done {
-                self.subscribers.fire(.downloadingFulfilled(episode, self.downloadingEpisodes, $0))
-            }.catch { _ in }
-        }
-        downloadingRecordCancellers[episode] = canceller
+        
+        downloadManagers[episode] = manager
     }
     
-    func cancelDownloadingRecord(ofEpisode episode: Episode) {
-        if let downloadCanceller = downloadingRecordCancellers.removeValue(forKey: episode) {
-            downloadCanceller()
-            downloadingEpisodes[episode] = nil
-            subscribers.fire(.downloadingCancelled(episode, downloadingEpisodes))
-        }
+    func pauseDownloadRecord(ofEpisode episode: Episode) {
+        downloadManagers[episode]?.suspend()
+    }
+    
+    func resumeDownloadRecord(ofEpisode episode: Episode) {
+        downloadManagers[episode]?.resume()
+    }
+    
+    func cancelDownloadRecord(ofEpisode episode: Episode) {
+        downloadManagers.removeValue(forKey: episode)?.cancel()
     }
     
     func subscribe(_ subscriber: @escaping (EpisodeRecordRepositoryEvent) -> Void) -> Subscription {
-        firstly {
-            recordStorage.getEpisodeRecordDescriptors(withSortPolicy: { _, _ in return true })
-        }.done {
-            subscriber(.initial($0, self.downloadingEpisodes))
-        }.catch { _ in }
+        subscriber(.initial(self.downloads))
         return subscribers.subscribe(action: subscriber)
     }
 }

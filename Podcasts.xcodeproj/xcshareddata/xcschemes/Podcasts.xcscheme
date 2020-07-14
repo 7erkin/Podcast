@@ -48,6 +48,16 @@
                ReferencedContainer = "container:Podcasts.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7CFF670824AD0100007B80FA"
+               BuildableName = "FileSystemRecordsStorageTest.xctest"
+               BlueprintName = "FileSystemRecordsStorageTest"
+               ReferencedContainer = "container:Podcasts.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

@@ -9,18 +9,31 @@
 import Foundation
 
 enum DownloadedEpisodesModelEvent {
-    case initial([EpisodeRecordDescriptor], DownloadEpisodes)
-    case episodeDownloadingFinishWithCancel(Episode, DownloadEpisodes)
-    case episodeDownloadingFinishWithError(Episode, DownloadEpisodes)
-    case episodeDownloaded(Episode, [EpisodeRecordDescriptor], DownloadEpisodes)
-    case episodeRecordRemoved(Episode, [EpisodeRecordDescriptor])
+    case initial(DownloadedEpisodesModel.State)
+    case downloaded(Episode, DownloadedEpisodesModel.State)
+    case downloadStarted(Episode, Podcast, DownloadedEpisodesModel.State)
+    case downloadFinishWithCancel(Episode, DownloadedEpisodesModel.State)
+    case downloadFinishWithError(Episode, DownloadedEpisodesModel.State)
+    case recordRemoved(Episode, DownloadedEpisodesModel.State)
 }
 
 final class DownloadedEpisodesModel {
+    struct State {
+        var episodeRecords: [EpisodeRecordDescriptor]
+        var downloadEpisodes: [DownloadEpisode]
+        init() {
+            self.episodeRecords = []
+            self.downloadEpisodes = []
+        }
+        
+        init(_ episodesDownloads: EpisodesDownloads) {
+            episodeRecords = episodesDownloads.fulfilled
+            downloadEpisodes = episodesDownloads.active
+        }
+    }
     private var subscribers = Subscribers<DownloadedEpisodesModelEvent>()
     private var subscriptions: [Subscription] = []
-    private var downloadingEpisodes: DownloadEpisodes = [:]
-    private var episodeRecords: [EpisodeRecordDescriptor] = []
+    private var state: State
     // MARK: - dependencies
     private let recordRepository: EpisodeRecordRepositoring
     private let trackListPlayer: TrackListPlaying
@@ -29,6 +42,7 @@ final class DownloadedEpisodesModel {
         recordRepository: EpisodeRecordRepositoring,
         trackListPlayer: TrackListPlaying
     ) {
+        state = .init()
         self.recordRepository = recordRepository
         self.trackListPlayer = trackListPlayer
         self.recordRepository
@@ -39,22 +53,30 @@ final class DownloadedEpisodesModel {
             .stored(in: &subscriptions)
     }
     
-    func subscribe(
-        _ subscriber: @escaping (DownloadedEpisodesModelEvent) -> Void
-    ) -> Subscription {
-        subscriber(.initial(episodeRecords, downloadingEpisodes))
-        return subscribers.subscribe(action: subscriber)
+    func playEpisode(withIndex index: Int) {
+        let trackList = state.episodeRecords.map { Track(episode: $0.episode, podcast: $0.podcast, url: $0.recordUrl) }
+        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
     }
     
     private func updateWithRecordRepository(_ event: EpisodeRecordRepositoryEvent) {
         switch event {
-        case .initial(let episodeRecords, let downloadingEpisodes):
-            self.episodeRecords = episodeRecords
-            self.downloadingEpisodes = downloadingEpisodes
-            subscribers.fire(.initial(self.episodeRecords, self.downloadingEpisodes))
-        case .removed(let episodeRecord, let episodeRecords):
-            self.episodeRecords = episodeRecords
-            subscribers.fire(.episodeRecordRemoved(episodeRecord.episode, episodeRecords))
+        case .initial(let episodesDownloads):
+            state = .init(episodesDownloads)
+            subscribers.fire(.initial(state))
+        case .downloadStarted(let episode, let podcast, let episodesDownloads):
+            state = .init(episodesDownloads)
+            subscribers.fire(.downloadStarted(episode, podcast, state))
+        case .downloadCancelled(let episode, _, let episodesDownloads):
+            state = .init(episodesDownloads)
+            subscribers.fire(.downloadFinishWithCancel(episode, state))
+        case .download(let episodesDownloads):
+            state = .init(episodesDownloads)
+        case .downloadFulfilled(let episode, _, let episodesDownloads):
+            state = .init(episodesDownloads)
+            subscribers.fire(.downloaded(episode, state))
+        case .removed(let recordDescriptor, let episodesDownloads):
+            state = .init(episodesDownloads)
+            subscribers.fire(.recordRemoved(recordDescriptor.episode, state))
         default:
             break
         }
@@ -62,18 +84,10 @@ final class DownloadedEpisodesModel {
     
     private func updateWithTrackListPlayer(_ event: TrackListPlayerEvent) {}
     
-    func removeEpisodeRecord(_ episode: Episode) {
-        guard let index = episodeRecords.firstIndex(where: { $0.episode == episode }) else { fatalError() }
-        
-        recordRepository.remove(recordDescriptor: episodeRecords[index])
-    }
-    
-    func playEpisode(withIndex index: Int) {
-        let trackList = episodeRecords.map { Track(episode: $0.episode, podcast: $0.podcast, url: $0.recordUrl) }
-        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
-    }
-    
-    func cancelEpisodeRecordDownloading(withIndex index: Int) {
-        recordRepository.cancelDownloadingRecord(ofEpisode: episodeRecords[index].episode)
+    func subscribe(
+        _ subscriber: @escaping (DownloadedEpisodesModelEvent) -> Void
+    ) -> Subscription {
+        subscriber(.initial(state))
+        return subscribers.subscribe(action: subscriber)
     }
 }

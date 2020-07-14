@@ -34,12 +34,12 @@ final class EpisodeCellViewModel: _EpisodeCellViewModel {
         }
     }
     
-    private func updateWithDownloadingStatus(_ status: EpisodeDownloadingStatus) {
+    private func updateWithDownloadingStatus(_ status: EpisodeDownloadStatus) {
         switch status {
         case .downloaded:
             isEpisodeDownloaded = true
             progress = nil
-        case .notStarted:
+        case .downloadNotLaunched:
             isEpisodeDownloaded = false
             progress = nil
         case .inProgress(let progress):

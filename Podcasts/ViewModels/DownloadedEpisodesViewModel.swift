@@ -10,8 +10,9 @@ import Foundation
 import Combine
 
 final class DownloadedEpisodesViewModel {
-    @Published var downloadingEpisodes: [EpisodeCellViewModel] = []
-    @Published var downloadedEpisodes: [DownloadedEpisodeCellViewModel] = []
+    @Published var downloadEpisodeViewModels: [EpisodeCellViewModel] = []
+    @Published var episodeRecordViewModels: [DownloadedEpisodeCellViewModel] = []
+    
     private let model: DownloadedEpisodesModel
     private var subscriptions: [Subscription] = []
     init(model: DownloadedEpisodesModel) {
@@ -21,27 +22,39 @@ final class DownloadedEpisodesViewModel {
             .stored(in: &subscriptions)
     }
     
-    func removeEpisodeRecord(_ episode: Episode) {
-        model.removeEpisodeRecord(episode)
-    }
-    
     private func updateWithModel(_ event: DownloadedEpisodesModelEvent) {
         switch event {
-        case .initial(let episodeRecords, let downloadingEpisodes):
-            self.downloadingEpisodes = downloadingEpisodes.keys.map {
+        case .initial(let state):
+            downloadEpisodeViewModels = state.downloadEpisodes.map {
                 EpisodeCellViewModel(
-                    model: EpisodeModel(
-                        episode: $0,
-                        podcast: downloadingEpisodes[$0]!.podcast,
+                    model: .init(
+                        episode: $0.episode,
+                        podcast: $0.podcast,
                         recordRepository: ServiceLocator.recordRepository
                     )
                 )
             }
-            downloadedEpisodes = episodeRecords.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
-        case .episodeRecordRemoved(_, let episodeRecords):
-            downloadedEpisodes = episodeRecords.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
-        default:
-            break
+            
+            episodeRecordViewModels = state.episodeRecords.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
+        case .downloaded(let episode, _):
+            if let index = downloadEpisodeViewModels.firstIndex(where: { $0.episode == episode }) {
+                downloadEpisodeViewModels.remove(at: index)
+            }
+            episodeRecordViewModels.append(.init(episode: episode))
+        case .downloadStarted(let episode, let podcast, _):
+            downloadEpisodeViewModels.append(.init(model: .init(episode: episode, podcast: podcast, recordRepository: ServiceLocator.recordRepository)))
+        case .downloadFinishWithCancel(let episode, _):
+            if let index = downloadEpisodeViewModels.firstIndex(where: { $0.episode == episode }) {
+                downloadEpisodeViewModels.remove(at: index)
+            }
+        case .downloadFinishWithError(let episode, _):
+            if let index = downloadEpisodeViewModels.firstIndex(where: { $0.episode == episode }) {
+                downloadEpisodeViewModels.remove(at: index)
+            }
+        case .recordRemoved(let episode, _):
+            if let index = episodeRecordViewModels.firstIndex(where: { $0.episode == episode }) {
+                episodeRecordViewModels.remove(at: index)
+            }
         }
     }
 }

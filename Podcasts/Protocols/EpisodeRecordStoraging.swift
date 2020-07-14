@@ -9,8 +9,16 @@
 import PromiseKit
 import Foundation
 
+enum EpisodeRecordStorageError: Error {
+    case storageInitializeError
+    case loadingRecordsError
+    case saveRecordError(Episode, Podcast)
+    case removeRecordError(EpisodeRecordDescriptor)
+}
+
 protocol EpisodeRecordStoraging: class {
     func saveRecord(_ recordData: Data, ofEpisode episode: Episode, ofPodcast podcast: Podcast) -> Promise<[EpisodeRecordDescriptor]>
+    func saveRecord(withUrl url: URL, ofEpisode episode: Episode, ofPodcast podcast: Podcast) -> Promise<[EpisodeRecordDescriptor]>
     func removeRecord(_ recordDescriptor: EpisodeRecordDescriptor) -> Promise<[EpisodeRecordDescriptor]>
     func getEpisodeRecordDescriptors(
         withSortPolicy sortPolicy: @escaping (EpisodeRecordDescriptor, EpisodeRecordDescriptor) -> Bool

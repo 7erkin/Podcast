@@ -9,5 +9,9 @@
 import Foundation
 
 protocol PodcastFetching: class {
-    func fetchPodcasts(searchText: String, _ completionHandler: @escaping ([Podcast]) -> Void)
+    typealias Handler = (Result<[Podcast], URLError>) -> Void
+    func fetchPodcasts(
+        searchText: String,
+        _ completionHandler: @escaping Handler
+    )
 }

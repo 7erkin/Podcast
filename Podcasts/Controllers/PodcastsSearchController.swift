@@ -45,12 +45,14 @@ final class PodcastsSearchController: UITableViewController, UISearchBarDelegate
     // MARK: - Setup
     private lazy var setupBindings = { [unowned self] in
         executeOnce {
-            self.viewModel.$podcastCellViewModels.sink { [unowned self] in
-                var snapshot = Snapshot()
-                snapshot.appendSections([.main])
-                snapshot.appendItems($0, toSection: .main)
-                self.dataSource.apply(snapshot, animatingDifferences: false, completion: nil)
-            }.store(in: &self.subscriptions)
+            self.viewModel.$podcastCellViewModels
+                .receive(on: DispatchQueue.main)
+                .sink { [unowned self] in
+                    var snapshot = Snapshot()
+                    snapshot.appendSections([.main])
+                    snapshot.appendItems($0, toSection: .main)
+                    self.dataSource.apply(snapshot, animatingDifferences: false, completion: nil)
+                }.store(in: &self.subscriptions)
         }
     }()
     

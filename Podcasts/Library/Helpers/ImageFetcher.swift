@@ -74,6 +74,7 @@ final class ImageFetcher {
                     self?.firePendingHandlers(forImageDescriptor: imageDescriptor, .failure(.fetchingError))
                     return
                 }
+                
                 DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                     let image = downsample(imageData: data, to: imageSize, scale: UITraitCollection.current.displayScale)
                     self?.serviceQueue.async {

@@ -8,8 +8,8 @@
 
 import Foundation
 
-enum EpisodeDownloadingStatus {
-    case notStarted
+enum EpisodeDownloadStatus {
+    case downloadNotLaunched
     case inProgress(Double)
     case downloaded
     case finishedWithError
@@ -17,8 +17,8 @@ enum EpisodeDownloadingStatus {
 }
 
 enum EpisodeModelEvent {
-    case initial(Episode, EpisodeDownloadingStatus)
-    case episodeDownloadingStatusChanged(EpisodeDownloadingStatus)
+    case initial(Episode, EpisodeDownloadStatus)
+    case episodeDownloadingStatusChanged(EpisodeDownloadStatus)
 }
 
 final class EpisodeModel {
@@ -26,9 +26,9 @@ final class EpisodeModel {
     private var subscribers = Subscribers<EpisodeModelEvent>()
     let episode: Episode
     private let podcast: Podcast
-    private var episodeDownloadingStatus: EpisodeDownloadingStatus = .notStarted {
+    private var downloadStatus: EpisodeDownloadStatus = .downloadNotLaunched {
         didSet {
-            subscribers.fire(.episodeDownloadingStatusChanged(self.episodeDownloadingStatus))
+            subscribers.fire(.episodeDownloadingStatusChanged(self.downloadStatus))
         }
     }
     private let recordRepository: EpisodeRecordRepositoring
@@ -46,46 +46,50 @@ final class EpisodeModel {
     }
     
     func cancelEpisodeDownloading() {
-        recordRepository.cancelDownloadingRecord(ofEpisode: episode)
+        recordRepository.cancelDownloadRecord(ofEpisode: episode)
     }
     
     private func updateWithRecordRepository(_ event: EpisodeRecordRepositoryEvent) {
         switch event {
-        case .initial(let recordDescriptors, let downloadingEpisodes):
-            if let _ = recordDescriptors.first(where: { $0.episode == episode }) {
-                episodeDownloadingStatus = .downloaded
+        case .initial(let episodesDownloads):
+            if let download = episodesDownloads.active.first(where: { $0.episode == episode }) {
+                downloadStatus = .inProgress(download.progress)
             } else {
-                if let progress = downloadingEpisodes[episode]?.progress {
-                    episodeDownloadingStatus = .inProgress(progress)
+                if episodesDownloads.fulfilled.contains(where: { $0.episode == episode }) {
+                    downloadStatus = .downloaded
                 } else {
-                    episodeDownloadingStatus = .notStarted
+                    downloadStatus = .downloadNotLaunched
                 }
             }
-        case .downloadingCancelled(let episode, _):
-            if episode == self.episode {
-                episodeDownloadingStatus = .finishedWithCancelation
+        case .downloadStarted(let episode, _, let episodesDownloads):
+            if self.episode == episode {
+                if let progress = episodesDownloads.active.first(where: { $0.episode == episode })?.progress {
+                    downloadStatus = .inProgress(progress)
+                }
             }
-        case .downloadingFulfilled(let episode, _, _):
-            if episode == self.episode {
-                episodeDownloadingStatus = .downloaded
+        case .downloadCancelled(let episode, _, _):
+            if self.episode == episode {
+                downloadStatus = .downloadNotLaunched
+            }
+        case .download(let episodesDownloads):
+            if let progress = episodesDownloads.active.first(where: { $0.episode == episode })?.progress {
+                downloadStatus = .inProgress(progress)
+            }
+        case .downloadFulfilled(let episode, _, _):
+            if self.episode == episode {
+                downloadStatus = .downloaded
             }
         case .removed(let recordDescriptor, _):
-            if recordDescriptor.episode == self.episode {
-                episodeDownloadingStatus = .notStarted
+            if episode == recordDescriptor.episode {
+                downloadStatus = .downloadNotLaunched
             }
-        case .downloadingStarted(let episode, _):
-            if episode == self.episode {
-                episodeDownloadingStatus = .inProgress(0)
-            }
-        case .downloading(let downloadEpisodes):
-            if let progress = downloadEpisodes[episode]?.progress {
-                episodeDownloadingStatus = .inProgress(progress)
-            }
+        default:
+            break
         }
     }
 
     func subscribe(_ subscriber: @escaping (EpisodeModelEvent) -> Void) -> Subscription {
-        subscriber(.initial(episode, episodeDownloadingStatus))
+        subscriber(.initial(episode, downloadStatus))
         return subscribers.subscribe(action: subscriber)
     }
 }

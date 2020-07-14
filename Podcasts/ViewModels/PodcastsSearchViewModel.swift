@@ -17,9 +17,13 @@ final class PodcastsSearchViewModel {
     }
     
     func findPodcasts(bySearchText searchText: String) {
-        podcastFetcher.fetchPodcasts(searchText: searchText) { [weak self] podcasts in
-            DispatchQueue.main.async {
+        podcastFetcher.fetchPodcasts(searchText: searchText) { [weak self] result in
+            print(result)
+            switch result {
+            case .success(let podcasts):
                 self?.podcastCellViewModels = podcasts.map { PodcastCellViewModel(podcast: $0) }
+            case .failure(_):
+                break
             }
         }
     }

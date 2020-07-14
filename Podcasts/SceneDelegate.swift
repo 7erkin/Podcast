@@ -7,23 +7,9 @@
 //
 
 import UIKit
-import Swinject
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
-//    let container: Container = {
-//        let container = Container()
-//        container.register(ImageCaching.self) { _ in InMemoryImageCache(withFlushPolicy: LatestImageFlushPolicy(withCacheMemoryLimit: 75)) }
-//        container.register(ImageServicing.self, name: "ImageService") { _ in ImageService.shared }
-//        container.register(ImageServicing.self, name: "CachedImageService") { _ in
-//            let service = ImageServiceProxi.shared as! ImageServiceProxi
-//            service.instantiateProxingServiceInvoker = { container.resolve(ImageServicing.self)! }
-//            service.imageCache = container.resolve(ImageCaching.self)!
-//            return service
-//        }
-//        container.register(PodcastServicing.self) { _ in ITunesService.shared }
-//        return container
-//    }()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.

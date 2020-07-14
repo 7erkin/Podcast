@@ -8,10 +8,36 @@
 
 import Foundation
 
-protocol EpisodeRecordFetching: class {
-    func fetchEpisodeRecord(
+final class DownloadManager {
+    typealias Handler = () -> Void
+    let cancel: Handler
+    let resume: Handler
+    let suspend: Handler
+    init(cancel: @escaping Handler, resume: @escaping Handler, suspend: @escaping Handler) {
+        self.cancel = cancel
+        self.resume = resume
+        self.suspend = suspend
+    }
+}
+
+enum EpisodeRecordDownloadEvent {
+    case inProgress(Double)
+    case fulfilled(URL)
+    case suspended
+    case started
+    case canceled
+    case resumed
+}
+
+enum EpisodeRecordDownloadResult {
+    case event(EpisodeRecordDownloadEvent)
+    case failure(URLError)
+}
+
+protocol EpisodeRecordDownloading: class {
+    typealias Handler = (EpisodeRecordDownloadResult) -> Void
+    func downloadEpisodeRecord(
         episode: Episode,
-        _ progressHandler: ((Double) -> Void)?,
-        _ completionHandler: @escaping (Data) -> Void
-    ) -> AsyncOperationCanceller
+        _ block: @escaping Handler
+    ) -> DownloadManager
 }

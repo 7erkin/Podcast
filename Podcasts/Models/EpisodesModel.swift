@@ -22,7 +22,6 @@ final class EpisodesModel {
     // MARK: - dependencies
     private var podcastStorage: FavoritePodcastsStoraging
     private var trackListPlayer: TrackListPlaying
-    private var episodeFetcher: EpisodeFetching
     // MARK: -
     private var subscriptions: [Subscription] = []
     private var subscribers = Subscribers<EpisodesModelEvent>()
@@ -35,14 +34,13 @@ final class EpisodesModel {
     ) {
         self.podcast = podcast
         self.podcastStorage = podcastStorage
-        self.episodeFetcher = episodeFetcher
         self.trackListPlayer = trackListPlayer
         
         self.podcastStorage
             .subscribe { [weak self] in self?.updateWithFavoritePodcastsStorage($0) }
             .stored(in: &subscriptions)
         
-        fetchEpisodes()
+        fetchEpisodes(withEpisodeFetcher: episodeFetcher)
     }
     
     func subscribe(
@@ -61,13 +59,16 @@ final class EpisodesModel {
 //        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
     }
     // MARK: - helpers
-    private func fetchEpisodes() {
+    private func fetchEpisodes(withEpisodeFetcher episodeFetcher: EpisodeFetching) {
         if let feedUrl = self.podcast.feedUrl {
-            episodeFetcher.fetchEpisodes(url: feedUrl) { [weak self] episodes in
-                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-                    guard let self = self else { return }
-                    
+            episodeFetcher.fetchEpisodes(url: feedUrl) { [weak self] result in
+                guard let self = self else { return }
+                
+                switch result {
+                case .success(let episodes):
                     self.episodes = episodes.applyPodcastImageIfNeeded(self.podcast)
+                case .failure(_):
+                    break
                 }
             }
         }

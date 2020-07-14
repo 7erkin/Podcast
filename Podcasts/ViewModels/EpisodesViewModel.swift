@@ -22,6 +22,7 @@ final class EpisodesViewModel {
     @Published private(set) var podcastName: String?
     @Published private(set) var isPodcastFavorite: Bool?
     @Published private(set) var episodeCellViewModels: [EpisodeCellViewModel] = []
+    
     private let model: EpisodesModel
     private var subscriptions: [Subscription] = []
     init(model: EpisodesModel) {

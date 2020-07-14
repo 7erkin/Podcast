@@ -28,7 +28,7 @@ final class DownloadedEpisodesDataSource: UITableViewDiffableDataSource<Download
         return true
     }
 }
-
+// how to not update view when view not in window
 final class DownloadedEpisodesController: UITableViewController {
     typealias DataSource = DownloadedEpisodesDataSource
     typealias Snapshot = NSDiffableDataSourceSnapshot<DownloadedEpisodesSection, _EpisodeCellViewModel>
@@ -63,8 +63,12 @@ final class DownloadedEpisodesController: UITableViewController {
     
     private lazy var setupBindings: () -> Void = { [unowned self] in
         executeOnce {
+            var snapshot = Snapshot()
+            snapshot.appendSections([.currentDownloadings, .downloadedEpisodes])
+            self.dataSource.apply(snapshot)
             [
-                self.viewModel.$downloadingEpisodes
+                self.viewModel.$downloadEpisodeViewModels
+                    .receive(on: DispatchQueue.main)
                     .sink {
                         var snapshot = self.dataSource.snapshot()
                         snapshot.deleteSections([.currentDownloadings])
@@ -72,7 +76,8 @@ final class DownloadedEpisodesController: UITableViewController {
                         snapshot.appendItems($0, toSection: .currentDownloadings)
                         self.dataSource.apply(snapshot, animatingDifferences: true, completion: nil)
                     },
-                self.viewModel.$downloadedEpisodes
+                self.viewModel.$episodeRecordViewModels
+                    .receive(on: DispatchQueue.main)
                     .sink {
                         var snapshot = self.dataSource.snapshot()
                         snapshot.deleteSections([.downloadedEpisodes])
@@ -102,8 +107,7 @@ final class DownloadedEpisodesController: UITableViewController {
         var actions: [UIContextualAction] = []
         if indexPath.section == dataSource.snapshot().indexOfSection(.downloadedEpisodes) {
             actions.append(UIContextualAction(style: .destructive, title: "Remove record") { [unowned self] (_, _, completionHandler) in
-                let episode = self.dataSource.snapshot().itemIdentifiers(inSection: .downloadedEpisodes)[indexPath.row].episode
-                self.viewModel.removeEpisodeRecord(episode)
+                
                 completionHandler(true)
             })
         } else {

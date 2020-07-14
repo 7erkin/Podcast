@@ -8,9 +8,13 @@
 import Foundation
 import PromiseKit
 
-// saved episode stored as directory where json { StoredItem } and recordsFile.
 // directory name is awCollectionId=510318&awEpisodeId=857652287 (number1.number2)
 final class FileSystemRecordsStorage: EpisodeRecordStoraging {
+    struct UrlForRecordSave {
+        let rootUrl: URL
+        let recordUrl: URL
+        let recordDescriptorUrl: URL
+    }
     private let recordDescriptionFileName = "description"
     private let recordFileName = "record.mp3"
     private let serviceQueue = DispatchQueue(
@@ -27,34 +31,17 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
         return url
     }()
     init?() {
-        if let isExist = try? isRecordsDirectoryExist().wait() {
-            if !isExist {
-                try! createRecordsRootDirectory().wait()
-            }
-        } else {
-            return nil
-        }
+        do {
+            try createRecordDirectoryIfNeeded()
+        } catch { return nil }
     }
     // MARK: - EpisodeRecordStoraging
     func saveRecord(_ recordData: Data, ofEpisode episode: Episode, ofPodcast podcast: Podcast) -> Promise<[EpisodeRecordDescriptor]> {
-        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[EpisodeRecordDescriptor]> in
-            // create record directory
-            let directoryName = self.getRecordDirectoryName(forSavedEpisode: episode)
-            var directoryUrl = self.recordsDirectoryRootUrl
-            directoryUrl.appendPathComponent(directoryName)
-            try! FileManager.default.createDirectory(at: directoryUrl.absoluteURL, withIntermediateDirectories: true, attributes: nil)
-            // create record file in directory
-            var recordUrl = directoryUrl
-            recordUrl.appendPathComponent(self.recordFileName)
-            try! recordData.write(to: recordUrl)
-            // create description file in record directory
-            var recordDescriptorUrl = directoryUrl
-            recordDescriptorUrl.appendPathComponent(self.recordDescriptionFileName)
-            let recordDescriptor = EpisodeRecordDescriptor(episode: episode, podcast: podcast, recordUrl: recordUrl)
-            let serializedRecordDescription = try! JSONEncoder().encode(recordDescriptor)
-            try! serializedRecordDescription.write(to: recordDescriptorUrl)
-            return self.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
-        }
+        return saveRecord(ofEpisode: episode, ofPodcast: podcast, saveBlock: { try recordData.write(to: $0) })
+    }
+    
+    func saveRecord(withUrl url: URL, ofEpisode episode: Episode, ofPodcast podcast: Podcast) -> Promise<[EpisodeRecordDescriptor]> {
+        return saveRecord(ofEpisode: episode, ofPodcast: podcast, saveBlock: { try FileManager.default.moveItem(at: url, to: $0) })
     }
     
     func removeRecord(_ recordDescriptor: EpisodeRecordDescriptor) -> Promise<[EpisodeRecordDescriptor]> {
@@ -62,8 +49,12 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
             let deletedDirectoryName = self.getRecordDirectoryName(forSavedEpisode: recordDescriptor.episode)
             var directoryUrl = self.recordsDirectoryRootUrl
             directoryUrl.appendPathComponent(deletedDirectoryName)
-            try? FileManager.default.removeItem(at: directoryUrl)
-            return self.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
+            do {
+                try FileManager.default.removeItem(at: directoryUrl)
+                return self.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
+            } catch {
+                throw EpisodeRecordStorageError.removeRecordError(recordDescriptor)
+            }
         }
     }
     
@@ -71,7 +62,7 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
         withSortPolicy sortPolicy: @escaping (EpisodeRecordDescriptor, EpisodeRecordDescriptor) -> Bool
     ) -> Promise<[EpisodeRecordDescriptor]> {
         return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[EpisodeRecordDescriptor]> in
-            let recordDescriptors = try! FileManager.default.contentsOfDirectory(
+            let recordDescriptors = try? FileManager.default.contentsOfDirectory(
                 at: self.recordsDirectoryRootUrl,
                 includingPropertiesForKeys: nil,
                 options: []
@@ -82,22 +73,62 @@ final class FileSystemRecordsStorage: EpisodeRecordStoraging {
             }.compactMap { data in
                 return try? JSONDecoder().decode(EpisodeRecordDescriptor.self, from: data)
             }.sorted(by: sortPolicy)
-            return Promise { resolver in resolver.fulfill(recordDescriptors) }
+            
+            if let descriptors = recordDescriptors {
+                return Promise { resolver in resolver.fulfill(descriptors) }
+            }
+            
+            throw EpisodeRecordStorageError.loadingRecordsError
         }
     }
     // MARK: - helpers
-    private func createRecordsRootDirectory() -> Promise<Void> {
-        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<Void> in
-            try! FileManager.default.createDirectory(at: self.recordsDirectoryRootUrl, withIntermediateDirectories: true, attributes: [:])
-            return Promise.value
+    private func getUrlForRecordSave(forSavedEpisode episode: Episode) -> UrlForRecordSave {
+        let directoryName = getRecordDirectoryName(forSavedEpisode: episode)
+        let directoryUrl = recordsDirectoryRootUrl.appendingPathComponent(directoryName)
+        return UrlForRecordSave(
+            rootUrl: directoryUrl,
+            recordUrl: directoryUrl.appendingPathComponent(recordFileName),
+            recordDescriptorUrl: directoryUrl.appendingPathComponent(recordDescriptionFileName)
+        )
+    }
+    
+    private func saveRecord(
+        ofEpisode episode: Episode,
+        ofPodcast podcast: Podcast,
+        saveBlock: @escaping (URL) throws -> Void
+    ) -> Promise<[EpisodeRecordDescriptor]> {
+        return Promise.value.then(on: serviceQueue, flags: nil) { _ -> Promise<[EpisodeRecordDescriptor]> in
+            let url = self.getUrlForRecordSave(forSavedEpisode: episode)
+            let fileManager = FileManager.default
+            do {
+                // create record directory
+                try fileManager.createDirectory(at: url.rootUrl.absoluteURL, withIntermediateDirectories: true, attributes: nil)
+                // create record file in directory
+                try saveBlock(url.recordUrl)
+                // create description file in record directory
+                let recordDescriptor = EpisodeRecordDescriptor(episode: episode, podcast: podcast, recordUrl: url.recordUrl)
+                let serializedRecordDescription = try JSONEncoder().encode(recordDescriptor)
+                try serializedRecordDescription.write(to: url.recordDescriptorUrl)
+                return self.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
+            } catch let err {
+                print("Error again: ", err)
+                [url.recordUrl, url.recordDescriptorUrl].forEach { try? fileManager.removeItem(at: $0) }
+                throw EpisodeRecordStorageError.saveRecordError(episode, podcast)
+            }
         }
     }
     
-    private func createRecordDirectory(forEpisode episode: Episode) {
-        let directoryName = self.getRecordDirectoryName(forSavedEpisode: episode)
-        var directoryUrl = self.recordsDirectoryRootUrl
-        directoryUrl.appendPathComponent(directoryName)
-        try! FileManager.default.createDirectory(atPath: directoryUrl.absoluteString, withIntermediateDirectories: true, attributes: nil)
+    private func createRecordDirectoryIfNeeded() throws {
+        if try isRecordsDirectoryExist().wait() {
+            try createRecordsRootDirectory().wait()
+        }
+    }
+    
+    private func createRecordsRootDirectory() -> Promise<Void> {
+        return Promise.value.then(on: serviceQueue, flags: nil) { _ throws -> Promise<Void> in
+            try FileManager.default.createDirectory(at: self.recordsDirectoryRootUrl, withIntermediateDirectories: true, attributes: [:])
+            return Promise.value
+        }
     }
     
     private func isRecordsDirectoryExist() -> Promise<Bool> {

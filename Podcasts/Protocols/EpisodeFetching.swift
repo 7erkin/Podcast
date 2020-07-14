@@ -9,5 +9,6 @@
 import Foundation
 
 protocol EpisodeFetching: class {
-    func fetchEpisodes(url: URL, _ completionHandler: @escaping ([Episode]) -> Void)
+    typealias Handler = (Result<[Episode], URLError>) -> Void
+    func fetchEpisodes(url: URL, _ completionHandler: @escaping Handler)
 }

@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         handleEventsForBackgroundURLSession identifier: String,
         completionHandler: @escaping () -> Void
     ) {
-        ServiceLocator.backgroundSessionScheduler.handleBackgroundSessionEvent(
+        ServiceLocator.backgroundSessionScheduler.triggerBackgroundSessionEventHandling(
             sessionIdentifier: identifier,
             completionHandler
         )

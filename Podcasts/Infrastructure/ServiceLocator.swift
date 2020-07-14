@@ -19,5 +19,5 @@ final class ServiceLocator {
         recordFetcher: ServiceLocator.episodeRecordDownloader
     )
     static let favoritePodcastsStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastStorage()
-    static let backgroundSessionScheduler = BackgroundSessionScheduler()
+    static let backgroundSessionScheduler = URLSessionScheduler()
 }

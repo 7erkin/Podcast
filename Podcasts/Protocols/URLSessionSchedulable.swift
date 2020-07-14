@@ -6,7 +6,7 @@
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
-protocol BackgroundSessionSchedulable: class {
+protocol URLSessionSchedulable: class {
     var sessionId: String { get }
     func backgroundTransit()
     func foregroundTransit()

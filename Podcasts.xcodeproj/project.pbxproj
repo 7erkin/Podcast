@@ -80,8 +80,8 @@
 		7CFF671624BCFC7B007B80FA /* RecordDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671524BCFC7B007B80FA /* RecordDownloader.swift */; };
 		B9112CDF2492241F00E0995E /* PlayingTrackManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9112CDE2492241F00E0995E /* PlayingTrackManaging.swift */; };
 		B9112CE12492263700E0995E /* DownloadedEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9112CE02492263700E0995E /* DownloadedEpisodesModel.swift */; };
-		B913BFAF24BD953900115A03 /* BackgroundSessionScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B913BFAE24BD953900115A03 /* BackgroundSessionScheduler.swift */; };
-		B913BFB124BD958600115A03 /* BackgroundSessionSchedulable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B913BFB024BD958600115A03 /* BackgroundSessionSchedulable.swift */; };
+		B913BFAF24BD953900115A03 /* URLSessionScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B913BFAE24BD953900115A03 /* URLSessionScheduler.swift */; };
+		B913BFB124BD958600115A03 /* URLSessionSchedulable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B913BFB024BD958600115A03 /* URLSessionSchedulable.swift */; };
 		B91E6D80248A657100019AEC /* FavoritePodcastsStoraging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91E6D7F248A657100019AEC /* FavoritePodcastsStoraging.swift */; };
 		B91E6D86248A6A7E00019AEC /* EpisodeFetching.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91E6D85248A6A7E00019AEC /* EpisodeFetching.swift */; };
 		B91E6D88248A6A8A00019AEC /* PodcastFetching.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91E6D87248A6A8A00019AEC /* PodcastFetching.swift */; };
@@ -180,8 +180,8 @@
 		7CFF671524BCFC7B007B80FA /* RecordDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDownloader.swift; sourceTree = "<group>"; };
 		B9112CDE2492241F00E0995E /* PlayingTrackManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingTrackManaging.swift; sourceTree = "<group>"; };
 		B9112CE02492263700E0995E /* DownloadedEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedEpisodesModel.swift; sourceTree = "<group>"; };
-		B913BFAE24BD953900115A03 /* BackgroundSessionScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSessionScheduler.swift; sourceTree = "<group>"; };
-		B913BFB024BD958600115A03 /* BackgroundSessionSchedulable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundSessionSchedulable.swift; sourceTree = "<group>"; };
+		B913BFAE24BD953900115A03 /* URLSessionScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionScheduler.swift; sourceTree = "<group>"; };
+		B913BFB024BD958600115A03 /* URLSessionSchedulable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionSchedulable.swift; sourceTree = "<group>"; };
 		B91E6D7F248A657100019AEC /* FavoritePodcastsStoraging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritePodcastsStoraging.swift; sourceTree = "<group>"; };
 		B91E6D85248A6A7E00019AEC /* EpisodeFetching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeFetching.swift; sourceTree = "<group>"; };
 		B91E6D87248A6A8A00019AEC /* PodcastFetching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastFetching.swift; sourceTree = "<group>"; };
@@ -286,7 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				7C17D0602475A4F300BD158E /* ServiceLocator.swift */,
-				B913BFAE24BD953900115A03 /* BackgroundSessionScheduler.swift */,
+				B913BFAE24BD953900115A03 /* URLSessionScheduler.swift */,
 			);
 			path = Infrastructure;
 			sourceTree = "<group>";
@@ -442,7 +442,7 @@
 				7C3F93FB249015F100835B7D /* TrackListPlaying.swift */,
 				B9112CDE2492241F00E0995E /* PlayingTrackManaging.swift */,
 				B993FF1A249BB61200635B22 /* EpisodeCellOutput.swift */,
-				B913BFB024BD958600115A03 /* BackgroundSessionSchedulable.swift */,
+				B913BFB024BD958600115A03 /* URLSessionSchedulable.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -612,7 +612,7 @@
 				7CEC7A8624871655008FB3FC /* FavoriteButtonItem.swift in Sources */,
 				B91E6D88248A6A8A00019AEC /* PodcastFetching.swift in Sources */,
 				7C466D3A2460FEF70014D33A /* ITunesService.swift in Sources */,
-				B913BFAF24BD953900115A03 /* BackgroundSessionScheduler.swift in Sources */,
+				B913BFAF24BD953900115A03 /* URLSessionScheduler.swift in Sources */,
 				B9958CAD2480FC8E00963BF0 /* TabBarAnimations.swift in Sources */,
 				7C643729249E1F590090BAE8 /* PodcastCellViewModel.swift in Sources */,
 				7CEC7A792485C4BA008FB3FC /* AnyCache.swift in Sources */,
@@ -627,7 +627,7 @@
 				7C466D412461E6860014D33A /* EpisodesController.swift in Sources */,
 				7C466D4A246205C10014D33A /* Episode.swift in Sources */,
 				7CEDAD6A2470247300DACFE5 /* AppPlayerViewAnimations.swift in Sources */,
-				B913BFB124BD958600115A03 /* BackgroundSessionSchedulable.swift in Sources */,
+				B913BFB124BD958600115A03 /* URLSessionSchedulable.swift in Sources */,
 				7C466D47246204F90014D33A /* EpisodeCell.swift in Sources */,
 				7C3654C82475FB7900EB68C4 /* FileSystemRecordsStorage.swift in Sources */,
 				7C17D0612475A4F300BD158E /* ServiceLocator.swift in Sources */,

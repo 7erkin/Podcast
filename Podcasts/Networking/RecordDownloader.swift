@@ -22,8 +22,7 @@ final class Download<DownloadHandler> {
     }
 }
 
-final class RecordDownloader:
-NSObject, EpisodeRecordDownloading, URLSessionDelegate, BackgroundSessionSchedulable {
+final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDelegate, URLSessionSchedulable {
     func backgroundTransit() {
         print(#function)
         for download in activeDownloads.values {
@@ -41,6 +40,9 @@ NSObject, EpisodeRecordDownloading, URLSessionDelegate, BackgroundSessionSchedul
     
     func foregroundTransit() {
         print(#function)
+        backgroundSession.getAllTasks { tasks in
+            print(tasks.count)
+        }
     }
     
     func handleSessionEvent(_ completionHandler: @escaping () -> Void) {
@@ -70,63 +72,62 @@ NSObject, EpisodeRecordDownloading, URLSessionDelegate, BackgroundSessionSchedul
             delegateQueue: OperationQueue.current
         )
     }()
-    private lazy var defaultSession: URLSession = { [unowned self] in
+    private lazy var foregroundSession: URLSession = { [unowned self] in
         return URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue.current)
     }()
-    private let scheduler: BackgroundSessionScheduler
-    init(backgroundSessionScheduler scheduler: BackgroundSessionScheduler) {
+    private let scheduler: URLSessionScheduler
+    private var schedulerRegistrationCanceller: URLSessionScheduler.ResignSchedulerClient?
+    init(backgroundSessionScheduler scheduler: URLSessionScheduler) {
         self.scheduler = scheduler
+        super.init()
+        initializeWithBackgroundSession()
+    }
+    
+    private func initializeWithBackgroundSession() {
+        backgroundSession.getAllTasks { tasks in
+            for task in tasks {
+                if let downloadTask = task as? URLSessionDownloadTask {
+                    downloadTask.cancel { [weak self] data in
+                        self?.serviceQueue.async {
+                            if let data = data {
+                                
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private func addToBackgroundSessionSchedulerIfNeeded() {
+        if schedulerRegistrationCanceller == nil {
+            schedulerRegistrationCanceller = try? scheduler.becomeSchedulerClient(self).wait()
+        }
+    }
+    
+    private func removeFromBackgroundSessionScheduler() {
+        schedulerRegistrationCanceller?()
     }
     
     func downloadEpisodeRecord(
         episode: Episode,
         _ block: @escaping EpisodeRecordDownloading.Handler
     ) -> Promise<DownloadManager> {
-        let download = Download(episode: episode, downloadHandler: block)
-        return firstly {
-            // scheduler.register(self)
-            return Promise { resolver in resolver.fulfill({}) }
-        }.then(on: serviceQueue, flags: nil) { registrationCanceller -> Promise<DownloadManager> in
-            download.task = self.backgroundSession.downloadTask(with: episode.streamUrl)
-            download.task?.resume()
-            block(.event(.started))
-            self.activeDownloads[episode.streamUrl] = download
-            let cancel: DownloadManager.Handler = { [weak self] in
-                self?.serviceQueue.async {
-                    registrationCanceller()
-                    if let download = self?.activeDownloads.removeValue(forKey: episode.streamUrl) {
-                        download.task?.cancel()
-                        download.handler(.event(.canceled))
-                    }
-                }
+        return Promise { resolver in
+            serviceQueue.async { [unowned self] in
+                let download = Download(episode: episode, downloadHandler: block)
+                self.activeDownloads[episode.streamUrl] = download
+                self.addToBackgroundSessionSchedulerIfNeeded()
+                download.task = self.foregroundSession.downloadTask(with: episode.streamUrl)
+                download.task?.resume()
+                block(.event(.started))
+                let manager = DownloadManager(
+                    cancel: self.createCancelHandler(forDownload: download),
+                    resume: self.createResumeHandler(forDownload: download),
+                    suspend: self.createSuspendHandler(forDownload: download)
+                )
+                resolver.fulfill(manager)
             }
-            let suspend: DownloadManager.Handler = { [weak self] in
-                self?.serviceQueue.async {
-                    registrationCanceller()
-                    if let download = self?.activeDownloads[episode.streamUrl], download.isDownloading {
-                        download.isDownloading = false
-                        download.task?.cancel(byProducingResumeData: {
-                            download.resumeData = $0
-                        })
-                        download.task = nil
-                        download.handler(.event(.suspended))
-                    }
-                }
-            }
-            let resume: DownloadManager.Handler = { [weak self] in
-                self?.serviceQueue.async {
-                    if let download = self?.activeDownloads[episode.streamUrl], !download.isDownloading {
-                        if let data = download.resumeData {
-                            download.task = self?.backgroundSession.downloadTask(withResumeData: data)
-                        } else {
-                            download.task = self?.backgroundSession.downloadTask(with: episode.streamUrl)
-                        }
-                        download.isDownloading = true
-                        download.handler(.event(.resumed))
-                    }
-                }
-            }
-            return Promise { $0.fulfill(DownloadManager(cancel: cancel, resume: resume, suspend: suspend)) }
         }
     }
     
@@ -143,6 +144,9 @@ NSObject, EpisodeRecordDownloading, URLSessionDelegate, BackgroundSessionSchedul
             do {
                 try FileManager.default.moveItem(at: location, to: temporaryUrl)
                 let download = activeDownloads.removeValue(forKey: url)
+                if activeDownloads.isEmpty {
+                    removeFromBackgroundSessionScheduler()
+                }
                 download?.handler(.event(.fulfilled(temporaryUrl)))
             } catch let err {
                 print("Error during move: ", err)
@@ -170,6 +174,56 @@ NSObject, EpisodeRecordDownloading, URLSessionDelegate, BackgroundSessionSchedul
             if let download = activeDownloads[url] {
                 // must be correct
                 download.handler(.failure(.init(.cancelled)))
+            }
+        }
+    }
+    // MARK: - Helpers
+    private func createResumeHandler(
+        forDownload download: Download<EpisodeRecordDownloading.Handler>
+    ) -> DownloadManager.Handler {
+        { [weak self] in
+            self?.serviceQueue.async {
+                if !download.isDownloading {
+                    if let data = download.resumeData {
+                        download.task = self?.foregroundSession.downloadTask(withResumeData: data)
+                    } else {
+                        download.task = self?.foregroundSession.downloadTask(with: download.episode.streamUrl)
+                    }
+                    download.isDownloading = true
+                    download.handler(.event(.resumed))
+                }
+            }
+        }
+    }
+    
+    private func createCancelHandler(
+        forDownload download: Download<EpisodeRecordDownloading.Handler>
+    ) -> DownloadManager.Handler {
+        { [weak self] in
+            self?.serviceQueue.async {
+                self?.activeDownloads.removeValue(forKey: download.episode.streamUrl)
+                download.task?.cancel()
+                if let isEmpty = self?.activeDownloads.isEmpty, isEmpty {
+                    self?.removeFromBackgroundSessionScheduler()
+                }
+                download.handler(.event(.canceled))
+            }
+        }
+    }
+    
+    private func createSuspendHandler(
+        forDownload download: Download<EpisodeRecordDownloading.Handler>
+    ) -> DownloadManager.Handler {
+        { [weak self] in
+            self?.serviceQueue.async {
+                if download.isDownloading {
+                    download.isDownloading = false
+                    download.task?.cancel(byProducingResumeData: {
+                        download.resumeData = $0
+                    })
+                    download.task = nil
+                    download.handler(.event(.suspended))
+                }
             }
         }
     }

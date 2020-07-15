@@ -44,16 +44,24 @@ final class FavoritePodcastsController: UICollectionViewController, UICollection
                     .receive(on: DispatchQueue.main)
                     .sink { [weak self] nextViewModels in
                         guard let self = self else { return }
+                        
                         var snapshot: Snapshot = self.dataSource.snapshot()
                         if snapshot.numberOfSections == 0 {
                             snapshot.appendSections([.main])
                         }
+                        
                         let itemsToDelete = snapshot
                             .itemIdentifiers(inSection: .main)
                             .filter { !nextViewModels.contains($0) }
                         snapshot.deleteItems(itemsToDelete)
                         let itemsToAdd = nextViewModels
                             .filter { !snapshot.itemIdentifiers(inSection: .main).contains($0) }
+                        if let firstItem = snapshot.itemIdentifiers(inSection: .main).first {
+                            snapshot.insertItems(itemsToAdd, beforeItem: firstItem)
+                        } else {
+                            snapshot.appendItems(itemsToAdd, toSection: .main)
+                        }
+                        
                         snapshot.appendItems(itemsToAdd, toSection: .main)
                         self.dataSource.apply(snapshot, animatingDifferences: true, completion: nil)
                     }

@@ -17,17 +17,17 @@ final class AsyncImageView: UIImageView {
         }
     }
     
+    private var _frame: CGRect = .zero
     override var frame: CGRect {
-        didSet {
-            loadImageIfAvailable()
-        }
+        get { return _frame }
+        set { _frame = newValue; loadImageIfAvailable() }
     }
     
     var startLoadingImage: LoadingImageCallback?
     var finishLoadingImage: LoadingImageCallback?
     private var defferedImageFetch: DefferedBlock!
     private func loadImageIfAvailable() {
-        guard let url = imageUrl, frame != .zero else { return }
+        guard let url = imageUrl, _frame != .zero else { return }
         
         let handler = ImageFetcher.Handler(
             handleOn: DispatchQueue.main,

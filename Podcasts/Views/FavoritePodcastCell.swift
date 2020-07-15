@@ -10,12 +10,7 @@ import UIKit
 import Combine
 
 final class FavoritePodcastCell: UICollectionViewCell {
-    private lazy var imageView: AsyncImageView = { [unowned self] in
-        let imageView = AsyncImageView()
-        imageView.startLoadingImage = { [unowned self] in self.loadingImageIndicator.startAnimating() }
-        imageView.finishLoadingImage = { [unowned self] in self.loadingImageIndicator.stopAnimating() }
-        return imageView
-    }()
+    private let imageView = AsyncImageView()
     private let nameLabel = UILabel()
     private let artistNameLabel = UILabel()
     private let loadingImageIndicator = UIActivityIndicatorView()
@@ -24,10 +19,12 @@ final class FavoritePodcastCell: UICollectionViewCell {
             if self.viewModel != nil {
                 artistNameLabel.text = self.viewModel.artistName
                 nameLabel.text = self.viewModel.podcastName
-                imageView.imageUrl = self.viewModel.podcastImageUrl
+                self.imageView.imageUrl = self.viewModel.podcastImageUrl
             }
         }
     }
+    
+    private var updateImageView: (() -> Void)!
     
     private func stylizeUI() {
         nameLabel.text = "Podcast name"
@@ -40,7 +37,9 @@ final class FavoritePodcastCell: UICollectionViewCell {
     private func setupView() {
         imageView.backgroundColor = .systemGroupedBackground
         imageView.contentMode = .scaleAspectFill
-        imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        //imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor).isActive = true
+        //imageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         
         let stackView = UIStackView(arrangedSubviews: [imageView, nameLabel, artistNameLabel])
         stackView.axis = .vertical
@@ -79,5 +78,6 @@ final class FavoritePodcastCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         loadingImageIndicator.center = .init(x: bounds.width / 2, y: bounds.width / 2)
+        imageView.frame.size = .init(width: bounds.width, height: bounds.width)
     }
 }

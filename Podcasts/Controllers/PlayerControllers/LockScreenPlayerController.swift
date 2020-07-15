@@ -30,10 +30,10 @@ final class LockScreenPlayerController {
     private func updateViewWithModel(_ playerState: PlayerState) {
         let lockScreenMediaCenter = MPNowPlayingInfoCenter.default()
         var info = [String:Any]()
-        info[MPMediaItemPropertyTitle] = playerState.track.episode.name
-        info[MPMediaItemPropertyArtist] = playerState.track.episode.author
+        info[MPMediaItemPropertyTitle] = playerState.track?.episode.name
+        info[MPMediaItemPropertyArtist] = playerState.track?.episode.author
         lockScreenMediaCenter.nowPlayingInfo = info
-        lockScreenMediaCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playerState.trackPlaybackTime.roundedSeconds
-        lockScreenMediaCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = playerState.trackDuration.roundedSeconds
+        lockScreenMediaCenter.nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playerState.trackPlaybackTime?.roundedSeconds
+        lockScreenMediaCenter.nowPlayingInfo?[MPMediaItemPropertyPlaybackDuration] = playerState.trackDuration?.roundedSeconds
     }
 }

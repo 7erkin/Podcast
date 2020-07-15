@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 final class MainTabBarController: UITabBarController {
-//    private var appPlayerController: AppPlayerController!
+    private var appPlayerController: AppPlayerController!
 //    private var mediaCenterPlayerController: MediaCenterPlayerController!
 //    private var lockScreenPlayerController: LockScreenPlayerController!
     override func viewDidLoad() {
@@ -20,23 +20,23 @@ final class MainTabBarController: UITabBarController {
         view.backgroundColor = .white
         
         setupRootViewControllers()
-//        setupPlayerControllers()
+        setupAppPlayerViewController()
     }
     // MARK :- setup functions
-//    private func setupAppPlayerViewController() {
-//        appPlayerController = .init()
-//        appPlayerController.player = Player.shared
-//        appPlayerController.view.frame = tabBar.frame
-//        view.insertSubview(appPlayerController.view, belowSubview: tabBar)
-//        appPlayerController.dissmisAnimationInvoker = { [ unowned tabBar = tabBar ] playerView in
-//            invokeAppearingAnimation(withTabBar: tabBar)
-//            invokeDissmisAnimation(withAppPlayerView: playerView)
-//        }
-//        appPlayerController.enlargeAnimationInvoker = { [ unowned tabBar = tabBar ] playerView in
-//            invokeHiddingAnimation(withTabBar: tabBar)
-//            invokeEnlargeAnimation(withAppPlayerView: playerView)
-//        }
-//    }
+    private func setupAppPlayerViewController() {
+        appPlayerController = .init()
+        appPlayerController.player = Player.shared
+        appPlayerController.view.frame = tabBar.frame
+        view.insertSubview(appPlayerController.view, belowSubview: tabBar)
+        appPlayerController.dissmisAnimationInvoker = { [ unowned tabBar = tabBar ] playerView in
+            invokeAppearingAnimation(withTabBar: tabBar)
+            invokeDissmisAnimation(withAppPlayerView: playerView)
+        }
+        appPlayerController.enlargeAnimationInvoker = { [ unowned tabBar = tabBar ] playerView in
+            invokeHiddingAnimation(withTabBar: tabBar)
+            invokeEnlargeAnimation(withAppPlayerView: playerView)
+        }
+    }
     
 //    private func setupPlayerControllers() {
 //        mediaCenterPlayerController = .init()

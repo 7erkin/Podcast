@@ -27,6 +27,7 @@ final class AppPlayerController: UIViewController {
                     case .initial(let playerState):
                         self.updateViewWithModel(playerState)
                     case .playerStateUpdated(let playerState):
+                        print(playerState)
                         self.updateViewWithModel(playerState)
                     }
                 }

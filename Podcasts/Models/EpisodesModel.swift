@@ -16,6 +16,7 @@ enum EpisodesModelEvent {
 }
 
 final class EpisodesModel {
+    private lazy var trackListIdentifier: String = { [unowned self] in self.podcast.name ?? "\(UUID())" }()
     private var podcast: Podcast
     private var episodes: [Episode] = [] { didSet { subscribers.fire(.episodesFetched(podcast, self.episodes)) } }
     private var isPodcastFavorite: Bool = false { didSet { subscribers.fire(.podcastStatusUpdated(self.isPodcastFavorite)) } }
@@ -55,8 +56,11 @@ final class EpisodesModel {
     }
     
     func playEpisode(withIndex index: Int) {
-//        let trackList = episodes.map { Track(episode: $0, podcast: podcast, url: $0.streamUrl) }
-//        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
+        let trackList = TrackList(
+            trackListIdentifier,
+            tracks: episodes.map { Track(episode: $0, podcast: podcast, url: $0.streamUrl) }, playingTrackIndex: index
+        )
+        trackListPlayer.setTrackList(trackList)
     }
     // MARK: - helpers
     private func fetchEpisodes(withEpisodeFetcher episodeFetcher: EpisodeFetching) {

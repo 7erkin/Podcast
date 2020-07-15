@@ -9,11 +9,20 @@
 import Foundation
 import AVKit
 
-struct PlayerState {
+struct PlayerState: CustomStringConvertible {
+    var description: String {
+        """
+        Playing: \(isPlaying).
+        TrackName: \(track?.episode.name ?? "").
+        Playback: \(trackPlaybackTime?.roundedSeconds ?? 0).
+        Duration: \(trackDuration?.roundedSeconds ?? 0)
+        """
+    }
+    
     var isPlaying: Bool
-    var track: Track
-    var trackPlaybackTime: CMTime
-    var trackDuration: CMTime
+    var track: Track?
+    var trackPlaybackTime: CMTime? = nil
+    var trackDuration: CMTime? = nil
     var volumeLevel: Int
 }
 

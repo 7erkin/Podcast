@@ -57,19 +57,21 @@ final class MediaCenterPlayerController {
     }
     
     private func updateViewWithTrackListPlayer(_ event: TrackListPlayerEvent) {
-        let update: ([Track], Int) -> Void = {
-            let mediaCenter = MPRemoteCommandCenter.shared()
-            mediaCenter.nextTrackCommand.isEnabled = $0.count != $1 + 1
-            mediaCenter.previousTrackCommand.isEnabled = $1 != 0
+        let update: (TrackList?) -> Void = {
+            if let trackList = $0 {
+                let mediaCenter = MPRemoteCommandCenter.shared()
+                mediaCenter.nextTrackCommand.isEnabled = trackList.hasNextTrackToPlay
+                mediaCenter.previousTrackCommand.isEnabled = trackList.hasPreviousTrackToPlay
+            }
         }
         
         switch event {
-        case .initial(let trackList, let playingTrackIndex):
-            update(trackList, playingTrackIndex)
-        case .playingTrackUpdated(let trackList, let playingTrackIndex):
-            update(trackList, playingTrackIndex)
-        case .trackListUpdated(let trackList, let playingTrackIndex):
-            update(trackList, playingTrackIndex)
+        case .initial(let trackList):
+            update(trackList)
+        case .playingTrackUpdated(let trackList):
+            update(trackList)
+        case .trackListUpdated(let trackList):
+            update(trackList)
         }
     }
 }

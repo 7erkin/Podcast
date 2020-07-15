@@ -11,29 +11,43 @@ import AVKit
 final class Player: PlayingTrackManaging, TrackListPlaying {
     // MARK: - private properties
     private var subscriptions: [Subscription] = []
-    private var playingTrackManagerSubscribers = Subscribers<PlayingTrackManagerEvent>()
-    private var trackListPlayerSubscribers = Subscribers<TrackListPlayerEvent>()
-    private lazy var player: AVPlayer = {
+    private let playingTrackManagerSubscribers = Subscribers<PlayingTrackManagerEvent>()
+    private let trackListPlayerSubscribers = Subscribers<TrackListPlayerEvent>()
+    private lazy var player: AVPlayer = { [weak self] in
         let player = AVPlayer()
         player.automaticallyWaitsToMinimizeStalling = false
         let interval = CMTime(seconds: 1, preferredTimescale: 1)
-        player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] _ in
-            guard let self = self else { return }
-            if let item = self.player.currentItem {
-
+        let updatePlayerState: (CMTime) -> Void = { _ in
+            if let item = self?.player.currentItem, var playerState = self?.playerState {
+                if let isPlayerPausedByClient = self?.isPlayerPausedByClient, !isPlayerPausedByClient {
+                    playerState.trackPlaybackTime = item.currentTime()
+                    playerState.trackDuration = item.duration
+                    playerState.isPlaying = true
+                    self?.playerState = playerState
+                }
             }
         }
+        player.addPeriodicTimeObserver(
+            forInterval: interval,
+            queue: DispatchQueue.main,
+            using: updatePlayerState
+        )
         return player
     }()
+    private var playerState: PlayerState {
+        didSet {
+            playingTrackManagerSubscribers.fire(.playerStateUpdated(self.playerState))
+        }
+    }
+    /* internal part of invariant for not to update playerState
+    in "player.addPeriodicTimeObserver" func
+    when player has been asked to pause */
+    private var isPlayerPausedByClient = false
+    private var trackList: TrackList?
     // MARK: - Singleton
     private init() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback)
-            try AVAudioSession.sharedInstance().setActive(true, options: [])
-        } catch let sessionErr {
-            print("Configure AudioSession Error: \(sessionErr)")
-            fatalError("UB")
-        }
+        playerState = PlayerState(isPlaying: false, volumeLevel: 2)
+        configureAudioSession()
     }
     static let shared = Player()
     // MARK: - PlayingTrackManaging
@@ -50,7 +64,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     }
     
     func setVolumeLevel(_ volumeLevel: Int) {
-        
+        player.volume = 2
     }
     
     func subscribe(_ subscriber: @escaping (PlayingTrackManagerEvent) -> Void) -> Subscription {
@@ -58,25 +72,62 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     }
     
     func playPause() {
-
+        if playerState.isPlaying {
+            player.pause()
+            isPlayerPausedByClient = true
+            playerState.isPlaying = false
+        } else {
+            isPlayerPausedByClient = false
+            player.play()
+        }
     }
     // MARK: - TrackListPlaying
-    func setTrackList(_ trackList: [Track], withPlayingTrackIndex trackIndex: Int) {
-            
+    func setTrackList(_ trackList: TrackList) {
+        self.trackList = trackList
+        trackListPlayerSubscribers.fire(.trackListUpdated(trackList))
+        play(trackList.currentPlayingTrack)
     }
     
     func playNextTrack() {
+        guard let trackList = trackList else { return }
         
+        if let track = trackList.getNextTrackToPlay() {
+            trackListPlayerSubscribers.fire(.playingTrackUpdated(trackList))
+            play(track)
+        }
     }
     
     func playPreviousTrack() {
+        guard let trackList = trackList else { return }
         
+        if let track = trackList.getPreviousTrackToPlay() {
+            trackListPlayerSubscribers.fire(.playingTrackUpdated(trackList))
+            play(track)
+        }
     }
     
     func subscribe(_ subscriber: @escaping (TrackListPlayerEvent) -> Void) -> Subscription {
         trackListPlayerSubscribers.subscribe(action: subscriber)
     }
     // MARK: - helpers
+    private func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback)
+            try AVAudioSession.sharedInstance().setActive(true, options: [])
+        } catch let sessionErr {
+            print("Configure AudioSession Error: \(sessionErr)")
+            fatalError("UB")
+        }
+    }
+    
+    private func play(_ track: Track) {
+        let playerItem = AVPlayerItem(url: track.url)
+        player.replaceCurrentItem(with: playerItem)
+        playerState = PlayerState(isPlaying: false, track: track, volumeLevel: 2)
+        isPlayerPausedByClient = false
+        player.play()
+    }
+    
     private func shiftByTime(_ time: Int64) {
         let playbackTime = player.currentTime()
         let shiftTime = CMTime(seconds: Double(time), preferredTimescale: 1)

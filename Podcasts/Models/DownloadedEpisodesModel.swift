@@ -18,6 +18,7 @@ enum DownloadedEpisodesModelEvent {
 }
 
 final class DownloadedEpisodesModel {
+    private static let trackListIdentifier = "DownloadedEpisodesTrackList"
     struct State {
         var episodeRecords: [EpisodeRecordDescriptor]
         var downloadEpisodes: [DownloadEpisode]
@@ -54,8 +55,15 @@ final class DownloadedEpisodesModel {
     }
     
     func playEpisode(withIndex index: Int) {
-        let trackList = state.episodeRecords.map { Track(episode: $0.episode, podcast: $0.podcast, url: $0.recordUrl) }
-        trackListPlayer.setTrackList(trackList, withPlayingTrackIndex: index)
+        let tracks = state.episodeRecords.map {
+            Track(
+                episode: $0.episode,
+                podcast: $0.podcast,
+                url: $0.recordUrl
+            )
+        }
+        let trackList = TrackList(DownloadedEpisodesModel.trackListIdentifier, tracks: tracks, playingTrackIndex: index)
+        trackListPlayer.setTrackList(trackList)
     }
     
     private func updateWithRecordRepository(_ event: EpisodeRecordRepositoryEvent) {

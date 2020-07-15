@@ -8,8 +8,9 @@
 
 import Foundation
 import AVKit
+import Combine
 
-struct PlayerState: CustomStringConvertible {
+struct PlayingTrackState: CustomStringConvertible {
     var description: String {
         """
         Playing: \(isPlaying).
@@ -27,8 +28,8 @@ struct PlayerState: CustomStringConvertible {
 }
 
 enum PlayingTrackManagerEvent {
-    case initial(PlayerState)
-    case playerStateUpdated(PlayerState)
+    case initial(PlayingTrackState)
+    case playerStateUpdated(PlayingTrackState)
 }
 
 protocol PlayingTrackManaging: class {

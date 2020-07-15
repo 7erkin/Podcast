@@ -88,7 +88,7 @@ final class AppPlayerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    var playerState: PlayerState? {
+    var playerState: PlayingTrackState? {
         set {
             maximizePlayerView.playerState = newValue
             minimizePlayerView.playerState = newValue

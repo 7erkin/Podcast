@@ -27,7 +27,7 @@ final class LockScreenPlayerController {
         }
     }
     
-    private func updateViewWithModel(_ playerState: PlayerState) {
+    private func updateViewWithModel(_ playerState: PlayingTrackState) {
         let lockScreenMediaCenter = MPNowPlayingInfoCenter.default()
         var info = [String:Any]()
         info[MPMediaItemPropertyTitle] = playerState.track?.episode.name

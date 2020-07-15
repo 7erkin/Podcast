@@ -24,7 +24,7 @@ final class MinimizePlayerView: UIStackView {
     private let playImage: UIImage = UIImage(named: "play")!
     private let pauseImage: UIImage = UIImage(named: "pause")!
     
-    var playerState: PlayerState! {
+    var playerState: PlayingTrackState! {
         didSet {
             let image = self.playerState.isPlaying ? pauseImage : playImage
             playPauseButton.setImage(image, for: .normal)

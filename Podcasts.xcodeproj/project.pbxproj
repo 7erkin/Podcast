@@ -75,7 +75,6 @@
 		7CFF66FF24AB9C55007B80FA /* PromiseKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7CFF66FE24AB9C55007B80FA /* PromiseKit */; };
 		7CFF670224AB9C64007B80FA /* FeedKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7CFF670124AB9C64007B80FA /* FeedKit */; };
 		7CFF670424ACE820007B80FA /* EpisodeRecordFetching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF670324ACE820007B80FA /* EpisodeRecordFetching.swift */; };
-		7CFF670C24AD0100007B80FA /* FileSystemRecordsStorageTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF670B24AD0100007B80FA /* FileSystemRecordsStorageTest.swift */; };
 		7CFF671424BCFC24007B80FA /* URLComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671324BCFC24007B80FA /* URLComponents.swift */; };
 		7CFF671624BCFC7B007B80FA /* RecordDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671524BCFC7B007B80FA /* RecordDownloader.swift */; };
 		7CFF671824BF6FC7007B80FA /* TrackList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671724BF6FC7007B80FA /* TrackList.swift */; };
@@ -94,16 +93,6 @@
 		B9958CAD2480FC8E00963BF0 /* TabBarAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9958CAC2480FC8E00963BF0 /* TabBarAnimations.swift */; };
 		B9E57DF7247D4B560009A8E4 /* OrderedDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9E57DF6247D4B560009A8E4 /* OrderedDictionary.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		7CFF670E24AD0100007B80FA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 7C35EE412460CBD20029DA95 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 7C35EE482460CBD30029DA95;
-			remoteInfo = Podcasts;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		7C13FB672483E5FC0029E287 /* Subscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subscription.swift; sourceTree = "<group>"; };
@@ -175,9 +164,6 @@
 		7CF4788F249A93D90067D437 /* FavoritePodcastCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritePodcastCellViewModel.swift; sourceTree = "<group>"; };
 		7CF47891249E02A70067D437 /* DownloadedEpisodesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedEpisodesViewModel.swift; sourceTree = "<group>"; };
 		7CFF670324ACE820007B80FA /* EpisodeRecordFetching.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodeRecordFetching.swift; sourceTree = "<group>"; };
-		7CFF670924AD0100007B80FA /* FileSystemRecordsStorageTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FileSystemRecordsStorageTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		7CFF670B24AD0100007B80FA /* FileSystemRecordsStorageTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemRecordsStorageTest.swift; sourceTree = "<group>"; };
-		7CFF670D24AD0100007B80FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7CFF671324BCFC24007B80FA /* URLComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLComponents.swift; sourceTree = "<group>"; };
 		7CFF671524BCFC7B007B80FA /* RecordDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDownloader.swift; sourceTree = "<group>"; };
 		7CFF671724BF6FC7007B80FA /* TrackList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackList.swift; sourceTree = "<group>"; };
@@ -207,13 +193,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7CFF670624AD0100007B80FA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -221,7 +200,6 @@
 			isa = PBXGroup;
 			children = (
 				7C35EE4B2460CBD30029DA95 /* Podcasts */,
-				7CFF670A24AD0100007B80FA /* FileSystemRecordsStorageTest */,
 				7C35EE4A2460CBD30029DA95 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -230,7 +208,6 @@
 			isa = PBXGroup;
 			children = (
 				7C35EE492460CBD30029DA95 /* Podcasts.app */,
-				7CFF670924AD0100007B80FA /* FileSystemRecordsStorageTest.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -426,15 +403,6 @@
 			path = Library;
 			sourceTree = "<group>";
 		};
-		7CFF670A24AD0100007B80FA /* FileSystemRecordsStorageTest */ = {
-			isa = PBXGroup;
-			children = (
-				7CFF670B24AD0100007B80FA /* FileSystemRecordsStorageTest.swift */,
-				7CFF670D24AD0100007B80FA /* Info.plist */,
-			);
-			path = FileSystemRecordsStorageTest;
-			sourceTree = "<group>";
-		};
 		B91E6D7C248A632600019AEC /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
@@ -512,24 +480,6 @@
 			productReference = 7C35EE492460CBD30029DA95 /* Podcasts.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7CFF670824AD0100007B80FA /* FileSystemRecordsStorageTest */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 7CFF671024AD0100007B80FA /* Build configuration list for PBXNativeTarget "FileSystemRecordsStorageTest" */;
-			buildPhases = (
-				7CFF670524AD0100007B80FA /* Sources */,
-				7CFF670624AD0100007B80FA /* Frameworks */,
-				7CFF670724AD0100007B80FA /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				7CFF670F24AD0100007B80FA /* PBXTargetDependency */,
-			);
-			name = FileSystemRecordsStorageTest;
-			productName = FileSystemRecordsStorageTest;
-			productReference = 7CFF670924AD0100007B80FA /* FileSystemRecordsStorageTest.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -543,10 +493,6 @@
 					7C35EE482460CBD30029DA95 = {
 						CreatedOnToolsVersion = 11.3;
 						LastSwiftMigration = 1130;
-					};
-					7CFF670824AD0100007B80FA = {
-						CreatedOnToolsVersion = 11.3;
-						TestTargetID = 7C35EE482460CBD30029DA95;
 					};
 				};
 			};
@@ -568,7 +514,6 @@
 			projectRoot = "";
 			targets = (
 				7C35EE482460CBD30029DA95 /* Podcasts */,
-				7CFF670824AD0100007B80FA /* FileSystemRecordsStorageTest */,
 			);
 		};
 /* End PBXProject section */
@@ -585,13 +530,6 @@
 				7C466D48246204F90014D33A /* EpisodeCell.xib in Resources */,
 				7C466D3D246186DE0014D33A /* PodcastCell.xib in Resources */,
 				7CA423A924678874009C4A18 /* MinimizePlayerView.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		7CFF670724AD0100007B80FA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -681,23 +619,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7CFF670524AD0100007B80FA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7CFF670C24AD0100007B80FA /* FileSystemRecordsStorageTest.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		7CFF670F24AD0100007B80FA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 7C35EE482460CBD30029DA95 /* Podcasts */;
-			targetProxy = 7CFF670E24AD0100007B80FA /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		7C35EE572460CBD50029DA95 /* LaunchScreen.storyboard */ = {
@@ -867,44 +789,6 @@
 			};
 			name = Release;
 		};
-		7CFF671124AD0100007B80FA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = FileSystemRecordsStorageTest/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = petProjects.FileSystemRecordsStorageTest;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Podcasts.app/Podcasts";
-			};
-			name = Debug;
-		};
-		7CFF671224AD0100007B80FA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = FileSystemRecordsStorageTest/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = petProjects.FileSystemRecordsStorageTest;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Podcasts.app/Podcasts";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -922,15 +806,6 @@
 			buildConfigurations = (
 				7C35EE5E2460CBD50029DA95 /* Debug */,
 				7C35EE5F2460CBD50029DA95 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		7CFF671024AD0100007B80FA /* Build configuration list for PBXNativeTarget "FileSystemRecordsStorageTest" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				7CFF671124AD0100007B80FA /* Debug */,
-				7CFF671224AD0100007B80FA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

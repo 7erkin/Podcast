@@ -7,6 +7,7 @@
 //
 
 import AVKit
+import Combine
 
 final class Player: PlayingTrackManaging, TrackListPlaying {
     // MARK: - private properties
@@ -18,12 +19,12 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         player.automaticallyWaitsToMinimizeStalling = false
         let interval = CMTime(seconds: 1, preferredTimescale: 1)
         let updatePlayerState: (CMTime) -> Void = { _ in
-            if let item = self?.player.currentItem, var playerState = self?.playerState {
+            if let item = self?.player.currentItem, var playerState = self?.playingTrackState {
                 if let isPlayerPausedByClient = self?.isPlayerPausedByClient, !isPlayerPausedByClient {
                     playerState.trackPlaybackTime = item.currentTime()
                     playerState.trackDuration = item.duration
                     playerState.isPlaying = true
-                    self?.playerState = playerState
+                    self?.playingTrackState = playerState
                 }
             }
         }
@@ -34,9 +35,9 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         )
         return player
     }()
-    private var playerState: PlayerState {
+    private var playingTrackState: PlayingTrackState {
         didSet {
-            playingTrackManagerSubscribers.fire(.playerStateUpdated(self.playerState))
+            playingTrackManagerSubscribers.fire(.playerStateUpdated(self.playingTrackState))
         }
     }
     /* internal part of invariant for not to update playerState
@@ -47,7 +48,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     private var trackListToCommit: TrackList?
     // MARK: - Singleton
     private init() {
-        playerState = PlayerState(isPlaying: false, volumeLevel: 2)
+        playingTrackState = PlayingTrackState(isPlaying: false, volumeLevel: 2)
         configureAudioSession()
     }
     static let shared = Player()
@@ -73,10 +74,10 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     }
     
     func playPause() {
-        if playerState.isPlaying {
+        if playingTrackState.isPlaying {
             player.pause()
             isPlayerPausedByClient = true
-            playerState.isPlaying = false
+            playingTrackState.isPlaying = false
         } else {
             isPlayerPausedByClient = false
             player.play()
@@ -145,7 +146,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         player.pause()
         let playerItem = AVPlayerItem(url: track.url)
         player.replaceCurrentItem(with: playerItem)
-        playerState = PlayerState(isPlaying: false, track: track, volumeLevel: 2)
+        playingTrackState = PlayingTrackState(isPlaying: false, track: track, volumeLevel: 2)
         isPlayerPausedByClient = false
         player.play()
     }

@@ -46,7 +46,7 @@ final class AppPlayerController: UIViewController {
         super.viewDidLoad()
     }
     // MARK: - helpers
-    private func updateViewWithModel(_ playerState: PlayerState) {
+    private func updateViewWithModel(_ playerState: PlayingTrackState) {
         if !hasAppPlayerViewBeenPresented {
             enlargeAnimationInvoker(appPlayerView)
             hasAppPlayerViewBeenPresented = true

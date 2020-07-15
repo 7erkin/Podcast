@@ -84,7 +84,7 @@ final class MaximizePlayerView: UIView {
     private var isPlaybackSliderUpdateAvailable: Bool = true
     private var expectedPlaybackTime: CMTime?
     // MARK: -
-    var playerState: PlayerState! { didSet { updateViewWithPlayerState() } }
+    var playerState: PlayingTrackState! { didSet { updateViewWithPlayerState() } }
     // MARK: - override methods
     override func awakeFromNib() {
         super.awakeFromNib()

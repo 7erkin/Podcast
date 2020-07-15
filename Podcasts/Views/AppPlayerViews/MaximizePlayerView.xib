@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -26,7 +26,7 @@
                                 <action selector="onDismissButtonTapped:" destination="dhH-yE-T4p" eventType="touchUpInside" id="jiP-KB-HNq"/>
                             </connections>
                         </button>
-                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LiU-t3-ttw">
+                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LiU-t3-ttw" customClass="AsyncImageView" customModule="Podcasts" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="30" width="382" height="382"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="LiU-t3-ttw" secondAttribute="height" id="SVI-2P-69Q"/>
@@ -175,7 +175,7 @@
                 <outlet property="episodeDurationLabel" destination="MgO-ug-fku" id="MI0-X0-cSu"/>
                 <outlet property="episodeImageView" destination="LiU-t3-ttw" id="pYC-Vw-GyP"/>
                 <outlet property="episodeNameLabel" destination="e1W-vj-aAW" id="Yrf-G0-ajh"/>
-                <outlet property="episodeTimePastLabel" destination="tw1-dk-xG0" id="UQi-qE-mrZ"/>
+                <outlet property="episodePlaybackTimeLabel" destination="tw1-dk-xG0" id="UQi-qE-mrZ"/>
                 <outlet property="playPauseButton" destination="VFC-9H-6IB" id="zO1-Yx-YRc"/>
                 <outlet property="timeSlider" destination="GWd-wY-v7w" id="bs5-Uc-EIa"/>
             </connections>

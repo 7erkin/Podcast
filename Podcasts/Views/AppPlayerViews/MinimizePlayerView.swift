@@ -10,7 +10,7 @@ import UIKit
 import PromiseKit
 
 final class MinimizePlayerView: UIStackView {
-    @IBOutlet var episodeImageView: UIImageView!
+    @IBOutlet var episodeImageView: AsyncImageView!
     @IBOutlet var episodeNameLabel: UILabel!
     @IBOutlet var playPauseButton: UIButton!
     
@@ -24,33 +24,11 @@ final class MinimizePlayerView: UIStackView {
     private let playImage: UIImage = UIImage(named: "play")!
     private let pauseImage: UIImage = UIImage(named: "pause")!
     
-    var episode: Episode! {
-        didSet {
-            episodeNameLabel.text = self.episode.name
-            if let _ = episodeImageView.image {
-                blurEpisodeImageView()
-            }
-            
-            if let episodeImageUrl = self.episode.imageUrl {
-//                firstly {
-//                    // imageFetcher.fetchImage(withImageUrl: episodeImageUrl)
-//                }.done(on: .main, flags: nil) { (image) in
-//                    if episodeImageUrl == self.episode.imageUrl {
-//                        self.episodeImageView.image = image
-//                    }
-//                }.ensure(on: .main, flags: nil) {
-//                    // hide loading indicator on episode image
-//                }.catch({ (_) in
-//                    // inform user with error
-//                })
-            }
-        }
-    }
-    
     var playerState: PlayerState! {
         didSet {
             let image = self.playerState.isPlaying ? pauseImage : playImage
             playPauseButton.setImage(image, for: .normal)
+            episodeImageView.imageUrl = self.playerState.track?.episode.imageUrl
         }
     }
     

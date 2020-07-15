@@ -25,11 +25,13 @@ final class MaximizePlayerView: UIView {
     @IBOutlet var episodeNameLabel: UILabel!
     @IBOutlet var authorLabel: UILabel!
     @IBOutlet var episodeDurationLabel: UILabel!
-    @IBOutlet var episodeTimePastLabel: UILabel!
-    @IBOutlet var episodeImageView: UIImageView! {
+    @IBOutlet var episodePlaybackTimeLabel: UILabel!
+    @IBOutlet var episodeImageView: AsyncImageView! {
         didSet {
             self.episodeImageView.layer.cornerRadius = 5
             self.episodeImageView.clipsToBounds = true
+            self.episodeImageView.startLoadingImage = {}
+            self.episodeImageView.finishLoadingImage = {}
         }
     }
     @IBOutlet var playPauseButton: UIButton!
@@ -82,7 +84,6 @@ final class MaximizePlayerView: UIView {
     private var isPlaybackSliderUpdateAvailable: Bool = true
     private var expectedPlaybackTime: CMTime?
     // MARK: -
-    var episode: Episode! { didSet { updateViewWithEpisode() } }
     var playerState: PlayerState! { didSet { updateViewWithPlayerState() } }
     // MARK: - override methods
     override func awakeFromNib() {
@@ -108,49 +109,35 @@ final class MaximizePlayerView: UIView {
     }
     
     // MARK: - update view functions
-    private func updateViewWithEpisode() {
-        episodeNameLabel.text = episode.name
-        authorLabel.text = episode.author
-        if let _ = episodeImageView.image {
-            blurEpisodeImage()
-        }
-        
-        if let _ = episode.imageUrl {
-            updateEpisodeImageWithImageService()
-        } else {
-            updateEpisodeImageWithDefaultImage()
-        }
-    }
-    
     private func updateViewWithPlayerState() {
-//        if playerState.duration.convertable {
-//            episodeDurationLabel.text = playerState.duration.toPlayerTimePresentation
-//            timeSlider.maximumValue = Float(playerState.duration.roundedSeconds)
-//            if !isPlaybackSliderUpdateAvailable {
-//                updatePlaybackTimeSliderAfterDirectlyUpdate()
-//            } else {
-//                timeSlider.value = Float(playerState.timePast.roundedSeconds)
-//            }
-//        } else {
-//            episodeDurationLabel.text = undefinedDurationPlaceholder
-//            timeSlider.maximumValue = timeSliderDefaultMaxValue
-//            timeSlider.value = timeSliderDefaultMinValue
-//        }
-        
-        var playPauseButtonImage: UIImage!
-        if playerState.isPlaying {
-            playPauseButtonImage = pauseImage
-            if isEpisodeImageViewShrinked() {
-                performEpisodeImageViewAnimatedEnlarge()
+        if let track = playerState.track {
+            if episodeImageView.imageUrl != track.episode.imageUrl {
+                episodeImageView.imageUrl = track.episode.imageUrl
             }
-        } else {
-            playPauseButtonImage = playImage
-            if !isEpisodeImageViewShrinked() {
-                performEpisodeImageViewAnimatedShrink()
+            // update play/pause button
+            var playPauseButtonImage: UIImage!
+            if playerState.isPlaying {
+                playPauseButtonImage = pauseImage
+                if isEpisodeImageViewShrinked() {
+                    performEpisodeImageViewAnimatedEnlarge()
+                }
+            } else {
+                playPauseButtonImage = playImage
+                if !isEpisodeImageViewShrinked() {
+                    performEpisodeImageViewAnimatedShrink()
+                }
+            }
+            playPauseButton.setImage(playPauseButtonImage, for: .normal)
+            // update playback time label
+            episodePlaybackTimeLabel.text = playerState.trackPlaybackTime?.toPlayerTimePresentation
+            // update duration label and slider
+            if let duration = playerState.trackDuration {
+                episodeDurationLabel.text = duration.convertable ? duration.toPlayerTimePresentation : undefinedDurationPlaceholder
+                // timeSlider.maximumValue = Float(duration.roundedSeconds)
+            } else {
+                episodeDurationLabel.text = undefinedDurationPlaceholder
             }
         }
-        playPauseButton.setImage(playPauseButtonImage, for: .normal)
-        // episodeTimePastLabel.text = playerState.timePast.toPlayerTimePresentation
     }
     
     // MARK: - perform animations functions
@@ -198,37 +185,6 @@ final class MaximizePlayerView: UIView {
         }.catch(on: .main, flags: nil, policy: .allErrors) { _ in
           
         }
-    }
-    
-    private func updateEpisodeImageWithImageService() {
-//        let imageUrl = episode.imageUrl!
-//        firstly {
-//            imageFetcher.fetchImage(withImageUrl: imageUrl)
-//        }.done(on: .main, flags: nil) { (image) in
-//            if imageUrl == self.episode.imageUrl {
-//                self.episodeImageView.image = image
-//            }
-//        }.ensure(on: .main, flags: nil) {
-//            // hide loading indicator on episode image
-//        }.catch { _ in
-//            // inform user with error
-//        }
-    }
-    
-    private func updatePlaybackTimeSliderAfterDirectlyUpdate() {
-//        let currentPlaybackTime = playerState.timePast.roundedSeconds
-//        if currentPlaybackTime == expectedPlaybackTime!.roundedSeconds {
-//            isPlaybackSliderUpdateAvailable = true
-//            expectedPlaybackTime = nil
-//            playbackTimeBeforeUpdate = nil
-//            timeSlider.value = Float(currentPlaybackTime)
-//        }
-//        
-//        if
-//            currentPlaybackTime == playbackTimeBeforeUpdate!.roundedSeconds + 1 &&
-//            expectedPlaybackTime!.roundedSeconds != currentPlaybackTime {
-//            playbackTimeBeforeUpdate = playerState.timePast
-//        }
     }
     
     private func updateEpisodeImageWithDefaultImage() {

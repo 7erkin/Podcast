@@ -27,7 +27,6 @@ final class AppPlayerController: UIViewController {
                     case .initial(let playerState):
                         self.updateViewWithModel(playerState)
                     case .playerStateUpdated(let playerState):
-                        print(playerState)
                         self.updateViewWithModel(playerState)
                     }
                 }
@@ -53,6 +52,7 @@ final class AppPlayerController: UIViewController {
             hasAppPlayerViewBeenPresented = true
         }
         
+        appPlayerView.playerState = playerState
     }
 }
 

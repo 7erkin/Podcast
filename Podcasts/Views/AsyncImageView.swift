@@ -23,8 +23,8 @@ final class AsyncImageView: UIImageView {
         }
     }
     
-    var startLoadingImage: LoadingImageCallback!
-    var finishLoadingImage: LoadingImageCallback!
+    var startLoadingImage: LoadingImageCallback?
+    var finishLoadingImage: LoadingImageCallback?
     private var defferedImageFetch: DefferedBlock!
     private func loadImageIfAvailable() {
         guard let url = imageUrl, frame != .zero else { return }
@@ -33,7 +33,7 @@ final class AsyncImageView: UIImageView {
             handleOn: DispatchQueue.main,
             block: { [weak self] in
                 if self?.imageUrl != url { return }
-                self?.finishLoadingImage()
+                self?.finishLoadingImage?()
                 switch $0 {
                 case .success(let image):
                     self?.image = image
@@ -42,7 +42,7 @@ final class AsyncImageView: UIImageView {
                 }
             }
         )
-        startLoadingImage()
+        startLoadingImage?()
         ImageFetcher.shared.fetch(
             imageUrl: url,
             withImageSize: self.frame.size,

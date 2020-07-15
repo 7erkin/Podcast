@@ -14,7 +14,7 @@ final class ServiceLocator {
         backgroundSessionScheduler: ServiceLocator.backgroundSessionScheduler
     )
     static let recordStorage: EpisodeRecordStoraging = FileSystemRecordsStorage()!
-    static let recordRepository: EpisodeRecordRepositoring = EpisodeRecordsRepository(
+    static let recordRepository: EpisodeRecordRepositoring = EpisodeRecordRepository(
         recordStorage: ServiceLocator.recordStorage,
         recordFetcher: ServiceLocator.episodeRecordDownloader
     )

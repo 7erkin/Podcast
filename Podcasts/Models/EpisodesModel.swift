@@ -13,6 +13,7 @@ enum EpisodesModelEvent {
     case initial(Podcast, [Episode], Bool)
     case episodesFetched(Podcast, [Episode])
     case podcastStatusUpdated(Bool)
+    case playingTrackIndexUpdated(Int?)
 }
 
 final class EpisodesModel {
@@ -26,6 +27,15 @@ final class EpisodesModel {
     // MARK: -
     private var subscriptions: [Subscription] = []
     private var subscribers = Subscribers<EpisodesModelEvent>()
+    private var currentPlayingTrackList: TrackList? {
+        willSet {
+            if trackListIdentifier == self.currentPlayingTrackList?.sourceIdentifier {
+                if self.currentPlayingTrackList?.currentPlayingTrackIndex != newValue?.currentPlayingTrackIndex {
+                    subscribers.fire(.playingTrackIndexUpdated(newValue?.currentPlayingTrackIndex))
+                }
+            }
+        }
+    }
     // MARK: -
     init(
         podcast: Podcast,
@@ -39,6 +49,10 @@ final class EpisodesModel {
         
         self.podcastStorage
             .subscribe { [weak self] in self?.updateWithFavoritePodcastsStorage($0) }
+            .stored(in: &subscriptions)
+        
+        self.trackListPlayer
+            .subscribe { [weak self] in self?.updateWithTrackListPlayer($0) }
             .stored(in: &subscriptions)
         
         fetchEpisodes(withEpisodeFetcher: episodeFetcher)
@@ -56,11 +70,18 @@ final class EpisodesModel {
     }
     
     func playEpisode(withIndex index: Int) {
+        if let trackList = currentPlayingTrackList {
+            if trackList.sourceIdentifier == trackListIdentifier {
+                trackListPlayer.playTrack(atIndex: index)
+                return
+            }
+        }
+        
         let trackList = TrackList(
             trackListIdentifier,
             tracks: episodes.map { Track(episode: $0, podcast: podcast, url: $0.streamUrl) }, playingTrackIndex: index
         )
-        trackListPlayer.setTrackList(trackList)
+        trackListPlayer.setTrackList(trackList, reasonOfSetting: .setNewTrackList)
     }
     // MARK: - helpers
     private func fetchEpisodes(withEpisodeFetcher episodeFetcher: EpisodeFetching) {
@@ -75,6 +96,17 @@ final class EpisodesModel {
                     break
                 }
             }
+        }
+    }
+    
+    private func updateWithTrackListPlayer(_ event: TrackListPlayerEvent) {
+        switch event {
+        case .initial(let trackList):
+            currentPlayingTrackList = trackList
+        case .playingTrackUpdated(let trackList):
+            currentPlayingTrackList = trackList
+        case .trackListUpdated(let trackList):
+            currentPlayingTrackList = trackList
         }
     }
     

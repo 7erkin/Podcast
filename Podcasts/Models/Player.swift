@@ -44,6 +44,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     when player has been asked to pause */
     private var isPlayerPausedByClient = false
     private var trackList: TrackList?
+    private var trackListToCommit: TrackList?
     // MARK: - Singleton
     private init() {
         playerState = PlayerState(isPlaying: false, volumeLevel: 2)
@@ -82,14 +83,19 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         }
     }
     // MARK: - TrackListPlaying
-    func setTrackList(_ trackList: TrackList) {
-        self.trackList = trackList
-        trackListPlayerSubscribers.fire(.trackListUpdated(trackList))
-        play(trackList.currentPlayingTrack)
+    func setTrackList(_ trackList: TrackList, reasonOfSetting: TrackListSettingMotivation) {
+        if case .setNewTrackList = reasonOfSetting {
+            self.trackList = trackList
+            trackListPlayerSubscribers.fire(.trackListUpdated(trackList))
+            play(trackList.currentPlayingTrack)
+        } else {
+           trackListToCommit = trackList
+        }
     }
     
     func playNextTrack() {
-        guard let trackList = trackList else { return }
+        commitUpdatedTrackListIfNeeded()
+        guard var trackList = trackList else { return }
         
         if let track = trackList.getNextTrackToPlay() {
             trackListPlayerSubscribers.fire(.playingTrackUpdated(trackList))
@@ -98,10 +104,19 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     }
     
     func playPreviousTrack() {
-        guard let trackList = trackList else { return }
+        commitUpdatedTrackListIfNeeded()
+        guard var trackList = trackList else { return }
         
         if let track = trackList.getPreviousTrackToPlay() {
             trackListPlayerSubscribers.fire(.playingTrackUpdated(trackList))
+            play(track)
+        }
+    }
+    
+    func playTrack(atIndex index: Int) {
+        commitUpdatedTrackListIfNeeded()
+        if var trackList = trackList, let track = trackList.getTrackToPlay(atIndex: index) {
+            trackListPlayerSubscribers.fire(.trackListUpdated(trackList))
             play(track)
         }
     }
@@ -110,6 +125,12 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         trackListPlayerSubscribers.subscribe(action: subscriber)
     }
     // MARK: - helpers
+    private func commitUpdatedTrackListIfNeeded() {
+        if trackListToCommit != nil {
+            trackList = trackListToCommit
+            trackListToCommit = nil
+        }
+    }
     private func configureAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
@@ -121,6 +142,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     }
     
     private func play(_ track: Track) {
+        player.pause()
         let playerItem = AVPlayerItem(url: track.url)
         player.replaceCurrentItem(with: playerItem)
         playerState = PlayerState(isPlaying: false, track: track, volumeLevel: 2)

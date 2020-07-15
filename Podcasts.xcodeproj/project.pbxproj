@@ -67,7 +67,7 @@
 		7CF237B7246364CE00B7A09F /* AppPlayerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF237B6246364CE00B7A09F /* AppPlayerController.swift */; };
 		7CF237BB2466529300B7A09F /* CMTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF237BA2466529300B7A09F /* CMTime.swift */; };
 		7CF237BD246779AE00B7A09F /* AppPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF237BC246779AE00B7A09F /* AppPlayerView.swift */; };
-		7CF33CF124794D8C0013E9FA /* EpisodeRecordsRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF33CF024794D8C0013E9FA /* EpisodeRecordsRepository.swift */; };
+		7CF33CF124794D8C0013E9FA /* EpisodeRecordRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF33CF024794D8C0013E9FA /* EpisodeRecordRepository.swift */; };
 		7CF4788C2491AD3E0067D437 /* EpisodeRecordDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4788B2491AD3E0067D437 /* EpisodeRecordDescriptor.swift */; };
 		7CF4788E249A93940067D437 /* FavoritePodcastsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4788D249A93940067D437 /* FavoritePodcastsViewModel.swift */; };
 		7CF47890249A93D90067D437 /* FavoritePodcastCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4788F249A93D90067D437 /* FavoritePodcastCellViewModel.swift */; };
@@ -78,6 +78,8 @@
 		7CFF670C24AD0100007B80FA /* FileSystemRecordsStorageTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF670B24AD0100007B80FA /* FileSystemRecordsStorageTest.swift */; };
 		7CFF671424BCFC24007B80FA /* URLComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671324BCFC24007B80FA /* URLComponents.swift */; };
 		7CFF671624BCFC7B007B80FA /* RecordDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671524BCFC7B007B80FA /* RecordDownloader.swift */; };
+		7CFF671824BF6FC7007B80FA /* TrackList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671724BF6FC7007B80FA /* TrackList.swift */; };
+		7CFF671A24BF6FF4007B80FA /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFF671924BF6FF4007B80FA /* Track.swift */; };
 		B9112CDF2492241F00E0995E /* PlayingTrackManaging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9112CDE2492241F00E0995E /* PlayingTrackManaging.swift */; };
 		B9112CE12492263700E0995E /* DownloadedEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9112CE02492263700E0995E /* DownloadedEpisodesModel.swift */; };
 		B913BFAF24BD953900115A03 /* URLSessionScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = B913BFAE24BD953900115A03 /* URLSessionScheduler.swift */; };
@@ -167,7 +169,7 @@
 		7CF237B6246364CE00B7A09F /* AppPlayerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPlayerController.swift; sourceTree = "<group>"; };
 		7CF237BA2466529300B7A09F /* CMTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CMTime.swift; sourceTree = "<group>"; };
 		7CF237BC246779AE00B7A09F /* AppPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppPlayerView.swift; sourceTree = "<group>"; };
-		7CF33CF024794D8C0013E9FA /* EpisodeRecordsRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRecordsRepository.swift; sourceTree = "<group>"; };
+		7CF33CF024794D8C0013E9FA /* EpisodeRecordRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeRecordRepository.swift; sourceTree = "<group>"; };
 		7CF4788B2491AD3E0067D437 /* EpisodeRecordDescriptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodeRecordDescriptor.swift; sourceTree = "<group>"; };
 		7CF4788D249A93940067D437 /* FavoritePodcastsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritePodcastsViewModel.swift; sourceTree = "<group>"; };
 		7CF4788F249A93D90067D437 /* FavoritePodcastCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritePodcastCellViewModel.swift; sourceTree = "<group>"; };
@@ -178,6 +180,8 @@
 		7CFF670D24AD0100007B80FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7CFF671324BCFC24007B80FA /* URLComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLComponents.swift; sourceTree = "<group>"; };
 		7CFF671524BCFC7B007B80FA /* RecordDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordDownloader.swift; sourceTree = "<group>"; };
+		7CFF671724BF6FC7007B80FA /* TrackList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackList.swift; sourceTree = "<group>"; };
+		7CFF671924BF6FF4007B80FA /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
 		B9112CDE2492241F00E0995E /* PlayingTrackManaging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayingTrackManaging.swift; sourceTree = "<group>"; };
 		B9112CE02492263700E0995E /* DownloadedEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedEpisodesModel.swift; sourceTree = "<group>"; };
 		B913BFAE24BD953900115A03 /* URLSessionScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionScheduler.swift; sourceTree = "<group>"; };
@@ -270,10 +274,12 @@
 			isa = PBXGroup;
 			children = (
 				7CF4788B2491AD3E0067D437 /* EpisodeRecordDescriptor.swift */,
-				7CF33CF024794D8C0013E9FA /* EpisodeRecordsRepository.swift */,
+				7CF33CF024794D8C0013E9FA /* EpisodeRecordRepository.swift */,
 				7C466D49246205C10014D33A /* Episode.swift */,
 				7C35EE662460D6C30029DA95 /* Podcast.swift */,
 				7CEF30252468D4CA0045AB91 /* Player.swift */,
+				7CFF671924BF6FF4007B80FA /* Track.swift */,
+				7CFF671724BF6FC7007B80FA /* TrackList.swift */,
 				7CEF3044246934B80045AB91 /* EpisodesModel.swift */,
 				7CEC7A8324871216008FB3FC /* EpisodeModel.swift */,
 				7C3654CD2475FE4700EB68C4 /* FavoritePodcastsModel.swift */,
@@ -611,6 +617,7 @@
 				B9685B7C24A1E8FC0030DCAF /* DownloadedEpisodeCellViewModel.swift in Sources */,
 				7CEC7A8624871655008FB3FC /* FavoriteButtonItem.swift in Sources */,
 				B91E6D88248A6A8A00019AEC /* PodcastFetching.swift in Sources */,
+				7CFF671824BF6FC7007B80FA /* TrackList.swift in Sources */,
 				7C466D3A2460FEF70014D33A /* ITunesService.swift in Sources */,
 				B913BFAF24BD953900115A03 /* URLSessionScheduler.swift in Sources */,
 				B9958CAD2480FC8E00963BF0 /* TabBarAnimations.swift in Sources */,
@@ -618,6 +625,7 @@
 				7CEC7A792485C4BA008FB3FC /* AnyCache.swift in Sources */,
 				7C6BAD4C249E38D2005B6761 /* UISearchController.swift in Sources */,
 				7C466D3F246188E10014D33A /* PodcastCell.swift in Sources */,
+				7CFF671A24BF6FF4007B80FA /* Track.swift in Sources */,
 				7CA423AB246788B0009C4A18 /* MinimizePlayerView.swift in Sources */,
 				7C35EE4D2460CBD30029DA95 /* AppDelegate.swift in Sources */,
 				7CDCCB5324A3934E00E26752 /* AsyncImageView.swift in Sources */,
@@ -661,7 +669,7 @@
 				7C3F93FA2490021500835B7D /* AsyncOperationCanceller.swift in Sources */,
 				B91E6D80248A657100019AEC /* FavoritePodcastsStoraging.swift in Sources */,
 				7C35EE4F2460CBD30029DA95 /* SceneDelegate.swift in Sources */,
-				7CF33CF124794D8C0013E9FA /* EpisodeRecordsRepository.swift in Sources */,
+				7CF33CF124794D8C0013E9FA /* EpisodeRecordRepository.swift in Sources */,
 				7CEF30242468D3DC0045AB91 /* MediaCenterPlayerController.swift in Sources */,
 				7CEC7A8A248720C0008FB3FC /* Atomic.swift in Sources */,
 				7CEC7A80248711BB008FB3FC /* EpisodesViewModel.swift in Sources */,

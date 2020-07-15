@@ -53,6 +53,8 @@ final class EpisodesViewModel {
             break
         case .podcastStatusUpdated(let isPodcastFavorite):
             self.isPodcastFavorite = isPodcastFavorite
+        default:
+            break
         }
     }
 }

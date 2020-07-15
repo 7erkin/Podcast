@@ -73,40 +73,22 @@ final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDele
         )
     }()
     private lazy var foregroundSession: URLSession = { [unowned self] in
-        return URLSession(configuration: .default, delegate: self, delegateQueue: OperationQueue.current)
+        return URLSession(configuration: .default, delegate: self, delegateQueue: nil)
     }()
     private let scheduler: URLSessionScheduler
-    private var schedulerRegistrationCanceller: URLSessionScheduler.ResignSchedulerClient?
+    private var resignSchedulerClient: URLSessionScheduler.ResignSchedulerClient?
     init(backgroundSessionScheduler scheduler: URLSessionScheduler) {
         self.scheduler = scheduler
-        super.init()
-        initializeWithBackgroundSession()
-    }
-    
-    private func initializeWithBackgroundSession() {
-        backgroundSession.getAllTasks { tasks in
-            for task in tasks {
-                if let downloadTask = task as? URLSessionDownloadTask {
-                    downloadTask.cancel { [weak self] data in
-                        self?.serviceQueue.async {
-                            if let data = data {
-                                
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
     
     private func addToBackgroundSessionSchedulerIfNeeded() {
-        if schedulerRegistrationCanceller == nil {
-            schedulerRegistrationCanceller = try? scheduler.becomeSchedulerClient(self).wait()
+        if resignSchedulerClient == nil {
+            resignSchedulerClient = try? scheduler.becomeSchedulerClient(self).wait()
         }
     }
     
     private func removeFromBackgroundSessionScheduler() {
-        schedulerRegistrationCanceller?()
+        resignSchedulerClient?()
     }
     
     func downloadEpisodeRecord(
@@ -118,7 +100,8 @@ final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDele
                 let download = Download(episode: episode, downloadHandler: block)
                 self.activeDownloads[episode.streamUrl] = download
                 self.addToBackgroundSessionSchedulerIfNeeded()
-                download.task = self.foregroundSession.downloadTask(with: episode.streamUrl)
+                let session = URLSession(configuration: .default)
+                download.task = session.downloadTask(with: episode.streamUrl)
                 download.task?.resume()
                 block(.event(.started))
                 let manager = DownloadManager(
@@ -161,7 +144,6 @@ final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDele
         totalBytesWritten: Int64,
         totalBytesExpectedToWrite: Int64
     ) {
-        print(totalBytesWritten)
         if let url = downloadTask.originalRequest?.url {
             let progress = Double((100 * totalBytesWritten) / totalBytesExpectedToWrite) / 100
             let download = activeDownloads[url]

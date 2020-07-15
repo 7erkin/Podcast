@@ -22,6 +22,10 @@ final class DownloadedEpisodesViewModel {
             .stored(in: &subscriptions)
     }
     
+    func playEpisode(withIndex index: Int) {
+        model.playEpisode(withIndex: index)
+    }
+    
     private func updateWithModel(_ event: DownloadedEpisodesModelEvent) {
         switch event {
         case .initial(let state):

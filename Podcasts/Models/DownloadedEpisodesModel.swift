@@ -35,6 +35,7 @@ final class DownloadedEpisodesModel {
     private var subscribers = Subscribers<DownloadedEpisodesModelEvent>()
     private var subscriptions: [Subscription] = []
     private var state: State
+    private var currentTrackList: TrackList?
     // MARK: - dependencies
     private let recordRepository: EpisodeRecordRepositoring
     private let trackListPlayer: TrackListPlaying
@@ -55,6 +56,11 @@ final class DownloadedEpisodesModel {
     }
     
     func playEpisode(withIndex index: Int) {
+        if currentTrackList?.sourceIdentifier == DownloadedEpisodesModel.trackListIdentifier {
+            trackListPlayer.playTrack(atIndex: index)
+            return
+        }
+        
         let tracks = state.episodeRecords.map {
             Track(
                 episode: $0.episode,
@@ -63,7 +69,7 @@ final class DownloadedEpisodesModel {
             )
         }
         let trackList = TrackList(DownloadedEpisodesModel.trackListIdentifier, tracks: tracks, playingTrackIndex: index)
-        trackListPlayer.setTrackList(trackList)
+        trackListPlayer.setTrackList(trackList, reasonOfSetting: .setNewTrackList)
     }
     
     private func updateWithRecordRepository(_ event: EpisodeRecordRepositoryEvent) {
@@ -90,7 +96,16 @@ final class DownloadedEpisodesModel {
         }
     }
     
-    private func updateWithTrackListPlayer(_ event: TrackListPlayerEvent) {}
+    private func updateWithTrackListPlayer(_ event: TrackListPlayerEvent) {
+        switch event {
+        case .initial(let trackList):
+            currentTrackList = trackList
+        case .playingTrackUpdated(let trackList):
+            currentTrackList = trackList
+        case .trackListUpdated(let trackList):
+            currentTrackList = trackList
+        }
+    }
     
     func subscribe(
         _ subscriber: @escaping (DownloadedEpisodesModelEvent) -> Void

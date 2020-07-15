@@ -9,7 +9,7 @@
 import Foundation 
 import PromiseKit
 
-final class EpisodeRecordsRepository: EpisodeRecordRepositoring {
+final class EpisodeRecordRepository: EpisodeRecordRepositoring {
     private(set) var downloads: EpisodesDownloads
     private var subscribers = Subscribers<EpisodeRecordRepositoryEvent>()
     private var downloadManagers: [Episode:DownloadManager] = [:]

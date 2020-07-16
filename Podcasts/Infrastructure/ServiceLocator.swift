@@ -20,4 +20,5 @@ final class ServiceLocator {
     )
     static let favoritePodcastsStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastStorage()
     static let backgroundSessionScheduler = URLSessionScheduler()
+    static let networkReachability = NetworkReachability()
 }

@@ -22,9 +22,14 @@ final class Download<DownloadHandler> {
     }
 }
 
-final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDelegate {
+final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDownloadDelegate {
     private var activeDownloads: [URL:Download<EpisodeRecordDownloading.Handler>] = [:]
     private lazy var foregroundSession: URLSession = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+    private lazy var backgroundSession: URLSession = { [unowned self] in
+        let configuration = URLSessionConfiguration.background(withIdentifier: "background.session")
+        configuration.sessionSendsLaunchEvents = true
+        return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+    }()
     
     func downloadEpisodeRecord(
         episode: Episode,
@@ -32,7 +37,6 @@ final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDele
     ) -> DownloadManager {
         let download = Download(episode: episode, downloadHandler: block)
         self.activeDownloads[episode.streamUrl] = download
-        // self.addToBackgroundSessionSchedulerIfNeeded()
         let request = URLRequest(
             url: episode.streamUrl,
             cachePolicy: .returnCacheDataElseLoad,
@@ -56,7 +60,10 @@ final class RecordDownloader: NSObject, EpisodeRecordDownloading, URLSessionDele
     ) {
         if
             let url = downloadTask.originalRequest?.url,
-            let temporaryUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent(location.lastPathComponent)
+            let temporaryUrl = FileManager.default
+                .urls(for: .documentDirectory, in: .userDomainMask)
+                .first?
+                .appendingPathComponent(location.lastPathComponent)
         {
             do {
                 try FileManager.default.moveItem(at: location, to: temporaryUrl)

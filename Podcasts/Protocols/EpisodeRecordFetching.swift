@@ -40,5 +40,5 @@ protocol EpisodeRecordDownloading: class {
     func downloadEpisodeRecord(
         episode: Episode,
         _ block: @escaping Handler
-    ) -> DownloadManager
+    ) -> Promise<DownloadManager>
 }

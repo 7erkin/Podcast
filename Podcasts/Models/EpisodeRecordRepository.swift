@@ -39,45 +39,13 @@ final class EpisodeRecordRepository: EpisodeRecordRepositoring {
     }
     
     func downloadRecord(ofEpisode episode: Episode, ofPodcast podcast: Podcast) {
-        downloadManagers[episode] = recordDownloader.downloadEpisodeRecord(episode: episode) { [weak self] in
-            guard let self = self else { return }
-            
-            if case .event(let event) = $0 {
-                switch event {
-                case .fulfilled(let url):
-                    if let index = self.downloads.active.firstIndex(where: episode) {
-                        self.downloads.active.remove(at: index)
-                    }
-                    firstly {
-                        return self.recordStorage.saveRecord(withUrl: url, ofEpisode: episode, ofPodcast: podcast)
-                    }.done {
-                        self.downloads.fulfilled = $0
-                        self.subscribers.fire(.downloadFulfilled(episode, podcast, self.downloads))
-                    }.catch { _ in print("Err!") }
-                case .inProgress(let progress):
-                    if let index = self.downloads.active.firstIndex(where: { $0.episode == episode }) {
-                        self.downloads.active[index].progress = progress
-                        self.subscribers.fire(.download(self.downloads))
-                    }
-                case .started:
-                    self.downloads.active.append(.init(episode: episode, podcast: podcast, progress: 0))
-                    self.subscribers.fire(.downloadStarted(episode, podcast, self.downloads))
-                case .canceled:
-                    self.downloads.active.remove(where: episode)
-                    self.subscribers.fire(.downloadCancelled(episode, podcast, self.downloads))
-                case .suspended:
-                    if let download = self.downloads.active.remove(where: episode) {
-                        self.downloads.suspended.append(download)
-                        self.subscribers.fire(.downloadSuspended(episode, podcast, self.downloads))
-                    }
-                case .resumed:
-                    if let download = self.downloads.suspended.remove(where: episode) {
-                        self.downloads.active.append(download)
-                        self.subscribers.fire(.downloadResumed(episode, podcast, self.downloads))
-                    }
-                }
+        firstly {
+            recordDownloader.downloadEpisodeRecord(episode: episode) { [weak self] in
+                self?.updateWithRecordDownloader($0, episode: episode, podcast: podcast)
             }
-        }
+        }.done {
+            self.downloadManagers[episode] = $0
+        }.catch { _ in }
     }
     
     func pauseDownloadRecord(ofEpisode episode: Episode) {
@@ -95,5 +63,43 @@ final class EpisodeRecordRepository: EpisodeRecordRepositoring {
     func subscribe(_ subscriber: @escaping (EpisodeRecordRepositoryEvent) -> Void) -> Subscription {
         subscriber(.initial(self.downloads))
         return subscribers.subscribe(action: subscriber)
+    }
+    
+    private func updateWithRecordDownloader(_ result: EpisodeRecordDownloadResult, episode: Episode, podcast: Podcast) {
+        if case .event(let event) = result {
+            switch event {
+            case .fulfilled(let url):
+                if let index = self.downloads.active.firstIndex(where: episode) {
+                    self.downloads.active.remove(at: index)
+                }
+                firstly {
+                    return self.recordStorage.saveRecord(withUrl: url, ofEpisode: episode, ofPodcast: podcast)
+                }.done {
+                    self.downloads.fulfilled = $0
+                    self.subscribers.fire(.downloadFulfilled(episode, podcast, self.downloads))
+                }.catch { _ in print("Err!") }
+            case .inProgress(let progress):
+                if let index = self.downloads.active.firstIndex(where: { $0.episode == episode }) {
+                    self.downloads.active[index].progress = progress
+                    self.subscribers.fire(.download(self.downloads))
+                }
+            case .started:
+                self.downloads.active.append(.init(episode: episode, podcast: podcast, progress: 0))
+                self.subscribers.fire(.downloadStarted(episode, podcast, self.downloads))
+            case .canceled:
+                self.downloads.active.remove(where: episode)
+                self.subscribers.fire(.downloadCancelled(episode, podcast, self.downloads))
+            case .suspended:
+                if let download = self.downloads.active.remove(where: episode) {
+                    self.downloads.suspended.append(download)
+                    self.subscribers.fire(.downloadSuspended(episode, podcast, self.downloads))
+                }
+            case .resumed:
+                if let download = self.downloads.suspended.remove(where: episode) {
+                    self.downloads.active.append(download)
+                    self.subscribers.fire(.downloadResumed(episode, podcast, self.downloads))
+                }
+            }
+        }
     }
 }

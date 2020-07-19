@@ -52,11 +52,15 @@ final class AppPlayerController: UIViewController {
             hasAppPlayerViewBeenPresented = true
         }
         
-        appPlayerView.playerState = playerState
+        appPlayerView.playingTrackState = playerState
     }
 }
 
 extension AppPlayerController: PlayerManaging {
+    func setVolume(_ volume: Float) {
+        player.setVolume(volume)
+    }
+    
     func fastForward15() {
         player.fastForward15()
     }

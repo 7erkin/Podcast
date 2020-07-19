@@ -19,6 +19,7 @@ protocol PlayerManaging: class {
     func rewind15()
     func moveToPlaybackTime(_ playbackTime: CMTime)
     func playPause()
+    func setVolume(_ volume: Float)
 }
 
 final class AppPlayerView: UIView {
@@ -88,12 +89,12 @@ final class AppPlayerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    var playerState: PlayingTrackState? {
+    var playingTrackState: PlayingTrackState? {
         set {
-            maximizePlayerView.playerState = newValue
+            maximizePlayerView.playingTrackState = newValue
             minimizePlayerView.playerState = newValue
         }
-        get { maximizePlayerView.playerState }
+        get { maximizePlayerView.playingTrackState }
     }
     
     var delegate: PlayerViewDelegate! {

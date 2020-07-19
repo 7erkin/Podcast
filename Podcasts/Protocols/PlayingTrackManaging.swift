@@ -24,7 +24,7 @@ struct PlayingTrackState: CustomStringConvertible {
     var track: Track?
     var trackPlaybackTime: CMTime? = nil
     var trackDuration: CMTime? = nil
-    var volumeLevel: Int
+    var volume: Float
 }
 
 enum PlayingTrackManagerEvent {
@@ -37,7 +37,7 @@ protocol PlayingTrackManaging: class {
     func fastForward15()
     func rewind15()
     func playPause()
-    func setVolumeLevel(_ volumeLevel: Int)
+    func setVolume(_ volume: Float)
     func subscribe(
         _ subscriber: @escaping (PlayingTrackManagerEvent) -> Void
     ) -> Subscription

@@ -11,11 +11,12 @@ import Combine
 
 final class Player: PlayingTrackManaging, TrackListPlaying {
     // MARK: - private properties
-    private var subscriptions: [Subscription] = []
+    private var subscriptions: Set<AnyCancellable> = []
     private let playingTrackManagerSubscribers = Subscribers<PlayingTrackManagerEvent>()
     private let trackListPlayerSubscribers = Subscribers<TrackListPlayerEvent>()
     private lazy var player: AVPlayer = { [weak self] in
         let player = AVPlayer()
+        self?.playingTrackState.volume = player.volume
         player.automaticallyWaitsToMinimizeStalling = false
         let interval = CMTime(seconds: 1, preferredTimescale: 1)
         let updatePlayerState: (CMTime) -> Void = { _ in
@@ -48,7 +49,13 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
     private var trackListToCommit: TrackList?
     // MARK: - Singleton
     private init() {
-        playingTrackState = PlayingTrackState(isPlaying: false, volumeLevel: 2)
+        playingTrackState = PlayingTrackState(isPlaying: false, volume: 0)
+//        AVAudioSession.sharedInstance()
+//            .publisher(for: \.outputVolume)
+//            .receive(on: DispatchQueue.main)
+//            .sink { self.playingTrackState.volumeLevel = $0 }
+//            .store(in: &subscriptions)
+        
         configureAudioSession()
     }
     static let shared = Player()
@@ -65,8 +72,9 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         seekToTime(time)
     }
     
-    func setVolumeLevel(_ volumeLevel: Int) {
-        player.volume = 2
+    func setVolume(_ volume: Float) {
+        player.volume = volume
+        playingTrackState.volume = volume
     }
     
     func subscribe(_ subscriber: @escaping (PlayingTrackManagerEvent) -> Void) -> Subscription {
@@ -146,7 +154,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
         player.pause()
         let playerItem = AVPlayerItem(url: track.url)
         player.replaceCurrentItem(with: playerItem)
-        playingTrackState = PlayingTrackState(isPlaying: false, track: track, volumeLevel: 2)
+        playingTrackState = PlayingTrackState(isPlaying: false, track: track, volume: 2)
         isPlayerPausedByClient = false
         player.play()
     }

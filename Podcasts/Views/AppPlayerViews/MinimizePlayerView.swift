@@ -10,7 +10,11 @@ import UIKit
 import PromiseKit
 
 final class MinimizePlayerView: UIStackView {
-    @IBOutlet var episodeImageView: AsyncImageView!
+    @IBOutlet var episodeImageView: AsyncImageView! {
+        didSet {
+            self.episodeImageView.image = UIImage(named: "appicon")
+        }
+    }
     @IBOutlet var episodeNameLabel: UILabel!
     @IBOutlet var playPauseButton: UIButton!
     
@@ -28,7 +32,13 @@ final class MinimizePlayerView: UIStackView {
         didSet {
             let image = self.playerState.isPlaying ? pauseImage : playImage
             playPauseButton.setImage(image, for: .normal)
-            episodeImageView.imageUrl = self.playerState.track?.episode.imageUrl
+            episodeNameLabel.text = self.playerState.track?.episode.name
+            if let nextImageUrl = self.playerState.track?.episode.imageUrl {
+                if episodeImageView.imageUrl != nextImageUrl {
+                    blurEpisodeImageView()
+                    episodeImageView.imageUrl = nextImageUrl
+                }
+            }
         }
     }
     
@@ -47,14 +57,14 @@ final class MinimizePlayerView: UIStackView {
     }
     
     private func blurEpisodeImageView() {
-        guard let ciImage = CIImage(image: episodeImageView.image!) else { return }
-        
-        let blurFilter = CIFilter(name: "CIGaussianBlur")
-        blurFilter?.setValue(ciImage, forKey: kCIInputImageKey)
-        blurFilter?.setValue(20.0, forKey: kCIInputRadiusKey)
-        
-        guard let outputImage = blurFilter?.outputImage else { return }
-        
-        episodeImageView.image = UIImage(ciImage: outputImage)
+        if let image = episodeImageView.image, let ciImage = CIImage(image: image) {
+            let blurFilter = CIFilter(name: "CIGaussianBlur")
+            blurFilter?.setValue(ciImage, forKey: kCIInputImageKey)
+            blurFilter?.setValue(1.0, forKey: kCIInputRadiusKey)
+            
+            guard let outputImage = blurFilter?.outputImage else { return }
+            
+            episodeImageView.image = UIImage(ciImage: outputImage)
+        }
     }
 }

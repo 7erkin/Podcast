@@ -12,7 +12,8 @@ import PromiseKit
 
 final class MaximizePlayerView: UIView {
     // MARK: - constants
-    private let undefinedDurationPlaceholder = "--:--:--"
+    private let durationPlaceholder = "--:--"
+    private let playbackTimePlaceholder = "00:00"
     private let timeSliderDefaultMinValue: Float = 0
     private let timeSliderDefaultMaxValue: Float = 1
     //MARK: - outlets
@@ -20,6 +21,12 @@ final class MaximizePlayerView: UIView {
         didSet {
             self.timeSlider.isContinuous = false
             self.timeSlider.minimumValue = timeSliderDefaultMinValue
+        }
+    }
+    @IBOutlet var volumeSlider: UISlider! {
+        didSet {
+            self.volumeSlider.minimumValue = 0
+            self.volumeSlider.maximumValue = 1
         }
     }
     @IBOutlet var episodeNameLabel: UILabel!
@@ -32,6 +39,7 @@ final class MaximizePlayerView: UIView {
             self.episodeImageView.clipsToBounds = true
             self.episodeImageView.startLoadingImage = {}
             self.episodeImageView.finishLoadingImage = {}
+            self.episodeImageView.image = UIImage(named: "appicon")
         }
     }
     @IBOutlet var playPauseButton: UIButton!
@@ -66,6 +74,10 @@ final class MaximizePlayerView: UIView {
         playerManager.playPause()
     }
     
+    @IBAction func onVolumeChanged(_ sender: Any) {
+        playerManager.setVolume(volumeSlider.value)
+    }
+    
     @objc
     private func onSwipe() {
         delegate.dissmis()
@@ -84,7 +96,7 @@ final class MaximizePlayerView: UIView {
     private var isPlaybackSliderUpdateAvailable: Bool = true
     private var expectedPlaybackTime: CMTime?
     // MARK: -
-    var playerState: PlayingTrackState! { didSet { updateViewWithPlayerState() } }
+    var playingTrackState: PlayingTrackState! { didSet { updateViewWithPlayerState() } }
     // MARK: - override methods
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -101,7 +113,7 @@ final class MaximizePlayerView: UIView {
     }
     
     private func setupInitialViewState() {
-        episodeDurationLabel.text = undefinedDurationPlaceholder
+        episodeDurationLabel.text = durationPlaceholder
         timeSlider.maximumValue = timeSliderDefaultMaxValue
         timeSlider.value = timeSliderDefaultMinValue
         playPauseButton.setImage(playImage, for: .normal)
@@ -110,13 +122,13 @@ final class MaximizePlayerView: UIView {
     
     // MARK: - update view functions
     private func updateViewWithPlayerState() {
-        if let track = playerState.track {
+        if let track = playingTrackState.track {
             if episodeImageView.imageUrl != track.episode.imageUrl {
                 episodeImageView.imageUrl = track.episode.imageUrl
             }
             // update play/pause button
             var playPauseButtonImage: UIImage!
-            if playerState.isPlaying {
+            if playingTrackState.isPlaying {
                 playPauseButtonImage = pauseImage
                 if isEpisodeImageViewShrinked() {
                     performEpisodeImageViewAnimatedEnlarge()
@@ -129,14 +141,20 @@ final class MaximizePlayerView: UIView {
             }
             playPauseButton.setImage(playPauseButtonImage, for: .normal)
             // update playback time label
-            episodePlaybackTimeLabel.text = playerState.trackPlaybackTime?.toPlayerTimePresentation
+            episodePlaybackTimeLabel.text = playingTrackState.trackPlaybackTime?.toPlayerTimePresentation ?? playbackTimePlaceholder
             // update duration label and slider
-            if let duration = playerState.trackDuration {
-                episodeDurationLabel.text = duration.convertable ? duration.toPlayerTimePresentation : undefinedDurationPlaceholder
+            if let duration = playingTrackState.trackDuration {
+                episodeDurationLabel.text = duration.convertable ? duration.toPlayerTimePresentation : durationPlaceholder
                 // timeSlider.maximumValue = Float(duration.roundedSeconds)
             } else {
-                episodeDurationLabel.text = undefinedDurationPlaceholder
+                episodeDurationLabel.text = durationPlaceholder
             }
+            // update episode name label
+            episodeNameLabel.text = playingTrackState.track?.episode.name
+            // update artist name label
+            authorLabel.text = playingTrackState.track?.episode.author
+            // update volume
+            volumeSlider.value = playingTrackState.volume
         }
     }
     

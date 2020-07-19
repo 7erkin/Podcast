@@ -7,63 +7,47 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A9339D3A-1E51-495D-BA33-96D2F9AB3FF2"
+            uuid = "4F535B8D-038C-4296-8EBC-1DD66BCE0DC1"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Podcasts/Networking/RecordDownloader.swift"
+            filePath = "Podcasts/Models/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "81"
-            endingLineNumber = "81"
-            landmarkName = "urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "30212160-AA4B-439F-BE55-510F9595F66F"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Podcasts/Networking/RecordDownloader.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "82"
-            endingLineNumber = "82"
-            landmarkName = "urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:)"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
+            landmarkName = "init()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "30212160-AA4B-439F-BE55-510F9595F66F - 94c7fa31b42615c2"
+                  uuid = "4F535B8D-038C-4296-8EBC-1DD66BCE0DC1 - da962b4663b17773"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "Podcasts.RecordDownloader.urlSession(_: __C.NSURLSession, downloadTask: __C.NSURLSessionDownloadTask, didWriteData: Swift.Int64, totalBytesWritten: Swift.Int64, totalBytesExpectedToWrite: Swift.Int64) -&gt; ()"
+                  symbolName = "Podcasts.Player.() -&gt; Podcasts.Player(in _DBA067C8AD45DF6060CCC759D76CAFFF).init() -&gt; Podcasts.Player"
                   moduleName = "Podcasts"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/oleg/Desktop/dev/iOS/letsbuildthatapp/Podcast/Podcasts/Networking/RecordDownloader.swift"
+                  urlString = "file:///Users/oleg/Desktop/dev/iOS/letsbuildthatapp/Podcast/Podcasts/Models/Player.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "147"
-                  endingLineNumber = "147"
-                  offsetFromSymbolStart = "1159">
+                  startingLineNumber = "55"
+                  endingLineNumber = "55"
+                  offsetFromSymbolStart = "1879">
                </Location>
                <Location
-                  uuid = "30212160-AA4B-439F-BE55-510F9595F66F - 94c7fa31b42615c2"
+                  uuid = "4F535B8D-038C-4296-8EBC-1DD66BCE0DC1 - 8d6f00e6e483fcdc"
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "Podcasts.RecordDownloader.urlSession(_: __C.NSURLSession, downloadTask: __C.NSURLSessionDownloadTask, didWriteData: Swift.Int64, totalBytesWritten: Swift.Int64, totalBytesExpectedToWrite: Swift.Int64) -&gt; ()"
+                  symbolName = "closure #1 (Swift.Float) -&gt; () in Podcasts.Player.() -&gt; Podcasts.Player(in _DBA067C8AD45DF6060CCC759D76CAFFF).init() -&gt; Podcasts.Player"
                   moduleName = "Podcasts"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/oleg/Desktop/dev/iOS/letsbuildthatapp/Podcast/Podcasts/Networking/RecordDownloader.swift"
+                  urlString = "file:///Users/oleg/Desktop/dev/iOS/letsbuildthatapp/Podcast/Podcasts/Models/Player.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "147"
-                  endingLineNumber = "147"
-                  offsetFromSymbolStart = "1249">
+                  startingLineNumber = "55"
+                  endingLineNumber = "55"
+                  offsetFromSymbolStart = "93">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -71,80 +55,48 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "B7ECCE09-FA04-41CA-A0AC-0FDF2F8E442B"
+            uuid = "39361BCE-5E88-43FE-B59D-3475D8A363C4"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Podcasts/Models/EpisodesModel.swift"
+            filePath = "Podcasts/Models/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "75"
-            endingLineNumber = "75"
-            landmarkName = "playEpisode(withIndex:)"
+            startingLineNumber = "61"
+            endingLineNumber = "61"
+            landmarkName = "init()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "9BC5440E-F5E7-4752-88D4-29A4C7DE309C"
+            uuid = "F47F89E4-EF5B-4DE0-853F-E03A690B041F"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Podcasts/Models/EpisodesModel.swift"
+            filePath = "Podcasts/Models/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "34"
-            endingLineNumber = "34"
-            landmarkName = "currentPlayingTrackList"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
+            landmarkName = "player"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C7C51619-DDE6-4CFF-8845-1580FC415D34"
+            uuid = "1195F04C-75AA-4D8C-A443-EBB0B310A0DA"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Podcasts/Models/DownloadedEpisodesModel.swift"
+            filePath = "Podcasts/Models/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
-            landmarkName = "playEpisode(withIndex:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "BE4799EB-93F4-4335-BF4E-63AE99295CE5"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Podcasts/Networking/RecordDownloader.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "89"
-            endingLineNumber = "89"
-            landmarkName = "urlSession(_:task:didCompleteWithError:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "42EFCD1A-64DB-4F17-843A-68A0975EC6F4"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Podcasts/Networking/RecordDownloader.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "57"
-            endingLineNumber = "57"
-            landmarkName = "urlSession(_:downloadTask:didFinishDownloadingTo:)"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
+            landmarkName = "setVolume(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

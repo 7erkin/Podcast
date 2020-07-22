@@ -7,18 +7,19 @@
 //
 
 import Foundation
-
+// это плохо, я знаю
 final class ServiceLocator {
     static let podcastService: PodcastFetching & EpisodeFetching = ITunesService.shared
-    static let episodeRecordDownloader: EpisodeRecordDownloading = RecordDownloader(
-        urlSessionScheduler: ServiceLocator.backgroundSessionScheduler
+    static let episodeRecordDownloader: EpisodeRecordDownloading = EpisodeRecordDownloader(
+        sessionScheduler: ServiceLocator.sessionScheduler
     )
     static let recordStorage: EpisodeRecordStoraging = FileSystemRecordsStorage()!
     static let recordRepository: EpisodeRecordRepositoring = EpisodeRecordRepository(
         recordStorage: ServiceLocator.recordStorage,
-        recordFetcher: ServiceLocator.episodeRecordDownloader
+        recordDownloader: ServiceLocator.episodeRecordDownloader
     )
     static let favoritePodcastsStorage: FavoritePodcastsStoraging = UserDefaultsFavoritePodcastStorage()
-    static let backgroundSessionScheduler = URLSessionScheduler()
+    static let sessionScheduler = SessionScheduler()
     static let networkReachability = NetworkReachability()
+    static let urlSessionLogger: URLSessionLogger? = nil
 }

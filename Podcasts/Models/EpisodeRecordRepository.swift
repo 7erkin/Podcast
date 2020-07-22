@@ -8,19 +8,25 @@
 
 import Foundation 
 import PromiseKit
+import Combine
 
 final class EpisodeRecordRepository: EpisodeRecordRepositoring {
-    private(set) var downloads: EpisodesDownloads
+    private(set) var downloads: [EpisodeDownload]
     private var subscribers = Subscribers<EpisodeRecordRepositoryEvent>()
-    private var downloadManagers: [Episode:DownloadManager] = [:]
+    private var subscriptions: Set<AnyCancellable> = []
     // MARK: - dependencies
     private let recordStorage: EpisodeRecordStoraging
     private let recordDownloader: EpisodeRecordDownloading
     // MARK: -
-    init(recordStorage: EpisodeRecordStoraging, recordFetcher: EpisodeRecordDownloading) {
+    init(recordStorage: EpisodeRecordStoraging, recordDownloader: EpisodeRecordDownloading) {
         downloads = .init()
         self.recordStorage = recordStorage
-        self.recordDownloader = recordFetcher
+        self.recordDownloader = recordDownloader
+        self.recordDownloader
+            .publisher
+            .sink { [weak self] in self?.updateWithRecordDownloader($0) }
+            .store(in: &subscriptions)
+        
         firstly {
             recordStorage.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
         }.done {
@@ -39,25 +45,11 @@ final class EpisodeRecordRepository: EpisodeRecordRepositoring {
     }
     
     func downloadRecord(ofEpisode episode: Episode, ofPodcast podcast: Podcast) {
-        firstly {
-            recordDownloader.downloadEpisodeRecord(episode: episode) { [weak self] in
-                self?.updateWithRecordDownloader($0, episode: episode, podcast: podcast)
-            }
-        }.done {
-            self.downloadManagers[episode] = $0
-        }.catch { _ in }
-    }
-    
-    func pauseDownloadRecord(ofEpisode episode: Episode) {
-        downloadManagers[episode]?.suspend()
-    }
-    
-    func resumeDownloadRecord(ofEpisode episode: Episode) {
-        downloadManagers[episode]?.resume()
+        recordDownloader.downloadEpisodeRecord(episode)
     }
     
     func cancelDownloadRecord(ofEpisode episode: Episode) {
-        downloadManagers.removeValue(forKey: episode)?.cancel()
+        recordDownloader.cancelEpisodeRecordDownload(episode)
     }
     
     func subscribe(_ subscriber: @escaping (EpisodeRecordRepositoryEvent) -> Void) -> Subscription {
@@ -65,41 +57,18 @@ final class EpisodeRecordRepository: EpisodeRecordRepositoring {
         return subscribers.subscribe(action: subscriber)
     }
     
-    private func updateWithRecordDownloader(_ result: EpisodeRecordDownloadResult, episode: Episode, podcast: Podcast) {
-        if case .event(let event) = result {
-            switch event {
-            case .fulfilled(let url):
-                if let index = self.downloads.active.firstIndex(where: episode) {
-                    self.downloads.active.remove(at: index)
-                }
-                firstly {
-                    return self.recordStorage.saveRecord(withUrl: url, ofEpisode: episode, ofPodcast: podcast)
-                }.done {
-                    self.downloads.fulfilled = $0
-                    self.subscribers.fire(.downloadFulfilled(episode, podcast, self.downloads))
-                }.catch { _ in print("Err!") }
-            case .inProgress(let progress):
-                if let index = self.downloads.active.firstIndex(where: { $0.episode == episode }) {
-                    self.downloads.active[index].progress = progress
-                    self.subscribers.fire(.download(self.downloads))
-                }
-            case .started:
-                self.downloads.active.append(.init(episode: episode, podcast: podcast, progress: 0))
-                self.subscribers.fire(.downloadStarted(episode, podcast, self.downloads))
-            case .canceled:
-                self.downloads.active.remove(where: episode)
-                self.subscribers.fire(.downloadCancelled(episode, podcast, self.downloads))
-            case .suspended:
-                if let download = self.downloads.active.remove(where: episode) {
-                    self.downloads.suspended.append(download)
-                    self.subscribers.fire(.downloadSuspended(episode, podcast, self.downloads))
-                }
-            case .resumed:
-                if let download = self.downloads.suspended.remove(where: episode) {
-                    self.downloads.active.append(download)
-                    self.subscribers.fire(.downloadResumed(episode, podcast, self.downloads))
-                }
-            }
+    private func updateWithRecordDownloader(_ event: EpisodeRecordDownloaderEvent) {
+        switch event {
+        case .recovered(let episodes, let state):
+            downloads.active = state.downloads
+        case .progressUpdated(let episode, let state):
+            break
+        case .started(let episode, let state):
+            break
+        case .fulfilled(let episode, let url, let state):
+            break
+        case .cancelled(let episode, let state):
+            break
         }
     }
 }

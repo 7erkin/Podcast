@@ -55,8 +55,6 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
 //            .receive(on: DispatchQueue.main)
 //            .sink { self.playingTrackState.volumeLevel = $0 }
 //            .store(in: &subscriptions)
-        
-        configureAudioSession()
     }
     static let shared = Player()
     // MARK: - PlayingTrackManaging
@@ -87,6 +85,7 @@ final class Player: PlayingTrackManaging, TrackListPlaying {
             isPlayerPausedByClient = true
             playingTrackState.isPlaying = false
         } else {
+            configureAudioSession()
             isPlayerPausedByClient = false
             player.play()
         }

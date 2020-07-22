@@ -6,9 +6,10 @@
 //  Copyright © 2020 Олег Черных. All rights reserved.
 //
 
+import Foundation
+
 protocol URLSessionSchedulable: class {
     var sessionId: String { get }
-    func backgroundTransit()
-    func foregroundTransit()
-    func handleSessionEvent(_ completionHandler: @escaping () -> Void)
+    func transitToBackgroundSessionExecution()
+    func transitToForegroundSessionExecution()
 }

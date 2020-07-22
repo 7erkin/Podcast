@@ -101,7 +101,8 @@ final class PodcastsSearchController: UITableViewController, UISearchBarDelegate
                 podcast: podcast,
                 podcastStorage: ServiceLocator.favoritePodcastsStorage,
                 episodeFetcher: ServiceLocator.podcastService,
-                trackListPlayer: Player.shared
+                trackListPlayer: Player.shared,
+                networkReachability: ServiceLocator.networkReachability
             )
             let viewModel = EpisodesViewModel(model: model)
             let controller = EpisodesController()

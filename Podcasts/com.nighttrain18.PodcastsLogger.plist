@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+   logger.plist
+   Podcasts
+
+   Created by Олег Черных on 19.07.2020.
+   Copyright (c) 2020 Олег Черных. All rights reserved.
+-->
+<!--
+Should be copy to /Library/Preferences/Logging/Subsystems/ (probably it ensured with build scripts)
+execute: sudo cp com.nighttrain18.PodcastsLogger.plist /Library/Preferences/Logging/Subsystems/
+-->
+<plist version="1.0">
+    <dict>
+        <key>DEFAULT-OPTIONS</key>
+        <dict>
+        </dict>
+    </dict>
+</plist>

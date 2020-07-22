@@ -44,15 +44,15 @@ final class EpisodesViewModel {
     
     private func updateWithModel(_ event: EpisodesModelEvent) {
         switch event {
-        case .initial(let podcast, let episodes, let isPodcastFavorite):
-            podcastName = podcast.name
-            episodeCellViewModels = episodes.map { createEpisodeCellViewModel(episode: $0, podcast: podcast) }
-            self.isPodcastFavorite = isPodcastFavorite
-        case .episodesFetched(let podcast, let episodes):
-            episodeCellViewModels = episodes.map { createEpisodeCellViewModel(episode: $0, podcast: podcast) }
+        case .initial(let state):
+            podcastName = state.podcast.name
+            episodeCellViewModels = state.episodes.map { createEpisodeCellViewModel(episode: $0, podcast: state.podcast) }
+            self.isPodcastFavorite = state.isPodcastFavorite ?? false
+        case .episodesFetched(let state):
+            episodeCellViewModels = state.episodes.map { createEpisodeCellViewModel(episode: $0, podcast: state.podcast) }
             break
-        case .podcastStatusUpdated(let isPodcastFavorite):
-            self.isPodcastFavorite = isPodcastFavorite
+        case .podcastStatusUpdated(let state):
+            self.isPodcastFavorite = state.isPodcastFavorite ?? false
         default:
             break
         }

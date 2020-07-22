@@ -21,7 +21,7 @@ final class DownloadedEpisodesModel {
     private static let trackListIdentifier = "DownloadedEpisodesTrackList"
     struct State {
         var episodeRecords: [EpisodeRecordDescriptor]
-        var downloadEpisodes: [DownloadEpisode]
+        var downloadEpisodes: [EpisodeDownload]
         init() {
             self.episodeRecords = []
             self.downloadEpisodes = []

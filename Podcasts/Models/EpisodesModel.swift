@@ -8,32 +8,64 @@
 
 import Foundation
 import PromiseKit
+import Combine
 
 enum EpisodesModelEvent {
-    case initial(Podcast, [Episode], Bool)
-    case episodesFetched(Podcast, [Episode])
-    case podcastStatusUpdated(Bool)
-    case playingTrackIndexUpdated(Int?)
+    case initial(EpisodesModel.State)
+    case episodesFetched(EpisodesModel.State)
+    case podcastStatusUpdated(EpisodesModel.State)
+    case playingTrackIndexUpdated(EpisodesModel.State)
+    case networkReachabilityChanged(EpisodesModel.State)
 }
 
 final class EpisodesModel {
-    private lazy var trackListIdentifier: String = { [unowned self] in self.podcast.name ?? "\(UUID())" }()
-    private var podcast: Podcast
-    private var episodes: [Episode] = [] { didSet { subscribers.fire(.episodesFetched(podcast, self.episodes)) } }
-    private var isPodcastFavorite: Bool = false { didSet { subscribers.fire(.podcastStatusUpdated(self.isPodcastFavorite)) } }
+    struct State {
+        var emit: ((EpisodesModelEvent) -> Void)?
+        var podcast: Podcast
+        var episodes: [Episode] = []
+        var isEpisodesFetching: Bool = false {
+            willSet {
+                if self.isEpisodesFetching == newValue { return }
+                if self.isEpisodesFetching {
+                    emit?(.episodesFetched(self))
+                }
+            }
+            didSet {
+                emit?(.episodesFetched(self))
+            }
+        }
+        var isPodcastFavorite: Bool? {
+            didSet {
+                emit?(.podcastStatusUpdated(self))
+            }
+        }
+        var isNetworkReachable: Bool? {
+            didSet {
+                emit?(.networkReachabilityChanged(self))
+            }
+        }
+        var playingTrackIndex: Int? {
+            didSet {
+                emit?(.playingTrackIndexUpdated(self))
+            }
+        }
+    }
+    private var state: State
+    private lazy var trackListSourceIdentifier: String = { [unowned self] in self.state.podcast.name ?? "\(UUID())" }()
     // MARK: - dependencies
     private var podcastStorage: FavoritePodcastsStoraging
     private var trackListPlayer: TrackListPlaying
     // MARK: -
+    private var combineSubscriptions: Set<AnyCancellable> = []
     private var subscriptions: [Subscription] = []
     private var subscribers = Subscribers<EpisodesModelEvent>()
     private var currentPlayingTrackList: TrackList? {
         willSet {
-            if trackListIdentifier == self.currentPlayingTrackList?.sourceIdentifier {
-                if self.currentPlayingTrackList?.currentPlayingTrackIndex != newValue?.currentPlayingTrackIndex {
-                    subscribers.fire(.playingTrackIndexUpdated(newValue?.currentPlayingTrackIndex))
-                }
-            }
+//            if trackListIdentifier == self.currentPlayingTrackList?.sourceIdentifier {
+//                if self.currentPlayingTrackList?.currentPlayingTrackIndex != newValue?.currentPlayingTrackIndex {
+//                    subscribers.fire(.playingTrackIndexUpdated(newValue?.currentPlayingTrackIndex))
+//                }
+//            }
         }
     }
     // MARK: -
@@ -41,12 +73,13 @@ final class EpisodesModel {
         podcast: Podcast,
         podcastStorage: FavoritePodcastsStoraging,
         episodeFetcher: EpisodeFetching,
-        trackListPlayer: TrackListPlaying
+        trackListPlayer: TrackListPlaying,
+        networkReachability: NetworkReachability?
     ) {
-        self.podcast = podcast
         self.podcastStorage = podcastStorage
         self.trackListPlayer = trackListPlayer
-        
+        state = .init(podcast: podcast)
+        state.emit = { [weak self] in self?.emit(event: $0) }
         self.podcastStorage
             .subscribe { [weak self] in self?.updateWithFavoritePodcastsStorage($0) }
             .stored(in: &subscriptions)
@@ -55,43 +88,52 @@ final class EpisodesModel {
             .subscribe { [weak self] in self?.updateWithTrackListPlayer($0) }
             .stored(in: &subscriptions)
         
+        if let reachability = networkReachability {
+            reachability
+                .$publisher
+                .sink { _ in }
+                .store(in: &combineSubscriptions)
+        }
+        
         fetchEpisodes(withEpisodeFetcher: episodeFetcher)
     }
     
     func subscribe(
         _ subscriber: @escaping (EpisodesModelEvent) -> Void
     ) -> Subscription {
-        subscriber(.initial(podcast, episodes, isPodcastFavorite))
+        subscriber(.initial(state))
         return subscribers.subscribe(action: subscriber)
     }
     
     func savePodcastAsFavorite() {
-        podcastStorage.saveAsFavorite(podcast: podcast)
+        podcastStorage.saveAsFavorite(podcast: state.podcast)
     }
     
     func playEpisode(withIndex index: Int) {
         if let trackList = currentPlayingTrackList {
-            if trackList.sourceIdentifier == trackListIdentifier {
+            if trackList.sourceIdentifier == trackListSourceIdentifier {
                 trackListPlayer.playTrack(atIndex: index)
                 return
             }
         }
         
         let trackList = TrackList(
-            trackListIdentifier,
-            tracks: episodes.map { Track(episode: $0, podcast: podcast, url: $0.streamUrl) }, playingTrackIndex: index
+            trackListSourceIdentifier,
+            tracks: state.episodes.map { Track(episode: $0, podcast: state.podcast, url: $0.streamUrl) },
+            playingTrackIndex: index
         )
         trackListPlayer.setTrackList(trackList, reasonOfSetting: .setNewTrackList)
     }
     // MARK: - helpers
     private func fetchEpisodes(withEpisodeFetcher episodeFetcher: EpisodeFetching) {
-        if let feedUrl = self.podcast.feedUrl {
+        if let feedUrl = self.state.podcast.feedUrl {
             episodeFetcher.fetchEpisodes(url: feedUrl) { [weak self] result in
                 guard let self = self else { return }
                 
                 switch result {
                 case .success(let episodes):
-                    self.episodes = episodes.applyPodcastImageIfNeeded(self.podcast)
+                    self.state.episodes = episodes.applyPodcastImageIfNeeded(self.state.podcast)
+                    self.state.isEpisodesFetching = false
                 case .failure(_):
                     break
                 }
@@ -113,11 +155,15 @@ final class EpisodesModel {
     private func updateWithFavoritePodcastsStorage(_ event: FavoritePodcastsStorageEvent) {
         switch event {
         case .initial(let podcasts):
-            isPodcastFavorite = podcasts.contains(podcast)
+            state.isPodcastFavorite = podcasts.contains(state.podcast)
         case .removed(let podcast, _):
-            isPodcastFavorite = podcast == self.podcast
+            state.isPodcastFavorite = podcast == self.state.podcast
         case .saved(let podcast, _):
-            isPodcastFavorite = podcast == self.podcast
+            state.isPodcastFavorite = podcast == self.state.podcast
         }
+    }
+    
+    private func emit(event: EpisodesModelEvent) {
+        subscribers.fire(event)
     }
 }

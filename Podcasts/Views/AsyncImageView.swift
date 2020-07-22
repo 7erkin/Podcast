@@ -32,13 +32,8 @@ final class AsyncImageView: UIImageView {
         let handler = ImageFetcher.Handler(
             handleOn: DispatchQueue.main,
             block: { [weak self] in
-                if self?.imageUrl != url { return }
-                self?.finishLoadingImage?()
-                switch $0 {
-                case .success(let image):
-                    self?.image = image
-                default:
-                    self?.image = UIImage(named: "appicon")
+                if self?.imageUrl == url {
+                    self?.handleImageLoad($0)
                 }
             }
         )
@@ -48,5 +43,15 @@ final class AsyncImageView: UIImageView {
             withImageSize: self.frame.size,
             completionHandler: handler
         )
+    }
+    
+    private func handleImageLoad(_ result: ImageFetcher.ImageFetcherResult) {
+        finishLoadingImage?()
+        switch result {
+        case .success(let image):
+            self.image = image
+        default:
+            image = UIImage(named: "appicon")
+        }
     }
 }

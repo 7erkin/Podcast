@@ -68,8 +68,7 @@ final class ITunesService: EpisodeFetching, PodcastFetching {
                 let searchResults = try? JSONDecoder().decode(SearchResults.self, from: data)
             {
                 completionHandler(.success(searchResults.results))
-            } else {
-            }
+            } else { }
         }
         task.resume()
     }

@@ -73,8 +73,7 @@ final class EpisodesModel {
         podcast: Podcast,
         podcastStorage: FavoritePodcastsStoraging,
         episodeFetcher: EpisodeFetching,
-        trackListPlayer: TrackListPlaying,
-        networkReachability: NetworkReachability?
+        trackListPlayer: TrackListPlaying
     ) {
         self.podcastStorage = podcastStorage
         self.trackListPlayer = trackListPlayer
@@ -87,13 +86,6 @@ final class EpisodesModel {
         self.trackListPlayer
             .subscribe { [weak self] in self?.updateWithTrackListPlayer($0) }
             .stored(in: &subscriptions)
-        
-        if let reachability = networkReachability {
-            reachability
-                .$publisher
-                .sink { _ in }
-                .store(in: &combineSubscriptions)
-        }
         
         fetchEpisodes(withEpisodeFetcher: episodeFetcher)
     }

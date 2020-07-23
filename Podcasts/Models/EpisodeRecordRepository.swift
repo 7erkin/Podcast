@@ -11,15 +11,16 @@ import PromiseKit
 import Combine
 
 final class EpisodeRecordRepository: EpisodeRecordRepositoring {
-    private(set) var downloads: [EpisodeDownload]
     private var subscribers = Subscribers<EpisodeRecordRepositoryEvent>()
     private var subscriptions: Set<AnyCancellable> = []
+    private var state = EpisodeRecordRepositoryState()
+    private var episodeToPodcast: [Episode:Podcast] = [:]
     // MARK: - dependencies
     private let recordStorage: EpisodeRecordStoraging
     private let recordDownloader: EpisodeRecordDownloading
     // MARK: -
     init(recordStorage: EpisodeRecordStoraging, recordDownloader: EpisodeRecordDownloading) {
-        downloads = .init()
+        state = .init()
         self.recordStorage = recordStorage
         self.recordDownloader = recordDownloader
         self.recordDownloader
@@ -30,8 +31,8 @@ final class EpisodeRecordRepository: EpisodeRecordRepositoring {
         firstly {
             recordStorage.getEpisodeRecordDescriptors(withSortPolicy: { $0.dateOfCreate > $1.dateOfCreate })
         }.done {
-            self.downloads.fulfilled = $0
-            self.subscribers.fire(.initial(self.downloads))
+            self.state.localDownloads = $0
+            self.subscribers.fire(.initial(self.state))
         }.catch { _ in }
     }
     // MARK: - EpisodeRecordRepositoring impl
@@ -39,12 +40,13 @@ final class EpisodeRecordRepository: EpisodeRecordRepositoring {
         firstly {
             recordStorage.removeRecord(recordDescriptor)
         }.done {
-            self.downloads.fulfilled = $0
-            self.subscribers.fire(.removed(recordDescriptor, self.downloads))
+            self.state.localDownloads = $0
+            self.subscribers.fire(.removed(recordDescriptor, self.state))
         }.catch { _ in }
     }
     
     func downloadRecord(ofEpisode episode: Episode, ofPodcast podcast: Podcast) {
+        episodeToPodcast[episode] = podcast
         recordDownloader.downloadEpisodeRecord(episode)
     }
     
@@ -53,22 +55,31 @@ final class EpisodeRecordRepository: EpisodeRecordRepositoring {
     }
     
     func subscribe(_ subscriber: @escaping (EpisodeRecordRepositoryEvent) -> Void) -> Subscription {
-        subscriber(.initial(self.downloads))
+        subscriber(.initial(self.state))
         return subscribers.subscribe(action: subscriber)
     }
     
     private func updateWithRecordDownloader(_ event: EpisodeRecordDownloaderEvent) {
         switch event {
-        case .recovered(let episodes, let state):
-            downloads.active = state.downloads
-        case .progressUpdated(let episode, let state):
-            break
+        case .recovered(_, let state):
+            self.state.activeDownloads = state.downloads
+        case .progressUpdated(_, let state):
+            self.state.activeDownloads = state.downloads
+            subscribers.fire(.download(self.state))
         case .started(let episode, let state):
-            break
+            self.state.activeDownloads = state.downloads
+            subscribers.fire(.downloadStarted(episode, episodeToPodcast[episode]!, self.state))
         case .fulfilled(let episode, let url, let state):
-            break
+            self.state.activeDownloads = state.downloads
+            firstly {
+                self.recordStorage.saveRecord(withUrl: url, ofEpisode: episode, ofPodcast: episodeToPodcast[episode]!)
+            }.done {
+                self.state.localDownloads = $0
+                self.subscribers.fire(.downloadFulfilled(episode, self.episodeToPodcast[episode]!, self.state))
+            }.catch { _ in }
         case .cancelled(let episode, let state):
-            break
+            self.state.activeDownloads = state.downloads
+            subscribers.fire(.downloadCancelled(episode, episodeToPodcast[episode]!, self.state))
         }
     }
 }

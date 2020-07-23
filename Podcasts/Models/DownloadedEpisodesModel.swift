@@ -20,16 +20,12 @@ enum DownloadedEpisodesModelEvent {
 final class DownloadedEpisodesModel {
     private static let trackListIdentifier = "DownloadedEpisodesTrackList"
     struct State {
-        var episodeRecords: [EpisodeRecordDescriptor]
-        var downloadEpisodes: [EpisodeDownload]
-        init() {
-            self.episodeRecords = []
-            self.downloadEpisodes = []
-        }
+        var activeDownloads: [EpisodeDownload]
+        var localDownloads: [EpisodeRecordDescriptor]
         
-        init(_ episodesDownloads: EpisodesDownloads) {
-            episodeRecords = episodesDownloads.fulfilled
-            downloadEpisodes = episodesDownloads.active
+        init(_ state: EpisodeRecordRepositoryState) {
+            self.activeDownloads = state.activeDownloads
+            self.localDownloads = state.localDownloads
         }
     }
     private var subscribers = Subscribers<DownloadedEpisodesModelEvent>()
@@ -44,7 +40,6 @@ final class DownloadedEpisodesModel {
         recordRepository: EpisodeRecordRepositoring,
         trackListPlayer: TrackListPlaying
     ) {
-        state = .init()
         self.recordRepository = recordRepository
         self.trackListPlayer = trackListPlayer
         self.recordRepository
@@ -61,7 +56,7 @@ final class DownloadedEpisodesModel {
             return
         }
         
-        let tracks = state.episodeRecords.map {
+        let tracks = state.localDownloads.map {
             Track(
                 episode: $0.episode,
                 podcast: $0.podcast,
@@ -74,9 +69,9 @@ final class DownloadedEpisodesModel {
     
     private func updateWithRecordRepository(_ event: EpisodeRecordRepositoryEvent) {
         switch event {
-        case .initial(let episodesDownloads):
-            state = .init(episodesDownloads)
-            subscribers.fire(.initial(state))
+        case .initial(let state):
+            self.state = .init(state)
+            subscribers.fire(.initial(self.state))
         case .downloadStarted(let episode, let podcast, let episodesDownloads):
             state = .init(episodesDownloads)
             subscribers.fire(.downloadStarted(episode, podcast, state))
@@ -91,8 +86,6 @@ final class DownloadedEpisodesModel {
         case .removed(let recordDescriptor, let episodesDownloads):
             state = .init(episodesDownloads)
             subscribers.fire(.recordRemoved(recordDescriptor.episode, state))
-        default:
-            break
         }
     }
     

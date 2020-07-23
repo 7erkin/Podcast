@@ -90,6 +90,10 @@ extension EpisodeRecordDownloader: URLSessionSchedulable {
             }
         }
     }
+    
+    func terminateAllSessions() {
+        backgroundSession.getAllTasks { $0.forEach { $0.cancel() } }
+    }
 }
 
 private extension Episode {

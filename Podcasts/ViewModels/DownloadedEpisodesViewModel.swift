@@ -29,7 +29,7 @@ final class DownloadedEpisodesViewModel {
     private func updateWithModel(_ event: DownloadedEpisodesModelEvent) {
         switch event {
         case .initial(let state):
-            downloadEpisodeViewModels = state.downloadEpisodes.map {
+            downloadEpisodeViewModels = state.activeDownloads.map {
                 EpisodeCellViewModel(
                     model: .init(
                         episode: $0.episode,
@@ -39,7 +39,7 @@ final class DownloadedEpisodesViewModel {
                 )
             }
             
-            episodeRecordViewModels = state.episodeRecords.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
+            episodeRecordViewModels = state.localDownloads.map { DownloadedEpisodeCellViewModel(episode: $0.episode) }
         case .downloaded(let episode, _):
             if let index = downloadEpisodeViewModels.firstIndex(where: { $0.episode == episode }) {
                 downloadEpisodeViewModels.remove(at: index)

@@ -12,4 +12,5 @@ protocol URLSessionSchedulable: class {
     var sessionId: String { get }
     func transitToBackgroundSessionExecution()
     func transitToForegroundSessionExecution()
+    func terminateAllSessions()
 }

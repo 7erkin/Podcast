@@ -51,19 +51,19 @@ final class EpisodeModel {
     
     private func updateWithRecordRepository(_ event: EpisodeRecordRepositoryEvent) {
         switch event {
-        case .initial(let episodesDownloads):
-            if let download = episodesDownloads.active.first(where: { $0.episode == episode }) {
+        case .initial(let state):
+            if let download = state.activeDownloads.first(where: { $0.episode == episode }) {
                 downloadStatus = .inProgress(download.progress)
             } else {
-                if episodesDownloads.fulfilled.contains(where: { $0.episode == episode }) {
+                if state.localDownloads.contains(where: { $0.episode == episode }) {
                     downloadStatus = .downloaded
                 } else {
                     downloadStatus = .downloadNotLaunched
                 }
             }
-        case .downloadStarted(let episode, _, let episodesDownloads):
+        case .downloadStarted(let episode, _, let state):
             if self.episode == episode {
-                if let progress = episodesDownloads.active.first(where: { $0.episode == episode })?.progress {
+                if let progress = state.activeDownloads.first(where: { $0.episode == episode })?.progress {
                     downloadStatus = .inProgress(progress)
                 }
             }
@@ -71,8 +71,8 @@ final class EpisodeModel {
             if self.episode == episode {
                 downloadStatus = .downloadNotLaunched
             }
-        case .download(let episodesDownloads):
-            if let progress = episodesDownloads.active.first(where: { $0.episode == episode })?.progress {
+        case .download(let state):
+            if let progress = state.activeDownloads.first(where: { $0.episode == episode })?.progress {
                 downloadStatus = .inProgress(progress)
             }
         case .downloadFulfilled(let episode, _, _):

@@ -135,7 +135,6 @@
 		7CA423A824678874009C4A18 /* MinimizePlayerView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MinimizePlayerView.xib; sourceTree = "<group>"; };
 		7CA423AA246788B0009C4A18 /* MinimizePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MinimizePlayerView.swift; sourceTree = "<group>"; };
 		7CA423AC246788BB009C4A18 /* MaximizePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaximizePlayerView.swift; sourceTree = "<group>"; };
-		7CAA5DFA2472F8EC00ADD087 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		7CAA5DFD2473029400ADD087 /* FavoritePodcastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritePodcastCell.swift; sourceTree = "<group>"; };
 		7CAA5E0424732E2300ADD087 /* UserDefaultsFavoritePodcastStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsFavoritePodcastStorage.swift; sourceTree = "<group>"; };
 		7CDB722824797EB600EF487D /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
@@ -458,7 +457,6 @@
 			isa = PBXGroup;
 			children = (
 				7CDB722824797EB600EF487D /* Main.storyboard */,
-				7CAA5DFA2472F8EC00ADD087 /* TODO.md */,
 				7C35EE572460CBD50029DA95 /* LaunchScreen.storyboard */,
 				7C35EE552460CBD50029DA95 /* Assets.xcassets */,
 			);
